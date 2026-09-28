@@ -1,0 +1,17 @@
+{
+  "kind": "interface-demo-state-not-personal-measurements",
+  "note": "Last explored conversation state, preserved as context only. These are not required initial defaults and do not record any real sewing completion.",
+  "state": {
+    "delta": 12,
+    "stage": "sew",
+    "piece": "sleeve",
+    "original": false,
+    "width": 110,
+    "saved": null,
+    "steps": [
+      true,
+      true,
+      true
+    ]
+  }
+}

@@ -1,0 +1,16 @@
+node_modules/
+.npm-cache/
+.next/
+*.tsbuildinfo
+dist/
+coverage/
+playwright-report/
+test-results/
+.env
+.env.*
+!.env.example
+*.log
+.DS_Store
+Thumbs.db
+/devpost/learner-profile.md
+
