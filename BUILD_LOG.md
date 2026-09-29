@@ -2,6 +2,20 @@
 
 All checks below ran against the Stitches folder on the local Windows machine. This log distinguishes illustrative work from live provider or pattern proof.
 
+## September 29, 2026 — Sanity knowledge layer in progress
+
+- Follow-up: `sanity@6.15.0` online install eventually succeeded after 35m50s and intermittent TLS retries. The local Studio schema typechecked with `tsc --noEmit`; `sanity schemas extract --help` and `sanity schemas validate --workspace stitches-development --level error` each stalled for minutes and were interrupted, so neither is counted as a validation pass.
+- Added an authored illustrative source and fabric requirement, bringing the seed fixture to 13 records. `node --env-file=.env.local scripts/seed-development.mjs` passed dry run with 13 records, zero writes. Running it without the environment file failed at its project/dataset guard, as intended. `--apply` without `SANITY_WRITE_TOKEN` was also refused.
+- Latest verification after Context adapter refactoring: `tsc --noEmit` passed; `vitest run --testTimeout 15000` passed 18/18 in five files (26.16s); `next build` passed compile (3.6m), TypeScript, page generation, and optimization with exit code 0. This is local/fixture/mock verification, not a live Stitches knowledge proof.
+- Read-only Stitches development probe returned 0 published records. A live, read-only Crossgrade Context probe listed `initial_context` and `knowledge_base_read` and returned an outline; its content was not used as Stitches knowledge. Gemini `models.list` with the Crossgrade key showed both requested Flash candidates support `generateContent`, but no paid or free-tier inference has yet been run. No secret value was logged.
+
+- Created a separate Stitches project (`l4eeamth`) in the existing Sanity organization, with an empty `production` dataset and a dedicated public `development` dataset. No Stitches documents or schema were uploaded; no billing option was selected. The project is on Sanity's free trial/free-tier path, subject to Sanity's published terms and quotas.
+- Implemented a strict runtime knowledge graph resolver, a fixed-query `@sanity/client` adapter, a read-only Context MCP adapter, local Studio schema source, and a development-only fixture seeder. Wired the illustrative worktable effect trail to the resolver rather than a hardcoded affected-piece count. The local `.env.local` contains public Stitches IDs only; no token values were printed or written by the agent.
+- `pnpm add --offline sanity@6.15.0 @sanity/client@8.6.2 zod@4.6.5` was interrupted after very slow 805-package processing. Retrying only `@sanity/client` and `zod` offline failed because `get-it@9.5.5` was absent from the local store. Online retry succeeded in 1m 14s. The full Studio dependency install is still in progress and has encountered intermittent npm SSL/socket retries.
+- First parallel verification: `tsc --noEmit` found a generic type-narrowing error and the Context test's overly narrow environment type; both were corrected. `vitest run` passed 14/15, with the first knowledge test timing out at its default 5s during a cold, resource-constrained parallel run. After correction, `tsc --noEmit` passed and `vitest run --testTimeout 15000` passed 15/15 across five files in 5.35s. This is fixture/mock evidence only, not a live Sanity or Context result.
+- `node --env-file=.env.local scripts/seed-development.mjs` first failed while the concurrent Studio install temporarily removed the client link; moving the client import to the apply branch made the dry run independent of that install. Dry run then passed: 12 illustrative records selected for `l4eeamth/development`, zero writes.
+- Browser-control helper timed out twice before returning a page state, so no token or Knowledge Base was created through UI automation in this slice. No stale UI coordinate was used. Live Sanity data and Context gates remain open.
+
 ## September 28, 2026 — first worktable slice
 
 - Added pinned Next.js 16.3.5, React 19.3.0, TypeScript 5.9.3, Vitest 5.0.1, and pnpm 11.19.0 lockfile; created the responsive Fit worktable and sample SVG interaction.

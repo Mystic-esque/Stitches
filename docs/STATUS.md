@@ -2,6 +2,25 @@
 
 Updated: September 29, 2026.
 
+## Current checkpoint — September 29, 2026
+
+- The local Sanity knowledge implementation is typechecked, tested, and production-built, but BUILD-PLAN milestone 2 is **not complete**: the separate Stitches development dataset contains zero published records, and no Stitches Knowledge Base has been created or queried. Nothing was written to Sanity production. The worktable still uses an explicitly illustrative fixture.
+- `sanity@6.15.0`, `@sanity/client@8.6.2`, and `zod@4.6.5` are installed. Studio schema source typechecks. The Sanity CLI schema extract and validate invocations stalled and were interrupted; CLI schema validation is unverified.
+- Latest verification: `tsc --noEmit` passed; `vitest run --testTimeout 15000` passed 18/18 tests; `next build` passed all stages and generated the dynamic app and demo API routes; the guarded seed dry run selected 13 illustrative records with zero writes. The first seed command without `.env.local` correctly refused to run because project/dataset configuration was absent.
+- A read-only probe of Stitches `development` returned zero published knowledge records. A separate live probe of the existing Crossgrade organization Context endpoint listed two Knowledge Base tools and returned an outline. That proves the adapter can contact Context, **not** that Stitches has a Knowledge Base. A read-only Gemini model list showed `gemini-3.8-flash` and `gemini-3.7-flash` as accessible for `generateContent`; no inference was made and neither model is yet qualified by the product gates.
+- Stitches still needs its own scoped development write token and Context Knowledge Base/MCP endpoint and viewer token, or equivalent authorized access. The Crossgrade write token is not used for Stitches. Continue independent drafting and agent infrastructure without relabeling fixture or mocked results as live.
+
+Next executable task: build a deterministic, scoped drafting/checking spike while keeping maker review and live Sanity/Context gates open; then wire the real Stitches knowledge path once its credentials and KB are available.
+
+## Sanity knowledge slice — in progress, September 29, 2026
+
+- Dedicated Sanity project `l4eeamth` exists; `development` is reserved for illustrative/editorial integration work and `production` is untouched. Added public IDs to `.env.example` and a Git-ignored `.env.local`; Stitches secret values are still missing.
+- Knowledge resolver, fixed-query Sanity adapter, Context MCP adapter, Studio schema source, and a safe dry-run seeder are in the worktree. The fixture-derived effect trail now drives the worktable's affected-piece and review summary. These changes are not yet a completed BUILD-PLAN milestone.
+- Current evidence: `tsc --noEmit` passed after type fixes; `vitest run --testTimeout 15000` passed 15/15. The initial default-timeout test run passed 14/15 and timed out one cold test; no assertion failed. Seeder dry run reported 12 illustrative records and made no writes. Studio dependency install and fresh production build remain pending. All Sanity/Context tests so far used fixtures or a mock transport, not live retrieval.
+- Browser-control helper timed out twice, before any fresh page state was available, so dashboard automation stopped. Live Context Knowledge Base setup, organization token, development write token, Sanity document mutation, schema extraction, and editorial correction proof remain open.
+
+Next executable task: finish the local Studio package install, extract/type-check its schema, rerun production build, then seed the dedicated development dataset only after an appropriate Stitches write token is configured. Establish a real Stitches Knowledge Base/MCP endpoint and verify its served entries separately from the fixture tests.
+
 ## Second implementation slice — September 29, 2026
 
 - Added a server-owned, single-user local demo project store under ignored `.data/`, with immutable original/accepted revision records, content fingerprint, idempotency key, serialized updates, and atomic file replacement. The accept route checks sample bounds and rejects stale project or fixture-content bases; progress writes validate width and sewing prerequisites. This is an illustrative local adapter, not an authenticated or live Sanity-backed project service.

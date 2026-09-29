@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { demoPattern, demoPiecePath, normalizeDemoAmount, type PieceKey } from "@/domain/demo-pattern";
 import { currentRevision, type DemoProject, type StepKey } from "@/domain/demo-project";
+import type { PatternSnapshot } from "@/domain/knowledge/resolve-pattern";
 
 const positions: Record<PieceKey, { x: number; y: number; scale: number; letterY: number; labelY: number }> = {
   front: { x: 78, y: 48, scale: .84, letterY: 145, labelY: 290 },
@@ -48,7 +49,7 @@ const sewingSteps: { key: StepKey; title: string; description: string; affected:
   { key: "prepare-sleeves", title: "Prepare the sleeves", description: "Check the sleeve-cap relationship before setting either sleeve.", affected: true },
 ];
 
-export function Worktable({ initialProject, contentFingerprint }: { initialProject: DemoProject; contentFingerprint: string }) {
+export function Worktable({ initialProject, contentFingerprint, knowledge }: { initialProject: DemoProject; contentFingerprint: string; knowledge: PatternSnapshot }) {
   const [project, setProject] = useState(initialProject);
   const [stage, setStage] = useState<Stage>("fit");
   const [amount, setAmount] = useState(() => currentRevision(initialProject).amountMm === 0 ? 10 : currentRevision(initialProject).amountMm);
@@ -60,6 +61,9 @@ export function Worktable({ initialProject, contentFingerprint }: { initialProje
   const piece = demoPattern.pieces.find((entry) => entry.key === selected)!;
   const accepted = currentRevision(project);
   const hasProposal = amount !== accepted.amountMm;
+  const effects = knowledge.effectsByOperation["shoulder-width"];
+  const directlyAffected = effects?.pieces.filter((item) => item.via === "direct") ?? [];
+  const joinAffected = effects?.pieces.filter((item) => item.via === "join") ?? [];
   const currentSteps = sewingSteps.filter((step) => project.completedStepRevision[step.key] === project.currentSequence).length;
 
   async function updateProject(url: string, method: "POST" | "PATCH", body: object) {
@@ -106,7 +110,7 @@ export function Worktable({ initialProject, contentFingerprint }: { initialProje
       {stage === "fit" && <section className="canvas-panel" aria-labelledby="canvas-title">
         <div className="canvas-toolbar"><h2 id="canvas-title">The pattern, connected.</h2><button type="button" className="outline-button" aria-pressed={originalView} onClick={() => setOriginalView((value) => !value)}>{originalView ? "See proposal" : "See original"}</button></div>
         <div className="pattern-paper"><PatternMap amount={amount} selected={selected} originalView={originalView} /><div className="map-legend"><span><i className="legend-proposal" /> Proposed change</span><span><i className="legend-original" /> Original outline</span></div></div>
-        <div className="canvas-note" aria-live="polite"><span className="branch-icon" aria-hidden="true">⌘</span><div><strong>{selected === "sleeve" ? "The sleeve follows the armhole." : "One adjustment. Three connected pieces."}</strong><span>{piece.reason}</span></div></div>
+        <div className="canvas-note" aria-live="polite"><span className="branch-icon" aria-hidden="true">⌘</span><div><strong>{effects?.pieces.some((item) => item.pieceId === `piece.${selected}`) ? `${effects.pieces.length} pieces in this knowledge trail.` : "This piece is outside the selected rule."}</strong><span>{piece.reason}</span></div></div>
       </section>}
       {stage === "fabric" && <section className="canvas-panel" aria-labelledby="fabric-title">
         <div className="canvas-toolbar"><h2 id="fabric-title">Make the most of your linen.</h2><span className="context-muted">Layout study only</span></div>
@@ -138,8 +142,8 @@ export function Worktable({ initialProject, contentFingerprint }: { initialProje
         <div className="range-ends" id="amount-help"><span>Original</span><span>+20 mm demo limit</span></div>
         <div className="lock-notice"><span aria-hidden="true">♧</span> Neckline shown unchanged in concept preview</div>
         <p className="impact-heading eyebrow">What follows this change</p>
-        <ol className="impact-list"><li><span>01</span><div><strong>Front + back</strong><small>Shoulder points move in this illustration</small></div></li><li><span>02</span><div><strong>Sleeve cap</strong><small>Real seam and ease check still needed</small></div></li><li><span>03</span><div><strong>Fabric + instructions</strong><small>Review after a verified version exists</small></div></li></ol>
-        <details className="why-details"><summary>Why these pieces?</summary><p>This sample links the shoulder rule to front and back pieces and an armhole–sleeve join. The source is <code>{demoPattern.sourceId}</code>. These relationships are illustrative; no seam or fit validity is claimed.</p></details>
+        <ol className="impact-list"><li><span>01</span><div><strong>{directlyAffected.map((item) => item.pieceTitle).join(" + ") || "No direct pieces"}</strong><small>Directly linked by the structured adjustment rule</small></div></li><li><span>02</span><div><strong>{joinAffected.map((item) => item.pieceTitle).join(" + ") || "No additional join pieces"}</strong><small>{effects?.unresolvedChecks.length ?? 0} seam relationship(s) still unreviewed</small></div></li><li><span>03</span><div><strong>Fabric + instructions</strong><small>{effects?.stepIds.length ?? 0} linked step(s); {effects?.invalidates.join(" and ") || "no"} invalidation</small></div></li></ol>
+        <details className="why-details"><summary>Why these pieces?</summary><p>This trail is computed from <code>{knowledge.ruleIds.join(", ")}</code> and source <code>{knowledge.sourceIds.join(", ")}</code>, fingerprint <code>{knowledge.fingerprint.slice(0, 12)}</code>. The records are illustrative; seam validity is unresolved and cutting is not authorized.</p></details>
         <div className="proposal-end"><div className="not-ready">Illustrative proposal · not for cutting</div><p className="accepted-basis">Accepted: revision {project.currentSequence} · +{accepted.amountMm} mm sample change</p><button className="keep-button" type="button" disabled={!hasProposal || busy} onClick={() => void keepProposal()}>{busy ? "Saving…" : "Keep this demo version →"}</button><div className="proposal-secondary"><button type="button" onClick={() => setAmount(accepted.amountMm)} disabled={!hasProposal || busy}>Discard proposal</button><button type="button" onClick={() => { setAmount(0); setOriginalView(false); }} disabled={busy}>Propose original</button></div><p>Your original remains in revision history.</p></div>
       </aside>}
       {stage === "fabric" && <aside className="proposal-panel" aria-label="Fabric planning">
