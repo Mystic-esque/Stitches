@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { demoPattern, demoPiecePath, normalizeDemoAmount, type PieceKey } from "@/domain/demo-pattern";
+import { currentRevision, type DemoProject, type StepKey } from "@/domain/demo-project";
 
 const positions: Record<PieceKey, { x: number; y: number; scale: number; letterY: number; labelY: number }> = {
   front: { x: 78, y: 48, scale: .84, letterY: 145, labelY: 290 },
@@ -39,21 +40,61 @@ function PatternMap({ amount, originalView, selected }: { amount: number; origin
   </svg>;
 }
 
-export function Worktable() {
-  const [amount, setAmount] = useState(10);
+type Stage = "fit" | "fabric" | "sew";
+
+const sewingSteps: { key: StepKey; title: string; description: string; affected: boolean }[] = [
+  { key: "join-shoulders", title: "Join the shoulders", description: "Match the front and back shoulder seams. Use the seam allowance specified by your reviewed pattern.", affected: true },
+  { key: "finish-neckline", title: "Finish the neckline", description: "After joining the shoulders, finish the neckline using the version-specific instructions.", affected: false },
+  { key: "prepare-sleeves", title: "Prepare the sleeves", description: "Check the sleeve-cap relationship before setting either sleeve.", affected: true },
+];
+
+export function Worktable({ initialProject, contentFingerprint }: { initialProject: DemoProject; contentFingerprint: string }) {
+  const [project, setProject] = useState(initialProject);
+  const [stage, setStage] = useState<Stage>("fit");
+  const [amount, setAmount] = useState(() => currentRevision(initialProject).amountMm === 0 ? 10 : currentRevision(initialProject).amountMm);
   const [selected, setSelected] = useState<PieceKey>("front");
   const [originalView, setOriginalView] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [notice, setNotice] = useState("");
+  const [noticeKind, setNoticeKind] = useState<"error" | "success">("success");
   const piece = demoPattern.pieces.find((entry) => entry.key === selected)!;
+  const accepted = currentRevision(project);
+  const hasProposal = amount !== accepted.amountMm;
+  const currentSteps = sewingSteps.filter((step) => project.completedStepRevision[step.key] === project.currentSequence).length;
+
+  async function updateProject(url: string, method: "POST" | "PATCH", body: object) {
+    setBusy(true);
+    setNotice("");
+    try {
+      const response = await fetch(url, { method, headers: { "content-type": "application/json" }, body: JSON.stringify(body) });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error?.message ?? "The local demo could not save this change.");
+      setProject(result.project as DemoProject);
+      return result.project as DemoProject;
+    } catch (error) {
+      setNoticeKind("error");
+      setNotice(error instanceof Error ? error.message : "The local demo is unavailable. Your accepted version was not changed.");
+      return null;
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function keepProposal() {
+    if (!hasProposal || busy) return;
+    const next = await updateProject("/api/demo/accept", "POST", { baseSequence: project.currentSequence, amountMm: amount, contentFingerprint, requestId: crypto.randomUUID() });
+    if (next) { setNoticeKind("success"); setNotice(`Demo revision ${next.currentSequence} saved. Fabric and sewing checks need review.`); }
+  }
 
   return <main className="studio-shell">
     <header className="topbar">
       <div className="wordmark">stitches.</div>
       <p className="topbar-promise">A little more you. In every seam.</p>
-      <div className="topbar-end"><span className="status-dot" /> Illustrative worktable <span className="avatar" aria-label="Sample workspace">DEMO</span></div>
+      <div className="topbar-end"><span className="status-dot" /> Demo revision {project.currentSequence} <span className="avatar" aria-label="Sample workspace">DEMO</span></div>
     </header>
     <div className="project-heading">
       <div><p className="eyebrow">On your worktable / Project 01</p><h1>{demoPattern.title}</h1><p className="subhead">Relaxed silhouette · Woven linen · Sample measurements</p></div>
-      <nav className="stage-tabs" aria-label="Project stages"><span className="stage-tab active" aria-current="step"><small>01</small> Fit</span><span className="stage-tab inactive"><small>02</small> Fabric <em>next</em></span><span className="stage-tab inactive"><small>03</small> Sew <em>next</em></span></nav>
+      <nav className="stage-tabs" aria-label="Project stages">{(["fit", "fabric", "sew"] as const).map((item, index) => <button key={item} type="button" className={`stage-tab ${stage === item ? "active" : "inactive"}`} aria-current={stage === item ? "step" : undefined} onClick={() => setStage(item)}><small>0{index + 1}</small> {item[0].toUpperCase() + item.slice(1)}</button>)}</nav>
     </div>
     <div className="worktable-grid">
       <aside className="context-panel" aria-label="Project context">
@@ -62,12 +103,35 @@ export function Worktable() {
         <div className="piece-list">{demoPattern.pieces.map((item) => <button key={item.key} type="button" className={`piece-button ${selected === item.key ? "selected" : ""}`} aria-pressed={selected === item.key} onClick={() => setSelected(item.key)}><span className="piece-code">{item.code}</span><span>{item.title}</span><span className="change-dot" aria-hidden="true" /></button>)}</div>
         <div className="context-rule" /><p className="eyebrow">From your stash</p><div className="fabric-swatch" role="img" aria-label="Illustrative oatmeal linen weave" /><p className="context-muted">Oatmeal linen<br />2.00 m available · sample data</p>
       </aside>
-      <section className="canvas-panel" aria-labelledby="canvas-title">
+      {stage === "fit" && <section className="canvas-panel" aria-labelledby="canvas-title">
         <div className="canvas-toolbar"><h2 id="canvas-title">The pattern, connected.</h2><button type="button" className="outline-button" aria-pressed={originalView} onClick={() => setOriginalView((value) => !value)}>{originalView ? "See proposal" : "See original"}</button></div>
         <div className="pattern-paper"><PatternMap amount={amount} selected={selected} originalView={originalView} /><div className="map-legend"><span><i className="legend-proposal" /> Proposed change</span><span><i className="legend-original" /> Original outline</span></div></div>
         <div className="canvas-note" aria-live="polite"><span className="branch-icon" aria-hidden="true">⌘</span><div><strong>{selected === "sleeve" ? "The sleeve follows the armhole." : "One adjustment. Three connected pieces."}</strong><span>{piece.reason}</span></div></div>
-      </section>
-      <aside className="proposal-panel" aria-label="Fit proposal">
+      </section>}
+      {stage === "fabric" && <section className="canvas-panel" aria-labelledby="fabric-title">
+        <div className="canvas-toolbar"><h2 id="fabric-title">Make the most of your linen.</h2><span className="context-muted">Layout study only</span></div>
+        <div className="fabric-workspace">
+          <div className="fabric-roll-heading"><strong>{project.fabricWidthCm} cm usable width</strong><span>Selvedge ↓</span></div>
+          <div className={`fabric-roll ${project.fabricWidthCm === 110 ? "narrow" : ""}`} role="img" aria-label="Concept-only cloth diagram. The shapes are not a verified placement.">
+            <svg viewBox="0 0 300 270" aria-hidden="true"><path d="M10 40 Q34 42 42 15 L97 30 Q87 64 112 78 L106 186 10 186Z"/><path d="M126 27 Q150 31 158 15 L213 30 Q203 64 228 78 L222 186 126 186Z"/><path d="M16 229 Q26 197 61 198 Q94 197 110 229 L101 258 24 258Z"/><path d="M132 229 Q142 197 177 198 Q210 197 226 229 L217 258 140 258Z"/><text x="46" y="113">A</text><text x="162" y="113">B</text><text x="57" y="237">C</text><text x="173" y="237">C</text></svg>
+          </div>
+          <p className="fabric-diagram-caption">Diagram from the concept reference · not a cutting layout</p>
+        </div>
+        <div className="canvas-note"><span className="branch-icon" aria-hidden="true">◇</span><div><strong>Placement is unknown.</strong><span>Final piece geometry, shrinkage, grain restrictions, and a real layout check are missing.</span></div></div>
+      </section>}
+      {stage === "sew" && <section className="canvas-panel" aria-labelledby="sew-title">
+        <div className="canvas-toolbar"><h2 id="sew-title">Your next few stitches.</h2><span className="context-muted">{currentSteps} of {sewingSteps.length} current</span></div>
+        <div className="sew-workspace"><p className="eyebrow">Assembly / Sample sequence</p><h2>One seam at a time.</h2><p className="subhead">Instructions stay connected to demo revision {project.currentSequence}.</p>
+          <div className="sew-steps">{sewingSteps.map((step, index) => {
+            const completedOn = project.completedStepRevision[step.key];
+            const current = completedOn === project.currentSequence;
+            const prerequisiteCurrent = index === 0 || project.completedStepRevision["join-shoulders"] === project.currentSequence;
+            return <div className="sew-step" key={step.key}><label><input type="checkbox" checked={current} disabled={busy || (!prerequisiteCurrent && !current)} onChange={(event) => void updateProject("/api/demo/progress", "PATCH", { kind: "sewing-step", stepKey: step.key, complete: event.target.checked })} /><span>{step.title}</span><small>0{index + 1}</small></label><p>{step.description}</p>{completedOn !== undefined && !current && <span className="review-tag">Completed on revision {completedOn} · review again</span>}{project.currentSequence > 0 && step.affected && <span className="review-tag">Affected by shoulder change</span>}</div>;
+          })}</div>
+        </div>
+        <div className="canvas-note"><span className="branch-icon" aria-hidden="true">⌁</span><div><strong>Your place is saved locally.</strong><span>Sample instructions and completion state are tied to the selected demo revision.</span></div></div>
+      </section>}
+      {stage === "fit" && <aside className="proposal-panel" aria-label="Fit proposal">
         <p className="eyebrow">A suggestion from Stitches</p><h2>Room to move.</h2><p className="request-copy">“A little more room at the shoulders. Keep the neckline just as it is.”</p>
         <div className="control-label"><label htmlFor="shoulder-amount">Added width per shoulder</label><output htmlFor="shoulder-amount">+{amount} mm</output></div>
         <input id="shoulder-amount" className="amount-slider" type="range" min="0" max="20" step="1" value={amount} onChange={(event) => setAmount(normalizeDemoAmount(Number(event.target.value)))} aria-describedby="amount-help" />
@@ -76,9 +140,22 @@ export function Worktable() {
         <p className="impact-heading eyebrow">What follows this change</p>
         <ol className="impact-list"><li><span>01</span><div><strong>Front + back</strong><small>Shoulder points move in this illustration</small></div></li><li><span>02</span><div><strong>Sleeve cap</strong><small>Real seam and ease check still needed</small></div></li><li><span>03</span><div><strong>Fabric + instructions</strong><small>Review after a verified version exists</small></div></li></ol>
         <details className="why-details"><summary>Why these pieces?</summary><p>This sample links the shoulder rule to front and back pieces and an armhole–sleeve join. The source is <code>{demoPattern.sourceId}</code>. These relationships are illustrative; no seam or fit validity is claimed.</p></details>
-        <div className="proposal-end"><strong>Illustrative proposal · not for cutting</strong><p>Acceptance and saved revisions arrive in the next build slice. Your original remains available.</p></div>
-      </aside>
+        <div className="proposal-end"><div className="not-ready">Illustrative proposal · not for cutting</div><p className="accepted-basis">Accepted: revision {project.currentSequence} · +{accepted.amountMm} mm sample change</p><button className="keep-button" type="button" disabled={!hasProposal || busy} onClick={() => void keepProposal()}>{busy ? "Saving…" : "Keep this demo version →"}</button><div className="proposal-secondary"><button type="button" onClick={() => setAmount(accepted.amountMm)} disabled={!hasProposal || busy}>Discard proposal</button><button type="button" onClick={() => { setAmount(0); setOriginalView(false); }} disabled={busy}>Propose original</button></div><p>Your original remains in revision history.</p></div>
+      </aside>}
+      {stage === "fabric" && <aside className="proposal-panel" aria-label="Fabric planning">
+        <p className="eyebrow">From your fabric stash</p><h2>Good things,<br /> less waste.</h2><p className="request-copy">Explore how usable width changes the planning question. This is not a placement result.</p>
+        <label className="fabric-select-label" htmlFor="fabric-width">Cuttable fabric width</label><select id="fabric-width" className="fabric-select" value={project.fabricWidthCm} disabled={busy} onChange={(event) => void updateProject("/api/demo/progress", "PATCH", { kind: "fabric-width", widthCm: Number(event.target.value) })}><option value="140">140 cm · wide linen</option><option value="110">110 cm · narrow linen</option></select>
+        <div className="fabric-facts"><div><span>Available length</span><strong>2.00 m · sample</strong></div><div><span>Layout result</span><strong>Unknown</strong></div><div><span>Shrinkage</span><strong>Not entered</strong></div><div><span>Fit basis</span><strong>Demo revision {project.currentSequence}</strong></div></div>
+        <div className="unknown-result"><strong>Check needed before cutting</strong><p>{project.currentSequence > 0 ? "The accepted fit changed. Any previous fabric plan needs review. " : ""}A verified piece set, grain direction, shrinkage, and placement calculation are still required.</p></div>
+        <details className="why-details"><summary>What needs checking?</summary><p>Cut counts, mirrored and fold pieces, grain, nap, usable width and length, defects, and the final scale of every piece. No area estimate is treated as a feasible layout.</p></details>
+        <button type="button" className="keep-button stage-next" onClick={() => setStage("sew")}>Explore the sewing plan →</button>
+      </aside>}
+      {stage === "sew" && <aside className="proposal-panel" aria-label="Sewing progress">
+        <p className="eyebrow">Your sewing companion</p><h2>Made by you.</h2><div className="sew-art" aria-hidden="true">A <span>⤳</span> B</div><p className="control-label">Sample sequence <strong>{currentSteps} / {sewingSteps.length} current</strong></p><div className="progress-track"><div style={{width: `${currentSteps / sewingSteps.length * 100}%`}} /></div><p className="request-copy">Your pattern, sample adjustment, and place in these instructions—together.</p>
+        <div className="lock-notice">Linked to demo revision {project.currentSequence} · +{accepted.amountMm} mm</div><p className="context-muted">These are sample steps, not a complete construction guide for a cut-ready pattern.</p><button type="button" className="keep-button stage-next" onClick={() => setStage("fit")}>Back to your fit ↗</button>
+      </aside>}
     </div>
+    {notice && <div className={`save-notice ${noticeKind}`} role="status"><span>{notice}</span>{noticeKind === "error" && <button type="button" onClick={() => window.location.reload()}>Reload current version</button>}</div>}
     <footer className="studio-footer"><strong>Considered changes. Confident making.</strong><span>Local demo · Illustrative geometry · Not for cutting</span></footer>
   </main>;
 }

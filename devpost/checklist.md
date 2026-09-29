@@ -19,7 +19,7 @@ Build mode: fast — the owner asked to start building without routine milestone
   Learner check: Open the local worktable and try the Fit control and original comparison; report whether the hierarchy feels like the reference.
   Commit: `Build illustrative Stitches worktable`
 
-- [ ] **2. Keep a revision and continue into Fabric and Sew**
+- [x] **2. Keep a revision and continue into Fabric and Sew**
   Becomes usable: A maker can accept or discard a sample proposal, restore the original, switch fabric width, mark steps complete, and return to their saved demo state.
   Why now: Acceptance and dependent tasks form the product loop; they also expose staleness and persistence mistakes early.
   PRD ref: `prd.md > Revision Acceptance and Dependency Status`, `Fabric and Sewing Consequences`

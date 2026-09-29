@@ -4,11 +4,11 @@ Patterns that adapt to you, with every change explained.
 
 Stitches is a personal sewing studio powered by structured pattern knowledge. This repository contains the product handoff and the first runnable, explicitly illustrative worktable slice.
 
-**Current status:** the local Next.js Fit worktable runs without credentials, with an interactive sample shoulder slider, original comparison, and piece explanation. Acceptance, Fabric/Sew functionality, verified drafting, live Sanity/Gemini connections, accounts, and deployment are not implemented yet. The sample outline is not for cutting.
+**Current status:** the local Next.js Fit / Fabric / Sew worktable runs without credentials. Sample shoulder proposals can be accepted as server-owned local revisions; the original remains in history, stale proposals are refused, fabric width and sewing progress persist, and affected work is marked for review. Verified drafting, fabric placement, live Sanity/Gemini connections, accounts, and deployment are not implemented yet. The sample outline is not for cutting.
 
 ## Run the first slice
 
-With Node.js 22.18+ and pnpm 11.19.0, run `pnpm install --frozen-lockfile`, then `pnpm dev` and open `http://localhost:3000`. `pnpm typecheck`, `pnpm test`, and `pnpm build` are the local checks. No secret is required for the illustrative worktable.
+With Node.js 22.18+ and pnpm 11.19.0, run `pnpm install --frozen-lockfile`, then `pnpm dev -- --hostname 127.0.0.1` and open the local URL printed by Next.js. `pnpm typecheck`, `pnpm test`, and `pnpm build` are the local checks. On the build machine, `node_modules\\.bin\\next.cmd dev -H 127.0.0.1 -p 3101` was the verified local run command. No secret is required for the illustrative worktable. Do not deploy the local single-user demo store as a public service.
 
 ## Continue in Codex
 

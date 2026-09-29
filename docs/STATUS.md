@@ -1,6 +1,15 @@
 # Status
 
-Updated: September 28, 2026.
+Updated: September 29, 2026.
+
+## Second implementation slice — September 29, 2026
+
+- Added a server-owned, single-user local demo project store under ignored `.data/`, with immutable original/accepted revision records, content fingerprint, idempotency key, serialized updates, and atomic file replacement. The accept route checks sample bounds and rejects stale project or fixture-content bases; progress writes validate width and sewing prerequisites. This is an illustrative local adapter, not an authenticated or live Sanity-backed project service.
+- Fit now accepts/discards sample proposals and can propose a return to the original. Fabric compares 140 cm and 110 cm sample widths but explicitly reports placement **unknown**; no fabricated feasible length is shown. Sew stores step completion by accepted revision and marks old progress for review after a new revision. A stale-save error offers a reload action.
+- Verification: `tsc --noEmit` completed without errors; `vitest run` passed 5/5 tests in two files. Browser journey on local `next dev -H 127.0.0.1 -p 3101`: accepted revision 1 (+10 mm); changed and persisted fabric width to 110 cm; completed the first sewing step; reloaded and found all three persisted. In a second tab, accepted revision 2 (+16 mm); the older tab's acceptance returned HTTP 409 and displayed a stale message; reloading showed revision 2 intact. Sew then showed prior step completion as needing review. The server log recorded POST 200, PATCH 200, and POST 409. At 320px and 390px, document width matched client width (305px and 375px with scrollbar), with no horizontal overflow. `next build` completed successfully, showing the dynamic `/`, `/api/demo/accept`, and `/api/demo/progress` routes. The first build attempt was interrupted after a very slow successful compile (10.9 minutes) but before type/page checks; a warm-cache rerun completed all phases, including TypeScript, with exit code 0.
+- Early learner hands-on checkpoint remains open; no owner feedback has been invented. No Sanity Context retrieval, Gemini call, verified geometry, physical maker review, or public deployment occurred.
+
+Next executable task: checklist slice 3 / BUILD-PLAN milestone 2 — implement the Sanity structured content layer, fixture/Sanity contract tests, and actual Context Knowledge Base connection. Sanity configuration must be scoped to an authorized Stitches dataset; Crossgrade's dataset is not silently reused.
 
 ## First implementation slice — September 28, 2026
 
@@ -10,7 +19,7 @@ Updated: September 28, 2026.
 - Verification: elevated `node_modules\\.bin\\tsc.cmd --noEmit` passed; elevated `node_modules\\.bin\\vitest.cmd run` passed 2/2 tests; elevated `node_modules\\.bin\\next.cmd build` passed with `/` statically rendered. The same commands without escalation initially failed because this Stitches folder is outside the current sandbox write root, not because of code failures.
 - Browser: local production server at `http://localhost:3100` returned HTTP 200. In the in-app browser, changing the slider from 10 to 16 updated its value and pattern description; keyboard Return toggled original view and selected the back piece with an updated reason. The desktop screenshot was inspected. At 320px and 390px viewport widths, DOM document width equaled its client width (305px and 375px after scrollbar), so no horizontal page overflow was observed. No live Sanity, Gemini, geometry, or physical-sewing claim follows from these checks.
 
-Next executable task: checklist slice 2 — add server-owned local demo revisions, explicit acceptance/staleness, and usable Fabric/Sew stages with honest unknown layout status; then rerun checks and browser journey. Early learner feedback can be requested after that slice without pausing independent integration work.
+At that checkpoint, the next task was slice 2; its result is recorded above.
 
 ## Complete
 
@@ -33,11 +42,11 @@ Next executable task: checklist slice 2 — add server-owned local demo revision
 
 ## Not implemented
 
-No verified drafting engine, real fabric nesting, Sanity schema deployment, live Gemini calls, accounts, private database, scale-correct pattern export, physical sewing validation, or public deployment. The new app scaffold is an illustrative local slice, not the complete milestone 1 workflow.
+No verified drafting engine, real fabric nesting, Sanity schema deployment, live Gemini calls, accounts, private database, scale-correct pattern export, physical sewing validation, or public deployment. BUILD-PLAN milestone 1 is complete as an illustrative local workflow only, not as a cut-ready or competition-ready product.
 
 ## Next task
 
-Implement checklist slice 2 and complete BUILD-PLAN milestone 1: server-owned local acceptance and revisions, Fabric/Sew stages, state restoration, and browser checks.
+Proceed with checklist slice 3 and BUILD-PLAN milestone 2; retain the pending learner feedback checkpoint without treating it as routine permission for local work.
 
 ## Required later
 
