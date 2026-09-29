@@ -17,6 +17,10 @@ Reviewed September 28, 2026. Recheck provider SDK details and model availability
 - [Next.js App Router](https://nextjs.org/docs/app): application and server structure.
 - [Supabase row-level security](https://supabase.com/docs/guides/database/postgres/row-level-security): owner-scoped access policies; the proposed application still needs its own policies and tests.
 - [FreeSewing developer documentation](https://freesewing.dev/): candidate drafting foundation, subject to design-specific evaluation.
+- [FreeSewing monorepo notice](https://github.com/freesewing/freesewing): the old MIT GitHub repository was archived and points to Codeberg; no design or drafting code has been imported into Stitches.
+- [Gemini function calling](https://ai.google.dev/gemini-api/docs/generate-content/function-calling): official JavaScript SDK manual tool loop, exact function-response IDs, and preservation of Gemini 3 thought signatures.
+- [Gemini API rate limits](https://ai.google.dev/gemini-api/docs/rate-limits): per-project quotas and usage-tier distinctions; model listing alone does not establish a zero-cost account tier.
+- [pnpm 11 configuration](https://pnpm.io/11.x/configuring): project dependency-build policy belongs in `pnpm-workspace.yaml`.
 - [FreeSewing custom patterns](https://freesewing.eu/docs/about/site/draft/): measurement-driven drafting and design options. This is not evidence that the Stitches shoulder operation is implemented or verified.
 
 The screenshots and reference are original Stitches design artifacts from this conversation. The fixture content is illustrative and is not attributed to FreeSewing or another pattern publisher.

@@ -2,13 +2,15 @@
 
 Patterns that adapt to you, with every change explained.
 
-Stitches is a personal sewing studio powered by structured pattern knowledge. This repository contains the product handoff and the first runnable, explicitly illustrative worktable slice.
+Stitches is a personal sewing studio powered by structured pattern knowledge. This repository contains the product handoff and a runnable, explicitly illustrative worktable plus unconnected integration infrastructure.
 
-**Current status:** the local Next.js Fit / Fabric / Sew worktable runs without credentials. Sample shoulder proposals can be accepted as server-owned local revisions; the original remains in history, stale proposals are refused, fabric width and sewing progress persist, and affected work is marked for review. Verified drafting, fabric placement, live Sanity/Gemini connections, accounts, and deployment are not implemented yet. The sample outline is not for cutting.
+**Current status:** the local Next.js Fit / Fabric / Sew worktable runs without credentials. Sample shoulder proposals can be accepted as server-owned local revisions; the original remains in history, stale proposals are refused, fabric width and sewing progress persist, and affected work is marked for review. A validated Sanity document resolver, development-only seeder, read-only Context adapter, bounded Gemini SDK session, and incomplete shoulder-seam geometry spike are implemented and tested locally. The Stitches Sanity dataset is still empty; no Stitches Knowledge Base retrieval or Gemini inference has occurred. Verified whole-pattern drafting, fabric placement, accounts, and deployment remain open. The sample outline is not for cutting.
 
 ## Run the first slice
 
 With Node.js 22.18+ and pnpm 11.19.0, run `pnpm install --frozen-lockfile`, then `pnpm dev -- --hostname 127.0.0.1` and open the local URL printed by Next.js. `pnpm typecheck`, `pnpm test`, and `pnpm build` are the local checks. On the build machine, `node_modules\\.bin\\next.cmd dev -H 127.0.0.1 -p 3101` was the verified local run command. No secret is required for the illustrative worktable. Do not deploy the local single-user demo store as a public service.
+
+For the dedicated Stitches Sanity project, `.env.example` records public project `l4eeamth`, dataset `development`, and organization `o3i0aqvqq`. Keep tokens in ignored `.env.local`. `node --env-file=.env.local scripts/probe-development.mjs` performs a read-only dataset probe; `node --env-file=.env.local scripts/seed-development.mjs` is a dry run. Only the explicit `--apply` form can write, and it requires a Stitches-scoped `SANITY_WRITE_TOKEN`; never substitute the Crossgrade dataset token. The local Studio source is in `sanity/`, but CLI schema validation and the editorial workflow have not yet passed. Context requires a Stitches Knowledge Base, endpoint name, and organization Viewer token. No live inference is enabled merely by adding a Gemini key; confirm a zero-cost tier before running it.
 
 ## Continue in Codex
 

@@ -1,0 +1,8 @@
+packages:
+  - .
+
+# Published SDK bundles are usable without these lifecycle scripts. Keep
+# dependency execution explicit rather than approving new scripts by default.
+allowBuilds:
+  "@google/genai": false
+  protobufjs: false
