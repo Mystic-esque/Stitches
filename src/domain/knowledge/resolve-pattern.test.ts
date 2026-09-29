@@ -27,6 +27,7 @@ describe("structured knowledge resolver", () => {
     expect(snapshot.effectsByOperation["shoulder-width"].stepIds).toEqual(["step.shoulders", "step.sleeves"]);
     expect(snapshot.effectsByOperation["shoulder-width"].unresolvedChecks).toEqual(["join.armhole-sleeve", "join.shoulders"]);
     expect(snapshot.sourceIds).toEqual(["source.stitches-demo"]);
+    expect(snapshot.sourceDetails[0]).toMatchObject({ id: "source.stitches-demo", title: "Stitches authored interaction fixture", reviewStatus: "illustrative" });
   });
 
   it("changes the effect trail and fingerprint when a join relationship changes", () => {
@@ -45,6 +46,7 @@ describe("structured knowledge resolver", () => {
     const after = resolvePatternSnapshot(rows, versionId, "illustrative");
     expect(after.fingerprint).not.toBe(before.fingerprint);
     expect(after.effectsByOperation["shoulder-width"].pieces).toEqual(before.effectsByOperation["shoulder-width"].pieces);
+    expect(after.sourceDetails[0]?.content).toBe("Correction: shoulder source wording revised.");
   });
 
   it("withholds an unresolved source conflict until precedence is documented", () => {

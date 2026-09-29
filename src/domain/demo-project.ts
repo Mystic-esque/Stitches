@@ -29,7 +29,7 @@ export type AcceptInput = {
 };
 
 export class DemoProjectError extends Error {
-  constructor(public readonly code: "invalid" | "stale" | "content-stale" | "prerequisite", message: string) {
+  constructor(public readonly code: "invalid" | "stale" | "content-stale" | "prerequisite" | "mode", message: string) {
     super(message);
     this.name = "DemoProjectError";
   }

@@ -38,7 +38,7 @@ export function sanityKnowledgeRepository(client: QueryClient): KnowledgeReposit
   };
 }
 
-export function createSanityKnowledgeRepository(env: NodeJS.ProcessEnv = process.env): KnowledgeRepository {
+export function createSanityKnowledgeRepository(env: Record<string, string | undefined> = process.env): KnowledgeRepository {
   const projectId = env.SANITY_PROJECT_ID;
   const dataset = env.SANITY_DATASET;
   if (!projectId || !dataset) throw new KnowledgeError("missing", "SANITY_PROJECT_ID and SANITY_DATASET are required for live knowledge retrieval.");

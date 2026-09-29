@@ -43,13 +43,20 @@ function PatternMap({ amount, originalView, selected }: { amount: number; origin
 
 type Stage = "fit" | "fabric" | "sew";
 
+function sourceExcerpt(content: string): string {
+  if (content.length <= 600) return content;
+  const prefix = content.slice(0, 600);
+  const lastSpace = prefix.lastIndexOf(" ");
+  return `${prefix.slice(0, lastSpace > 450 ? lastSpace : 600).trimEnd()}…`;
+}
+
 const sewingSteps: { key: StepKey; title: string; description: string; affected: boolean }[] = [
   { key: "join-shoulders", title: "Join the shoulders", description: "Match the front and back shoulder seams. Use the seam allowance specified by your reviewed pattern.", affected: true },
   { key: "finish-neckline", title: "Finish the neckline", description: "After joining the shoulders, finish the neckline using the version-specific instructions.", affected: false },
   { key: "prepare-sleeves", title: "Prepare the sleeves", description: "Check the sleeve-cap relationship before setting either sleeve.", affected: true },
 ];
 
-export function Worktable({ initialProject, contentFingerprint, knowledge }: { initialProject: DemoProject; contentFingerprint: string; knowledge: PatternSnapshot }) {
+export function Worktable({ initialProject, contentFingerprint, knowledge, knowledgeOrigin, canAcceptSample }: { initialProject: DemoProject; contentFingerprint: string; knowledge: PatternSnapshot; knowledgeOrigin: "fixture" | "sanity-development" | "sanity-reviewed"; canAcceptSample: boolean }) {
   const [project, setProject] = useState(initialProject);
   const [stage, setStage] = useState<Stage>("fit");
   const [amount, setAmount] = useState(() => currentRevision(initialProject).amountMm === 0 ? 10 : currentRevision(initialProject).amountMm);
@@ -85,7 +92,7 @@ export function Worktable({ initialProject, contentFingerprint, knowledge }: { i
   }
 
   async function keepProposal() {
-    if (!hasProposal || busy) return;
+    if (!hasProposal || busy || !canAcceptSample) return;
     const next = await updateProject("/api/demo/accept", "POST", { baseSequence: project.currentSequence, amountMm: amount, contentFingerprint, requestId: crypto.randomUUID() });
     if (next) { setNoticeKind("success"); setNotice(`Demo revision ${next.currentSequence} saved. Fabric and sewing checks need review.`); }
   }
@@ -94,10 +101,10 @@ export function Worktable({ initialProject, contentFingerprint, knowledge }: { i
     <header className="topbar">
       <div className="wordmark">stitches.</div>
       <p className="topbar-promise">A little more you. In every seam.</p>
-      <div className="topbar-end"><span className="status-dot" /> Demo revision {project.currentSequence} <span className="avatar" aria-label="Sample workspace">DEMO</span></div>
+      <div className="topbar-end"><span className="status-dot" /> {knowledgeOrigin === "fixture" ? "Local fixture" : knowledgeOrigin === "sanity-development" ? "Sanity development" : "Sanity reviewed"} · demo revision {project.currentSequence} <span className="avatar" aria-label="Sample workspace">DEMO</span></div>
     </header>
     <div className="project-heading">
-      <div><p className="eyebrow">On your worktable / Project 01</p><h1>{demoPattern.title}</h1><p className="subhead">Relaxed silhouette · Woven linen · Sample measurements</p></div>
+      <div><p className="eyebrow">On your worktable / Project 01</p><h1>{demoPattern.title}</h1><p className="subhead">Relaxed silhouette · Woven linen · Sample measurements</p><p className="knowledge-origin-mobile">{knowledgeOrigin === "fixture" ? "Local fixture · sample only" : knowledgeOrigin === "sanity-development" ? "Sanity development · illustrative" : "Sanity reviewed · inspection only"}</p></div>
       <nav className="stage-tabs" aria-label="Project stages">{(["fit", "fabric", "sew"] as const).map((item, index) => <button key={item} type="button" className={`stage-tab ${stage === item ? "active" : "inactive"}`} aria-current={stage === item ? "step" : undefined} onClick={() => setStage(item)}><small>0{index + 1}</small> {item[0].toUpperCase() + item.slice(1)}</button>)}</nav>
     </div>
     <div className="worktable-grid">
@@ -143,8 +150,19 @@ export function Worktable({ initialProject, contentFingerprint, knowledge }: { i
         <div className="lock-notice"><span aria-hidden="true">♧</span> Neckline shown unchanged in concept preview</div>
         <p className="impact-heading eyebrow">What follows this change</p>
         <ol className="impact-list"><li><span>01</span><div><strong>{directlyAffected.map((item) => item.pieceTitle).join(" + ") || "No direct pieces"}</strong><small>Directly linked by the structured adjustment rule</small></div></li><li><span>02</span><div><strong>{joinAffected.map((item) => item.pieceTitle).join(" + ") || "No additional join pieces"}</strong><small>{effects?.unresolvedChecks.length ?? 0} seam relationship(s) still unreviewed</small></div></li><li><span>03</span><div><strong>Fabric + instructions</strong><small>{effects?.stepIds.length ?? 0} linked step(s); {effects?.invalidates.join(" and ") || "no"} invalidation</small></div></li></ol>
-        <details className="why-details"><summary>Why these pieces?</summary><p>This trail is computed from <code>{knowledge.ruleIds.join(", ")}</code> and source <code>{knowledge.sourceIds.join(", ")}</code>, fingerprint <code>{knowledge.fingerprint.slice(0, 12)}</code>. The records are illustrative; seam validity is unresolved and cutting is not authorized.</p></details>
-        <div className="proposal-end"><div className="not-ready">Illustrative proposal · not for cutting</div><p className="accepted-basis">Accepted: revision {project.currentSequence} · +{accepted.amountMm} mm sample change</p><button className="keep-button" type="button" disabled={!hasProposal || busy} onClick={() => void keepProposal()}>{busy ? "Saving…" : "Keep this demo version →"}</button><div className="proposal-secondary"><button type="button" onClick={() => setAmount(accepted.amountMm)} disabled={!hasProposal || busy}>Discard proposal</button><button type="button" onClick={() => { setAmount(0); setOriginalView(false); }} disabled={busy}>Propose original</button></div><p>Your original remains in revision history.</p></div>
+        <details className="why-details"><summary>Trace the change to its sources</summary>
+          <p>The linked records below produced this effect trail. It is illustrative; seam validity is unresolved and cutting is not authorized.</p>
+          <ol className="evidence-trail">{effects?.pieces.map((item) => <li key={item.pieceId}>
+            <strong>{item.pieceTitle}</strong>
+            <span>{item.via === "direct" ? "Direct rule link" : `Reached through ${item.joinId}`} · {item.ruleId}</span>
+          </li>)}</ol>
+          {knowledge.sourceDetails.map((source) => <div className="evidence-source" key={source.id}>
+            <strong>{source.title}</strong><span>{source.reviewStatus} source · {source.locator ?? source.id}</span>
+            {source.content && <p>{sourceExcerpt(source.content)}</p>}
+          </div>)}
+          <p>Content fingerprint <code>{knowledge.fingerprint.slice(0, 12)}</code>. A later correction makes pending proposals stale; it does not rewrite an accepted revision.</p>
+        </details>
+        <div className="proposal-end"><div className="not-ready">Illustrative proposal · not for cutting</div><p className="accepted-basis">Accepted: revision {project.currentSequence} · +{accepted.amountMm} mm sample change</p><button className="keep-button" type="button" disabled={!hasProposal || busy || !canAcceptSample} onClick={() => void keepProposal()}>{busy ? "Saving…" : canAcceptSample ? "Keep this demo version →" : "Live knowledge inspection only"}</button><div className="proposal-secondary"><button type="button" onClick={() => setAmount(accepted.amountMm)} disabled={!hasProposal || busy}>Discard proposal</button><button type="button" onClick={() => { setAmount(0); setOriginalView(false); }} disabled={busy}>Propose original</button></div><p>{canAcceptSample ? "Your original remains in revision history." : "Sample revisions cannot be accepted against live Sanity content until drafting and checks are reviewed."}</p></div>
       </aside>}
       {stage === "fabric" && <aside className="proposal-panel" aria-label="Fabric planning">
         <p className="eyebrow">From your fabric stash</p><h2>Good things,<br /> less waste.</h2><p className="request-copy">Explore how usable width changes the planning question. This is not a placement result.</p>

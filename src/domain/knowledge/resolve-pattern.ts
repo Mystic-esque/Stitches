@@ -19,6 +19,7 @@ export type KnowledgeDocument = z.infer<typeof knowledgeDocumentSchema>;
 export type KnowledgeMode = "illustrative" | "reviewed";
 
 export type PieceEffect = { pieceId: string; pieceTitle: string; via: "direct" | "join"; ruleId: string; joinId?: string; sourceIds: string[] };
+export type SourceDetail = { id: string; title: string; reviewStatus: string; locator?: string; content?: string; url?: string; licenseNotes?: string };
 export type PatternSnapshot = {
   patternId: string;
   patternTitle: string;
@@ -31,6 +32,7 @@ export type PatternSnapshot = {
   ruleIds: string[];
   stepIds: string[];
   sourceIds: string[];
+  sourceDetails: SourceDetail[];
   effectsByOperation: Record<string, { pieces: PieceEffect[]; stepIds: string[]; dependentRuleIds: string[]; invalidates: string[]; unresolvedChecks: string[] }>;
 };
 
@@ -193,5 +195,9 @@ export function resolvePatternSnapshot(raw: unknown, versionId: string, mode: Kn
   }
   const relevant = [...used].map((id) => byId.get(id)!).sort((a, b) => a._id.localeCompare(b._id));
   const fingerprint = createHash("sha256").update(JSON.stringify(relevant)).digest("hex");
-  return { patternId: pattern._id, patternTitle: pattern.title, versionId, version: version.version, mode, fingerprint, pieceIds: pieces.map((item) => item._id).sort(), joinIds: joins.map((item) => item._id).sort(), ruleIds: rules.map((item) => item._id).sort(), stepIds: steps.map((item) => item._id).sort(), sourceIds: relevant.filter((item) => item._type === "sourceDocument").map((item) => item._id), effectsByOperation };
+  const sourceDetails = relevant.filter((item): item is Extract<KnowledgeDocument, { _type: "sourceDocument" }> => item._type === "sourceDocument")
+    .map((item) => ({ id: item._id, title: item.title, reviewStatus: item.reviewStatus,
+      ...(item.locator ? { locator: item.locator } : {}), ...(item.content ? { content: item.content } : {}),
+      ...(item.url ? { url: item.url } : {}), ...(item.licenseNotes ? { licenseNotes: item.licenseNotes } : {}) }));
+  return { patternId: pattern._id, patternTitle: pattern.title, versionId, version: version.version, mode, fingerprint, pieceIds: pieces.map((item) => item._id).sort(), joinIds: joins.map((item) => item._id).sort(), ruleIds: rules.map((item) => item._id).sort(), stepIds: steps.map((item) => item._id).sort(), sourceIds: sourceDetails.map((item) => item.id), sourceDetails, effectsByOperation };
 }

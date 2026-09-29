@@ -16,6 +16,7 @@ const snapshot: PatternSnapshot = {
   patternId: "pattern.demo", patternTitle: "Demo", versionId: "version.demo", version: "0.1.0",
   mode: "illustrative", fingerprint: "abc123", pieceIds: ["front", "back"], joinIds: ["shoulder"],
   ruleIds: ["rule.shoulder"], stepIds: [], sourceIds: ["source.demo"],
+  sourceDetails: [{ id: "source.demo", title: "Synthetic source", reviewStatus: "illustrative" }],
   effectsByOperation: { "shoulder-width": { pieces: [
     { pieceId: "front", pieceTitle: "Front", via: "direct", ruleId: "rule.shoulder", sourceIds: ["source.demo"] },
   ], stepIds: [], dependentRuleIds: [], invalidates: ["fabric-layout"], unresolvedChecks: ["sleeve-cap"] } },
