@@ -5,6 +5,12 @@ status: approved
 
 # Stitches — Technical Spec
 
+## Approved garment-studio technical amendment — September 29, 2026
+
+The owner approved a garment gallery, interactive piece/assembly views, supported customization, and an agent carrying a design through making. The first complete family remains the Everyday blouse. Build from one exact versioned Sanity graph shared by the explorer, deterministic operations, and bounded assistant. This amendment supersedes older passages that open directly on Fit, describe the shoulder operation as the whole product, or recommend Gemini 3.8/3.7.
+
+`gemini-3.5-flash-lite` is the sole selected local preview candidate. A read-only model list confirmed `generateContent` access, not a free-tier allocation or a successful inference. The installed SDK implementation uses a bounded `generateContent` function-calling loop, not the draft `interactions.create` flow below. The $0 gate remains closed until account-specific verification.
+
 ## How This Works, In Plain Language
 
 Sanity holds the reviewed pattern, its pieces, joins, adjustment rules, sewing instructions, and the sources behind them. Its Knowledge Base gives the agent a navigable explanation of applicable knowledge. The application also reads the exact current pattern records, because a summary cannot prove a seam length or authorize an operation. Gemini interprets the maker's request and asks for one of a small set of permitted actions. A separate drafting engine calculates the proposed pieces and checks them. The maker sees the result and decides whether to keep it. The server saves each accepted version and refuses a proposal whose pattern or knowledge has changed since it was prepared.
@@ -15,7 +21,7 @@ This separation is the answer to the learner's expressed Sanity question: Contex
 
 ## The Core Journey Through the System
 
-1. The worktable loads the local demo project and the selected reviewed pattern version. The server obtains a bounded, validated Sanity snapshot; fixture mode uses the same shape and is visibly labeled. The browser renders the accepted SVG and next action. Implements `prd.md > Pattern and Project Context`.
+1. A garment study loads the selected exact version's bounded, validated Sanity snapshot. Explore maps the finished illustration to flat pieces, seam partners, and prerequisite-safe assembly; fixture mode uses the same domain shape and is visibly labeled. The maker then moves into the version's project worktable. Implements `prd.md > Garment Discovery and Dissection` and `Pattern and Project Context`.
 2. The maker enters a shoulder request. The server first checks the project revision, measurements, and allowed operation. The Gemini adapter can read a relevant Context Knowledge Base entry and call only registered application tools. A direct, parameterized Sanity read supplies exact rule and relationship records. Missing or conflicting evidence stops the proposal. Implements `prd.md > Fit Proposal and Explanation`.
 3. The deterministic engine drafts the change, checks the locked neckline and related seams, and returns coordinates, check results, source IDs, and a proposal ID. The canvas overlays original and proposed pieces; the inspector explains each affected object. Implements `prd.md > Fit Proposal and Explanation`.
 4. Acceptance goes to the server, which compares the proposal's base revision and content fingerprint with the current project and reviewed content. A mismatch returns stale. A match saves one immutable accepted snapshot and marks dependent fabric and instruction results for review. Implements `prd.md > Revision Acceptance and Dependency Status` and `Fabric and Sewing Consequences`.
@@ -25,14 +31,14 @@ This separation is the answer to the learner's expressed Sanity question: Contex
 
 - [Next.js App Router](https://nextjs.org/docs/app) with React and TypeScript for the worktable and server routes. The project handoff selected this stack; use a Node.js runtime for provider calls and local demo persistence. Pin compatible installed versions and the lockfile when scaffolding.
 - [Sanity Studio and Content Lake](https://www.sanity.io/docs/studio) for editorial records; [@sanity/client](https://www.sanity.io/docs/apis-and-sdks/js-client-querying) for allowlisted, parameterized reads; actual [Context MCP](https://www.sanity.io/docs/ai/sanity-context-mcp) in Knowledge Base mode for agent retrieval. Studio schema deployment is needed if a GROQ-mode Context endpoint is later used; the primary Knowledge Base endpoint is configured with Knowledge Base sources only.
-- [Google GenAI SDK](https://ai.google.dev/gemini-api/docs/function-calling) for a server-only bounded tool loop. Start with `gemini-3.8-flash`, as the owner requested. A `gemini-3.7-flash` fallback requires an explicit access and quality check; no paid model or provider spend is authorized. Verify model availability with the supplied key before a live claim.
+- [Google GenAI SDK](https://ai.google.dev/gemini-api/docs/function-calling) for a server-only bounded `generateContent` tool loop. The selected local candidate is `gemini-3.5-flash-lite`; model listing confirms access but not an account-specific free allocation. No paid model or provider spend is authorized.
 - SVG rendering and a pure TypeScript geometry engine. A FreeSewing adapter is a candidate only after confirming its specific design, license, adjustment behavior, and testability. The handoff's illustrative SVG formulas are not the engine.
 - Runtime schemas at API, Sanity, and model boundaries; [Vitest](https://vitest.dev/guide/) for domain and adapter contracts; [Playwright](https://playwright.dev/docs/intro) for the maker journey and responsive checks. Pin versions during the build.
 - A local, server-owned demo project store for sample measurements, proposals, revisions, and sewing progress. It is single-user and bound to local development. The planned private multi-user service remains the separate Supabase milestone.
 
 ## Where It Runs and How Someone Tries It
 
-The application is planned to run locally on Node.js. After the build adds and verifies scripts, install with `npm install`, start with `npm run dev`, and open `http://localhost:3000`. Start the local editorial interface with `npm run studio` and open its documented local URL. These are planned commands, not yet verified commands; `docs/STATUS.md` will record the actual versions, URLs, and results once the application exists.
+The application runs locally on Node.js with the pinned pnpm lockfile. Use the verified scripts in `package.json` and `README.md`; `docs/STATUS.md` records real build, test, and browser results. The local Studio source is not a published Studio or a completed schema-deployment proof.
 
 Fixture mode needs no credentials and is clearly marked illustrative. Live mode requires a dedicated Stitches Sanity project/dataset or an explicitly selected Stitches-only dataset, reviewed content, a built Knowledge Base and MCP endpoint, an organization Context Viewer token, a project read token if the dataset is private, and a Gemini key. A public deployment has not been authorized. For Devpost Basics, a short working demo video and a public repository are required; a live deployment is optional. Sanity Path One requires a DEV entry and the Sanity project ID or public dataset URL. See [Devpost event](https://learn-ai-basics.devpost.com/) and [Sanity Challenge](https://dev.to/challenges/sanity-2026-09-16).
 
@@ -42,9 +48,19 @@ Carry forward `prd.md > Look and Feel`: warm linen surfaces, olive actions, terr
 
 ## Components
 
+### Garment Graph and Explorer
+
+`patternVersion` binds a finished garment study to stable piece keys, seam endpoints, assembly steps, supported options, source IDs, and a content fingerprint. The server validates references, version consistency, duplicate keys, supported operations, and prerequisite cycles before rendering. The first `GarmentExplorer` uses an illustrative SVG front/back view keyed to the demo blouse; labels, cut counts, seam partners, and assembly order come from `PatternSnapshot`. Editing those records changes the explorer after reload, while an invalid graph yields an unavailable state rather than a fixture fallback in live mode.
+
+Later catalog expansion needs Sanity-authored view assets and part-region bindings, option compatibility records, required measurement definitions, and instruction variants. The renderer may be SVG or Three.js, but it never supplies pattern coordinates or drape/fit proof. A second gallery item is selectable only after its graph, visual mapping, operation support, and tests are complete. Private measurements stay outside public Sanity content.
+
+The direct-control and agent paths call the same server-side operation registry. `get_garment_context`, `explain_connection`, `get_assembly_step`, and `preview_supported_change` are proposed bounded tool responsibilities, not claims that those tools exist yet. Each must validate an exact version and fingerprint; no model-supplied arbitrary query, coordinate, shell command, or acceptance action is permitted.
+
+For a later multi-part design brief, maintain a server-owned plan with requested goals, locked features, garment-version scope, required measurements, available fabric/equipment, candidate operations, and per-step checked/unknown/refused results. Gemini may propose the next allowlisted tool call and explain results but does not mark a plan feasible. Direct controls produce the same plan transitions. Each accepted edit invalidates dependent geometry, layout, and instruction evidence; a failed fabric or technique constraint yields only authored supported alternatives. No independently generated image can stand in for the accepted pattern revision.
+
 ### Worktable and Stage Navigation
 
-Shows the selected project, exact pattern/accepted revision, readiness label, and Fit / Fabric / Sew stages. The local store restores sample progress after restart. Implements `prd.md > Pattern and Project Context` and `Screens and Layout`.
+Shows the selected garment/project, exact pattern/accepted revision, readiness label, and Explore / Fit / Fabric / Sew stages. The local store restores sample progress after restart. Implements `prd.md > Garment Discovery and Dissection`, `Pattern and Project Context`, and `Screens and Layout`.
 
 ### Pattern Canvas and Piece Inspector
 
@@ -111,7 +127,7 @@ Stitches/
 ├── docs/                       # full Stitches brief, evidence, status
 ├── .env.example                # names and placeholders, no credentials
 ├── package.json
-└── package-lock.json
+└── pnpm-lock.yaml
 ```
 
 ## External Services and Dependencies
@@ -122,7 +138,7 @@ Stitches/
 
 **Sanity Knowledge Base maintenance.** Connect a scoped dataset source, build and inspect its entries, and resolve relevant conflicts. After an editorial correction, run change detection, review and apply the resulting issues, and confirm the updated entry is actually served. Refresh detection alone keeps old entries in service. Record before/after content and retrieval evidence. [Create](https://www.sanity.io/docs/ai/sanity-context-create-knowledge-base) and [maintain](https://www.sanity.io/docs/ai/sanity-context-maintain-knowledge-base) guides.
 
-**Gemini.** The server creates `new GoogleGenAI({apiKey})` and uses the installed SDK's documented `interactions.create` function-calling flow with `model: 'gemini-3.8-flash'`, `store: false`, scoped input, and declared tools. Each returned function call is schema- and permission-checked, executed locally, and returned as a `function_result` with its matching `call_id`; the loop has tool, time, and output limits. Preserve provider steps required for continued calls. Return typed clarification, quota, timeout, malformed, or unavailable states. Confirm exact installed SDK types and model access before live tests. [Google function calling](https://ai.google.dev/gemini-api/docs/function-calling) and [model catalog](https://ai.google.dev/gemini-api/docs/models).
+**Gemini.** The server uses the installed `@google/genai` SDK's bounded manual `generateContent` function-calling flow with `gemini-3.5-flash-lite`, scoped input, and declared tools. Each returned call is schema- and permission-checked, executed locally, and returned with its matching function-call identity and required model content; the loop has tool, time, and output limits. The current local preview is incomplete and disabled by default. Add garment navigation, compatibility, and multi-step brief handling only through deterministic server tools. Return typed clarification, quota, timeout, malformed, or unavailable states; verify this account's zero-cost inference eligibility before live calls. [Google function calling](https://ai.google.dev/gemini-api/docs/function-calling) and [model catalog](https://ai.google.dev/gemini-api/docs/models).
 
 **Later private storage.** Supabase Auth/Postgres is planned for accounts, personal measurements, and owner-scoped revisions, with tested row-level security. It is not a prerequisite for the local sample demonstration. [Supabase documentation](https://supabase.com/docs).
 

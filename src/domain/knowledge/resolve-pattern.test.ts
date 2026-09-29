@@ -39,6 +39,20 @@ describe("structured knowledge resolver", () => {
     expect(after.fingerprint).not.toBe(before.fingerprint);
   });
 
+  it("derives the garment dissection and assembly order from references, not display constants", () => {
+    const rows = documents();
+    const snapshot = resolvePatternSnapshot(rows, versionId, "illustrative");
+    expect(snapshot.garmentPieces.find((item) => item.key === "sleeve")).toMatchObject({ cutCount: 2, mirrored: true });
+    expect(snapshot.garmentConnections.find((item) => item.id === "join.armhole-sleeve")?.pieceKeys).toEqual(["front", "back", "sleeve"]);
+    expect(snapshot.assemblySteps.map((item) => item.key)).toEqual(["join-shoulders", "finish-neckline", "prepare-sleeves"]);
+    expect(snapshot.assemblySteps.find((item) => item.key === "prepare-sleeves")?.prerequisiteKeys).toEqual(["join-shoulders"]);
+    record(rows, "step.sleeves").title = "Set the sleeve after a cap check";
+    record(rows, "step.sleeves").pieces = [{ _ref: "piece.front" }, { _ref: "piece.sleeve" }];
+    const corrected = resolvePatternSnapshot(rows, versionId, "illustrative");
+    expect(corrected.assemblySteps.find((item) => item.key === "prepare-sleeves")).toMatchObject({ title: "Set the sleeve after a cap check", pieceKeys: ["front", "sleeve"] });
+    expect(corrected.fingerprint).not.toBe(snapshot.fingerprint);
+  });
+
   it("changes the content fingerprint when editorial source text is corrected", () => {
     const rows = documents();
     const before = resolvePatternSnapshot(rows, versionId, "illustrative");
@@ -77,6 +91,15 @@ describe("structured knowledge resolver", () => {
     duplicate.push(structuredClone(duplicate[0]));
     expect(() => resolvePatternSnapshot(duplicate, versionId, "illustrative")).toThrow(/Duplicate knowledge ID/);
     expect(() => resolvePatternSnapshot(documents(), versionId, "reviewed")).toThrow(/not reviewed/);
+  });
+
+  it("rejects ambiguous piece and step keys used by the garment studio", () => {
+    const repeatedPiece = documents();
+    record(repeatedPiece, "piece.back").pieceKey = "front";
+    expect(() => resolvePatternSnapshot(repeatedPiece, versionId, "illustrative")).toThrow(/piece keys must be unique/);
+    const repeatedStep = documents();
+    record(repeatedStep, "step.neckline").stepKey = "join-shoulders";
+    expect(() => resolvePatternSnapshot(repeatedStep, versionId, "illustrative")).toThrow(/step keys must be unique/);
   });
 
   it("permits a fully reviewed synthetic graph, without upgrading the fixture", () => {

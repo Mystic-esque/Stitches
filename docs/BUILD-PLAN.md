@@ -1,5 +1,13 @@
 # Sequenced build plan
 
+## Approved direction and immediate continuation — September 29, 2026
+
+Insert a garment-first vertical slice between milestones 1 and 2 without dropping any later gates: one browseable blouse study; front/back illustrative garment view; piece dissection; seam links; authored assembly timeline; direct supported fit control; revision-specific Fit/Fabric/Sew consequences. The current UI and validated snapshot begin this slice. Complete the remaining styling, accessibility, deterministic browser journey, and screenshot verification. Do not add fake gallery garments or a 3D simulation that implies tested fit.
+
+Milestone 2 remains the critical Sanity proof: seed only the dedicated Stitches `development` dataset; attach it as a Context Knowledge Base source; select the intended published document types; build and inspect served entries; create a Stitches-only MCP endpoint and read credential; run actual read-only retrieval; then demonstrate an editorial correction through issue application and changed agent/explorer behavior. The empty Knowledge Base created on September 29 is setup progress, not a completed integration gate. Keep `production` untouched.
+
+Milestone 4 uses `gemini-3.5-flash-lite` as the selected candidate. `models.list` access passed, but live inference remains disabled pending confirmation of this project's $0 tier and a real KB-backed route. Verify actual quota for this account rather than assuming public RPM figures. Extend the bounded tools toward garment navigation, compatibility, and step explanation only after deterministic server operations exist; acceptance remains outside the model. Prior plans for 3.8/3.7 are superseded.
+
 This is an implementation sequence, not a time or cost estimate. Each milestone ends with evidence. Checkpoints do not require a new permission request for ordinary local work.
 
 Sanity Challenge Path One is the primary competition target; Build With AI: Basics is secondary. The competition demonstration in `devpost/scope.md` requires live Context MCP and Knowledge Base use plus a tested drafting operation. The fixture milestone alone is not a submission candidate. Establish the Context connection and drafting feasibility early, before investing in the broader accounts and export work.

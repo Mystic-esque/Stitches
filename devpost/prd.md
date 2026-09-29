@@ -5,22 +5,29 @@ status: approved
 
 # Stitches — Product Requirements
 
-Stitches is a personal sewing studio for a home sewist who wants to change a supported pattern and understand every consequence before keeping the change. Sanity Challenge Path One is the primary entry. This document defines the first complete demonstration; the broader product remains in `docs/PRODUCT.md`.
+Stitches is a garment-first creative sewing studio for a maker who wants to understand how a finished design is built, shape a supported version, and carry its consequences through making. Sanity Challenge Path One is the primary entry. This document defines the first complete demonstration; the broader product remains in `docs/PRODUCT.md`.
+
+## Approved garment-studio direction — September 29, 2026
+
+The owner approved the gallery → interactive pieces → assembly → supported customization → making journey. The first catalog release has one fully connected Everyday blouse study, not fake selectable options. A construction illustration may be beautiful and interactive without claiming realistic drape, body fit, or printable pattern accuracy. This section supersedes older wording below that opens directly on Fit or treats the shoulder request as the complete product.
+
+The larger product is a design-to-making companion: a maker can describe a multi-part goal, the agent can coordinate garment choice, compatible changes, measurement questions, fabric and equipment constraints, and sewing guidance, and the result remains tied to one accepted version. The one-blouse/one-verified-operation competition demonstration is a proof slice of that ambition, not the end-state. Additional gallery families, meaningful options, full cutting/printing, and physically reviewed examples remain explicit product work; unsupported actions must not be simulated as available.
 
 Sources: `scope.md > The Unique Kernel`, `Who It's For`, `The Core Loop`, `What "Working" Looks Like`, and `The POC Boundary`.
 
 ## The Core Journey
 
-1. The maker opens the worktable, selects the supported woven-top pattern and its exact version, and sees the current accepted pattern, its readiness status, and the next useful task. Sample measurements and fabric are identified as demo inputs until a private profile exists.
-2. In Fit, the maker requests more shoulder room while keeping the neckline, or uses the available manual control. If the amount or required measurements are missing, Stitches asks for the one missing input or clearly labels a suggested amount before preparing a proposal.
-3. Stitches shows the operation, amount, neckline constraint, applicable source and rule, changed pieces, and checks that remain open. The proposal overlays the original; the maker can select a piece to learn why it changed. A proposal is never labeled ready to cut merely because an outline appears.
-4. The maker rejects the proposal or selects “Keep this version.” Acceptance creates a new revision; the original remains available. The accepted revision changes the status of dependent seam checks, fabric planning, and relevant sewing instructions.
-5. In Fabric, the maker sees whether their specified width and length are sufficient, insufficient, or still unknown, with assumptions and missing inputs. In Sew, they see steps tied to the accepted revision and can mark progress.
-6. For the Sanity demonstration, an editor corrects a relevant reviewed source or rule. After that correction is available to the agent, repeating the request shows a changed supported proposal or a clear refusal, with the new source reason. A proposal based on older evidence cannot be accepted. An already accepted revision remains visible and is marked for review if affected.
+1. The maker opens a garment gallery with one supported woven-top study, selects its exact version, and sees the finished-form illustration, its readiness status, and the next useful task. Sample measurements and fabric are identified as demo inputs until a private profile exists.
+2. In Explore, the maker turns the garment front/back, selects a visible part, inspects its corresponding flat pattern piece and seam partners, then advances through prerequisite-ordered assembly steps. Each label and relationship is tied to the authored version and source.
+3. In Fit, the maker requests more shoulder room while keeping the neckline, or uses the available manual control. If the amount or required measurements are missing, Stitches asks for the one missing input or clearly labels a suggested amount before preparing a proposal.
+4. Stitches shows the operation, amount, neckline constraint, applicable source and rule, changed pieces, and checks that remain open. The proposal overlays the original; the maker can select a piece to learn why it changed. A proposal is never labeled ready to cut merely because an outline appears.
+5. The maker rejects the proposal or selects “Keep this version.” Acceptance creates a new revision; the original remains available. The accepted revision changes the status of dependent seam checks, fabric planning, and relevant sewing instructions.
+6. In Fabric, the maker sees whether their specified width and length are sufficient, insufficient, or still unknown, with assumptions and missing inputs. In Sew, they see steps tied to the accepted revision and can mark progress.
+7. For the Sanity demonstration, an editor corrects a relevant seam, assembly step, source, or rule. Once the authored change and applied Knowledge Base issue are served, the explorer or assistant shows the changed consequence. A proposal based on older evidence cannot be accepted. An already accepted revision remains visible and is marked for review if affected.
 
 ## Screens and Layout
 
-The worktable opens to a project and its next action. Fit is the main workspace: pattern canvas in the center, garment/piece context beside it on wide screens, and a proposal panel next to the changed geometry. Fabric and Sew are stages of the same project and accepted revision. On small screens, the active task comes first; sewing steps have a focused reading view rather than a squeezed desktop inspector. The editorial correction happens in the content authoring surface and appears in the maker experience through a refreshed explanation or restriction.
+The studio opens to a garment study and its next action. Explore shows finished form, flat-piece identities, seam partners, and assembly progression. Fit then uses a pattern canvas in the center, garment/piece context beside it on wide screens, and a proposal panel next to changed geometry. Fabric and Sew are stages of the same project and accepted revision. On small screens, the active task comes first; sewing steps have a focused reading view rather than a squeezed desktop inspector. Editorial correction happens in Sanity and appears through a refreshed relationship, explanation, or restriction.
 
 Source: `scope.md > The Core Loop` and `Inspiration & Identity`.
 
@@ -31,6 +38,18 @@ The maker should feel they are at a quiet, well-organized sewing table. Use the 
 Source: `scope.md > Inspiration & Identity`.
 
 ## Features and Behavior
+
+### Garment Discovery and Dissection
+
+The maker enters through a finished-garment study, not a chat transcript. The selected version exposes each authored piece's title and cut role, every linked seam endpoint, and a prerequisite-safe assembly timeline. Selecting a part keeps its identity consistent between garment illustration, flat piece, connection trail, and sewing step. The first catalog contains only the Everyday blouse until another garment has equally complete authored and supported content. Unsupported catalog items are not presented as working choices.
+
+Observable success: changing a piece, seam, or assembly record in the validated source changes the corresponding UI trail without hardcoded copy changes; broken links or cycles fail visibly. The illustration is marked as illustrative until geometry and maker review qualify it.
+
+### Coordinated Design Briefs
+
+The maker can express a goal in ordinary language and provide constraints such as available cloth, equipment, experience, or features to preserve. The agent decomposes it into only registered garment and operation choices, asks for missing inputs, previews supported alternatives, and shows why a constraint fails or passes using deterministic tool results. The user can make the same choices manually and retains final acceptance authority. The first competition proof handles the supported blouse adjustment; multi-operation briefs, pocket/length variants, and cross-garment recommendations must be added only when their authored compatibility and engines exist.
+
+Observable success for the mature product: a multi-part brief produces an inspectable sequence of supported decisions, a recoverable response to at least one failed constraint, and a revision-specific construction package. It cannot appear complete when geometry, fabric placement, instructions, or physical review is unknown.
 
 ### Pattern and Project Context
 
@@ -85,14 +104,14 @@ Source: `scope.md > The Unique Kernel`, `What "Working" Looks Like`, and `Event 
 ## Product Decisions
 
 - Sanity entry first, Devpost Basics second — the live structured knowledge journey sets the required demonstration.
-- Pattern is the central object, with Fit / Fabric / Sew stages — the agent assists beside the work rather than replacing it with a chat screen.
-- One supported woven-top family and one shoulder adjustment first — this is the smallest coherent example of a rule propagating through pattern, fabric, and instructions.
+- Garment and its linked pattern are the central objects, with Explore / Fit / Fabric / Sew stages — the agent assists beside the work rather than replacing it with a chat screen.
+- One fully connected woven-top family and one verified customization first — this is the smallest coherent example of a design propagating through pieces, seams, assembly, fabric, and instructions.
 - Preserve original and explicit acceptance — the maker stays in control and can compare the consequence before committing.
 - Keep private maker information out of shared pattern content — authored knowledge and personal measurements have different audiences.
 
 ## What We're Building
 
-The complete journey above, live authored knowledge and agent retrieval, one verified supported adjustment, a visible editorial correction consequence, stale-proposal refusal, and a clear demonstration of incomplete and unavailable states. A fixture-only or illustrative result is an intermediate build state, not the final Sanity entry.
+The complete garment-to-making journey above, live authored knowledge and agent retrieval, one verified supported adjustment, a visible editorial correction consequence in both the explorer and assistant, stale-proposal refusal, and clear incomplete/unavailable states. A fixture-only or illustrative result is an intermediate build state, not the final Sanity entry.
 
 ## Deferred From the POC
 

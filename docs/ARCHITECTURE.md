@@ -1,6 +1,14 @@
 # Architecture
 
-This is a recommended design, not a claim that integrations already exist. Official references and review dates are in SOURCES.md.
+## Garment-studio rebaseline — September 29, 2026
+
+The read model must expose a validated `garment -> version -> pieces -> seam connections -> assembly steps -> supported operations -> source evidence` graph. The garment explorer and the bounded agent consume the same resolved version/fingerprint. Presentation assets (SVG/3D meshes) are views of identified parts; they never become numerical pattern authority. Assembly order is derived from prerequisite references and rejects cycles. Each supported style/fit option has explicit compatibility and affected-object links; the server verifies these independently of Gemini. A content edit changes the resolved graph and invalidates pending proposals while accepted revisions retain their former snapshot.
+
+The current app adds `GarmentExplorer` above the existing Fit/Fabric/Sew path and derives its part/seam/assembly labels from `PatternSnapshot`. This is illustrative because the underlying dataset and geometry remain unreviewed. Next, broaden the Sanity schema with versioned garment-view assets, option compatibility, measurement bindings, and revision-specific instruction variants only as those editors and engines are implemented. Avoid an independent hardcoded gallery or 3D scene that contradicts the Sanity graph. Private measurements still belong outside shared Sanity content.
+
+The user selected `gemini-3.5-flash-lite` for the local candidate and confirmed the Gemini project is on the Free tier. A read-only `models.list` check found `generateContent` access; a separate bounded live rehearsal then completed a real Gemini function-calling loop using Stitches Context evidence. This proves the scoped preview path, not general agent reliability or a production cost guarantee. The local runtime still requires an explicit zero-cost confirmation flag and does not run by default. The earlier 3.8/3.7 recommendation below is superseded.
+
+The garment explorer, Sanity development content graph, scoped Context read, and bounded Gemini preview loop exist and have the verification recorded in BUILD_LOG.md. The broader architecture below remains a target: physical pattern validation, fabric feasibility, private project storage, and public deployment have not been completed. Official references and review dates are in SOURCES.md.
 
 ## Components
 
@@ -37,12 +45,15 @@ Context is read-only and does not run the agent loop. Use Sanity Studio and appr
 
 ## Gemini
 
-Use the official `@google/genai` SDK. Evaluate `gemini-3.8-flash`, listed as stable in the official model catalog when this brief was prepared. Keep `GEMINI_MODEL` configurable and verify access in the user's project. Do not silently change models.
+Use the official `@google/genai` SDK with the currently selected `gemini-3.5-flash-lite` only after this account's $0 inference gate is verified. Keep the model configurable behind a server allowlist; do not silently fall back to a paid model. The existing narrow loop uses `generateContent` and is not yet a complete garment-studio agent.
 
 Use one bounded agent loop rather than multiple agents. Suggested tools:
 
 | Tool | Responsibility |
 | --- | --- |
+| `get_garment_context` | Retrieve the allowed garment version, pieces, joins, assembly, options, and provenance |
+| `explain_connection` | Identify an authored seam or construction dependency with exact source scope |
+| `get_assembly_step` | Return the prerequisite-safe step and revision-specific guidance |
 | `get_pattern_context` | Retrieve the allowed version, rules, relationships, and provenance |
 | `get_adjustment_options` | Return supported operations, bounds, units, and locks |
 | `preview_adjustment` | Invoke a whitelisted engine operation; return a proposal and dependency trail |

@@ -1,5 +1,11 @@
 # Design specification
 
+## Garment-first extension — September 29, 2026
+
+Keep the linen/olive/terracotta atelier system, but open on a finished garment rather than an isolated flat pattern. The first screen should communicate a simple promise: see the garment, uncover its actual authored pieces and seams, follow how it is assembled, then make a supported version. Retain Fit / Fabric / Sew after Explore, so an experienced maker can still jump straight to the worktable. A selected part must have the same identity in the finished view, flat-piece map, seam trail, and revision-specific instruction. Use motion only to clarify this relationship, and honor reduced motion.
+
+The first SVG garment is a labeled construction illustration. If a later 3D renderer is added, it needs front/back rotation, an exploded piece view, keyboard alternatives, and the same provenance labels; attractive rotation alone is not sufficient. Never use visual polish to suggest drape, graded sizes, or cut-readiness that the engine has not verified. On 320–390px screens, prioritize one current garment/step and readable direct controls. Avoid a grid of unavailable gallery cards.
+
 ## Reference and intent
 
 The interactive reference and screenshots capture the approved direction, not an exhaustive final interface. Preserve the visual identity and interaction model. Rebuild them as maintainable application components rather than embedding the reference HTML as the app.

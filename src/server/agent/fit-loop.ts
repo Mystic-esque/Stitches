@@ -39,6 +39,11 @@ export class FitLoopError extends Error {
 const draftArgs = z.object({ amountMm: z.number().finite() }).strict();
 const contextArgs = z.object({}).strict();
 
+function scopedKnowledgeExcerpt(text: string): string {
+  const lines = text.split(/\r?\n/).filter((line) => /shoulder|sleeve|neckline|piece|version|review|source/i.test(line));
+  return (lines.length ? lines.join("\n") : text).slice(0, 2_400);
+}
+
 /** The model never chooses a URL, path, pattern ID, shell command, or write action. */
 export async function runFitLoop(input: FitLoopInput): Promise<FitLoopResult> {
   const request = input.request.trim();
@@ -104,7 +109,7 @@ export async function runFitLoop(input: FitLoopInput): Promise<FitLoopResult> {
           affectedPieceIds: input.snapshot.effectsByOperation["shoulder-width"].pieces.map((item) => item.pieceId),
           unresolvedChecks: input.snapshot.effectsByOperation["shoulder-width"].unresolvedChecks,
           knowledgeBaseId: input.knowledgeBaseId,
-          knowledgeText: knowledge.text.slice(0, 6000),
+          knowledgeText: scopedKnowledgeExcerpt(knowledge.text),
           illustrationOnly: input.snapshot.mode === "illustrative",
         },
       };

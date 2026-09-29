@@ -28,15 +28,15 @@ export async function POST(request: Request) {
   if (!matchesToken(request.headers.get("authorization") ?? "", `Bearer ${token}`))
     return NextResponse.json({ error: { code: "unauthorized", message: "A development preview token is required." } }, { status: 401 });
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 45_000);
+  const timeout = setTimeout(() => controller.abort(), 100_000);
   const cancel = () => controller.abort();
   request.signal.addEventListener("abort", cancel, { once: true });
   try {
     const config = contextConfiguration();
-    const path = process.env.STITCHES_CONTEXT_SHOULDER_PATH;
+    const path = "fit_style_operations"; // Exact served path in the scoped Stitches KB outline.
     const key = process.env.GEMINI_API_KEY;
-    const model = process.env.GEMINI_MODEL || "gemini-3.8-flash";
-    if (!path || !path.startsWith("/") || path.length > 300 || !key || (model !== "gemini-3.8-flash" && model !== "gemini-3.7-flash"))
+    const model = process.env.GEMINI_MODEL || "gemini-3.5-flash-lite";
+    if (config.organizationId !== "o3i0aqvqq" || config.mcpName !== "stitches-garments" || config.knowledgeBaseId !== "kbkvu1vrPsLG" || !key || model !== "gemini-3.5-flash-lite")
       throw new FitPreviewError("disabled", "A server-selected Knowledge Base path and permitted Gemini model are required.");
     const raw: unknown = await request.json().catch(() => null);
     const result = await previewDevelopmentFit(raw, {

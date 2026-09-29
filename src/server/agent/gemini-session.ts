@@ -2,7 +2,7 @@ import { GoogleGenAI, Type, type Content, type GenerateContentParameters, type G
 import type { ModelFeedback, ModelSession, ModelTurn } from "./fit-loop";
 
 export class GeminiAdapterError extends Error {
-  constructor(public readonly code: "config" | "quota" | "cancelled" | "provider" | "protocol", message: string) {
+  constructor(public readonly code: "config" | "quota" | "cancelled" | "timeout" | "provider" | "protocol", message: string) {
     super(message);
     this.name = "GeminiAdapterError";
   }
@@ -10,7 +10,7 @@ export class GeminiAdapterError extends Error {
 
 export type GeminiSessionOptions = {
   apiKey: string;
-  model: "gemini-3.8-flash" | "gemini-3.7-flash";
+  model: "gemini-3.5-flash-lite";
   request: string;
   generate?: (parameters: GenerateContentParameters) => Promise<GenerateContentResponse>;
 };
@@ -31,7 +31,7 @@ const declarations: Tool[] = [{ functionDeclarations: [
 /** One session holds the exact model Content, including Gemini 3 thought signatures. */
 export function createGeminiSession(options: GeminiSessionOptions): ModelSession {
   if (!options.apiKey || options.apiKey.length > 500) throw new GeminiAdapterError("config", "A Gemini API key is required.");
-  if (options.model !== "gemini-3.8-flash" && options.model !== "gemini-3.7-flash")
+  if (options.model !== "gemini-3.5-flash-lite")
     throw new GeminiAdapterError("config", "The configured Gemini model is not allowlisted.");
   const request = options.request.trim();
   if (!request || request.length > 400) throw new GeminiAdapterError("config", "Invalid maker request.");
@@ -64,7 +64,7 @@ export function createGeminiSession(options: GeminiSessionOptions): ModelSession
             tools: declarations,
             temperature: 0.1,
             maxOutputTokens: 384,
-            httpOptions: { timeout: 15_000, retryOptions: { attempts: 1 } },
+            httpOptions: { timeout: 30_000, retryOptions: { attempts: 1 } },
             ...(signal ? { abortSignal: signal } : {}),
           },
         });
@@ -72,6 +72,8 @@ export function createGeminiSession(options: GeminiSessionOptions): ModelSession
         if (signal?.aborted) throw new GeminiAdapterError("cancelled", "The model request was cancelled.");
         const status = typeof error === "object" && error && "status" in error ? Number(error.status) : undefined;
         if (status === 429) throw new GeminiAdapterError("quota", "Gemini quota is exhausted; the manual controls remain available.");
+        const name = typeof error === "object" && error && "name" in error ? String(error.name) : "";
+        if (status === 504 || name === "AbortError" || name === "TimeoutError") throw new GeminiAdapterError("timeout", "Gemini took too long; the manual controls remain available.");
         throw new GeminiAdapterError("provider", "Gemini is unavailable; the manual controls remain available.");
       }
       lastModelContent = response.candidates?.[0]?.content;
@@ -82,7 +84,7 @@ export function createGeminiSession(options: GeminiSessionOptions): ModelSession
         : undefined;
       return {
         calls: rawCalls.map((call) => ({ id: call.id ?? "", name: call.name ?? "", args: call.args })),
-        text: response.text,
+        text: rawCalls.length ? undefined : response.text,
       };
     },
   };

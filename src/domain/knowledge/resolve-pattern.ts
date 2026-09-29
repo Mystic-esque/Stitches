@@ -20,9 +20,13 @@ export type KnowledgeMode = "illustrative" | "reviewed";
 
 export type PieceEffect = { pieceId: string; pieceTitle: string; via: "direct" | "join"; ruleId: string; joinId?: string; sourceIds: string[] };
 export type SourceDetail = { id: string; title: string; reviewStatus: string; locator?: string; content?: string; url?: string; licenseNotes?: string };
+export type GarmentPiece = { id: string; key: string; title: string; cutCount?: number; mirrored?: boolean; onFold?: boolean; edgeIds: string[] };
+export type GarmentConnection = { id: string; pieceKeys: string[]; edgeIds: string[]; relation: string; constraintStatus: string };
+export type AssemblyStep = { id: string; key: string; title: string; prerequisiteKeys: string[]; pieceKeys: string[]; affectedByOperationIds: string[] };
 export type PatternSnapshot = {
   patternId: string;
   patternTitle: string;
+  category?: string;
   versionId: string;
   version: string;
   mode: KnowledgeMode;
@@ -33,6 +37,9 @@ export type PatternSnapshot = {
   stepIds: string[];
   sourceIds: string[];
   sourceDetails: SourceDetail[];
+  garmentPieces: GarmentPiece[];
+  garmentConnections: GarmentConnection[];
+  assemblySteps: AssemblyStep[];
   effectsByOperation: Record<string, { pieces: PieceEffect[]; stepIds: string[]; dependentRuleIds: string[]; invalidates: string[]; unresolvedChecks: string[] }>;
 };
 
@@ -73,6 +80,8 @@ export function resolvePatternSnapshot(raw: unknown, versionId: string, mode: Kn
   const steps = documents.filter((item): item is Extract<KnowledgeDocument, { _type: "instructionStep" }> => item._type === "instructionStep" && item.patternVersion._ref === versionId);
   const fabrics = documents.filter((item): item is Extract<KnowledgeDocument, { _type: "fabricRequirement" }> => item._type === "fabricRequirement" && item.patternVersion._ref === versionId);
   if (!pieces.length || !rules.length) throw new KnowledgeError("missing", "Pattern version needs pieces and adjustment rules.");
+  if (new Set(pieces.map((item) => item.pieceKey)).size !== pieces.length) throw new KnowledgeError("conflict", "Pattern piece keys must be unique within a version.");
+  if (new Set(steps.map((item) => item.stepKey)).size !== steps.length) throw new KnowledgeError("conflict", "Instruction step keys must be unique within a version.");
   if (mode === "reviewed" && (version.reviewStatus !== "reviewed" || !version._rev || !fabrics.length)) {
     throw new KnowledgeError("unreviewed", "Pattern version, revision, or fabric requirements are not reviewed.");
   }
@@ -113,6 +122,7 @@ export function resolvePatternSnapshot(raw: unknown, versionId: string, mode: Kn
   }
   const visiting = new Set<string>();
   const visited = new Set<string>();
+  const assemblyOrder: string[] = [];
   function visitStep(id: string) {
     if (visiting.has(id)) throw new KnowledgeError("cycle", `Instruction prerequisite cycle at ${id}.`);
     if (visited.has(id)) return;
@@ -120,6 +130,7 @@ export function resolvePatternSnapshot(raw: unknown, versionId: string, mode: Kn
     for (const ref of stepById.get(id)?.prerequisites ?? []) visitStep(ref._ref);
     visiting.delete(id);
     visited.add(id);
+    assemblyOrder.push(id);
   }
   for (const step of steps) visitStep(step._id);
   const ruleById = new Map(rules.map((item) => [item._id, item]));
@@ -199,5 +210,17 @@ export function resolvePatternSnapshot(raw: unknown, versionId: string, mode: Kn
     .map((item) => ({ id: item._id, title: item.title, reviewStatus: item.reviewStatus,
       ...(item.locator ? { locator: item.locator } : {}), ...(item.content ? { content: item.content } : {}),
       ...(item.url ? { url: item.url } : {}), ...(item.licenseNotes ? { licenseNotes: item.licenseNotes } : {}) }));
-  return { patternId: pattern._id, patternTitle: pattern.title, versionId, version: version.version, mode, fingerprint, pieceIds: pieces.map((item) => item._id).sort(), joinIds: joins.map((item) => item._id).sort(), ruleIds: rules.map((item) => item._id).sort(), stepIds: steps.map((item) => item._id).sort(), sourceIds: sourceDetails.map((item) => item.id), sourceDetails, effectsByOperation };
+  const pieceById = new Map(pieces.map((item) => [item._id, item]));
+  const garmentPieces = pieces.map((item) => ({ id: item._id, key: item.pieceKey, title: item.title,
+    ...(item.cutCount ?? item.demoCut?.count ? { cutCount: item.cutCount ?? item.demoCut?.count } : {}),
+    ...(item.mirrored ?? item.demoCut?.mirrored ? { mirrored: item.mirrored ?? item.demoCut?.mirrored } : {}),
+    ...(item.onFold ?? item.demoCut?.onFold ? { onFold: item.onFold ?? item.demoCut?.onFold } : {}), edgeIds: item.edgeIds })).sort((a, b) => a.key.localeCompare(b.key));
+  const garmentConnections = joins.map((item) => ({ id: item._id,
+    pieceKeys: item.endpoints.map((endpoint) => pieceById.get(endpoint.piece._ref)!.pieceKey),
+    edgeIds: item.endpoints.map((endpoint) => endpoint.edgeId), relation: item.relation ?? "unresolved", constraintStatus: item.constraintStatus })).sort((a, b) => a.id.localeCompare(b.id));
+  const assemblySteps = assemblyOrder.map((id) => stepById.get(id)!).map((item) => ({ id: item._id, key: item.stepKey, title: item.title,
+    prerequisiteKeys: item.prerequisites.map((ref) => stepById.get(ref._ref)!.stepKey),
+    pieceKeys: (item.pieces ?? []).map((ref) => pieceById.get(ref._ref)!.pieceKey),
+    affectedByOperationIds: item.affectedBy.map((ref) => ruleById.get(ref._ref)!.operationId) }));
+  return { patternId: pattern._id, patternTitle: pattern.title, ...(pattern.category ? { category: pattern.category } : {}), versionId, version: version.version, mode, fingerprint, pieceIds: pieces.map((item) => item._id).sort(), joinIds: joins.map((item) => item._id).sort(), ruleIds: rules.map((item) => item._id).sort(), stepIds: steps.map((item) => item._id).sort(), sourceIds: sourceDetails.map((item) => item.id), sourceDetails, garmentPieces, garmentConnections, assemblySteps, effectsByOperation };
 }

@@ -1,5 +1,19 @@
 # Product brief
 
+## Approved product direction — September 29, 2026
+
+Stitches is now a **garment-first creative sewing studio**, not chiefly a shoulder-adjustment demo. A maker should be able to discover a supported finished garment, turn it over, inspect its linked flat pieces and seams, understand the assembly order, make a supported change with ordinary controls or natural language, and see revision-specific consequences across the garment, fabric questions, and sewing guide. The agent is a knowledgeable studio assistant beside this direct-manipulation workflow; it is not the whole product.
+
+The first complete family is the Everyday blouse. A one-garment release is honest only if the journey from garment to pieces to assembly to safe customization genuinely works. More garment cards may be authored later through Sanity; do not pad the gallery with fake selectable patterns. Sanity is essential to the garment/piece/seam/instruction graph, the compatibility rules, editorial provenance, and the Context Knowledge Base that grounds the assistant. A published content correction must change an observed decision or explanation. Gemini interprets requests and narrates verified tool output, but does not draft freehand geometry or infer cut-readiness.
+
+The visual experience may use an attractive rotatable or exploded illustration, with a future Three.js viewer if useful. Until true graded geometry and fabric simulation are verified, label rendered garments and flat shapes as construction illustrations, not accurate drape or body fit. User measurements should shape only operations supported by a reviewed pattern adapter; missing measurements lead to a focused question, not invented coordinates. This approved direction supersedes any reading of the older signature scenario below as the whole product scope.
+
+The full product ambition is a maker's design-to-making partner, not a lookup assistant with one slider. A brief such as “make this top longer, keep its neckline, use my available fabric, and guide me through a sleeve I have never sewn” should become a coordinated plan: identify supported design options, request only necessary measurements, run deterministic pattern and fabric tools, expose tradeoffs and unknowns, retain a revision, then teach the exact construction sequence for that version. The agent may choose, sequence, and inspect allowed tools, while the maker can perform the same supported actions directly. A failed constraint should lead to a specific recoverable alternative, never an invented feasible result.
+
+The connected wardrobe can grow to multiple reviewed garment families and variations as their Sanity-authored piece graphs, visual mappings, compatibility rules, sources, and deterministic operations are completed. The first blouse is the competition's coherent proof slice, not a permanent one-garment product limit. A future pattern/cutting/instruction package must correspond to the same accepted revision; visual renderings alone cannot qualify it. A physically made example is needed before claiming a cut-ready garment.
+
+Success for the refreshed MVP: a visitor can move through one visually polished garment study; select a piece and see its real authored seam links; scrub an authored, prerequisite-safe assembly story; request or directly set a supported customization; compare original/proposal; save an immutable revision; see stale fabric and sewing evidence re-evaluated; and receive a bounded, cited agent explanation from actual Context retrieval in live mode. The current fixture is only the first illustrative slice of that loop.
+
 ## Product and audience
 
 Stitches helps home sewists adapt a supported pattern to their preferences, understand the consequences, plan the fabric, and follow instructions for the accepted version. The initial audience is a maker who can follow a sewing pattern but lacks confidence adjusting one. More experienced makers can inspect the same geometry and constraints in greater detail.
@@ -14,12 +28,13 @@ The accepted change invalidates any outdated seam checks, fabric layout, and aff
 
 ## Core journey
 
-1. Worktable: pick up a project or start from a supported pattern. Show the next useful task.
-2. Setup: select the exact pattern version, confirm required measurements and units, choose fit preferences, and optionally add fabric.
-3. Fit: adjust manually or describe a change. Preview a proposal while preserving the original. Inspect affected pieces and the reason for each dependency.
-4. Fabric: calculate a feasible placement of final pieces within usable width and available length, respecting cut counts, grain, mirrored pieces, and relevant directional restrictions. Show missing inputs.
-5. Sew: use instructions tied to the accepted pattern revision. Follow prerequisite order and remember progress.
-6. Export: once the required checks are satisfied, produce versioned, scale-correct print output with a calibration square and assembly markings.
+1. Discover and Explore: choose a genuinely supported garment, turn its finished illustration, select flat pattern pieces and seam partners, and follow an authored assembly story.
+2. Worktable: pick up a project or start from that garment's exact pattern version. Show the next useful task.
+3. Setup: confirm required measurements and units, choose supported fit/style preferences, and optionally add fabric and available equipment.
+4. Shape: adjust manually or describe a multi-part goal. Preview only supported operations while preserving the original. Inspect affected pieces, compatibility, and the reason for each dependency.
+5. Fabric: calculate a feasible placement of final pieces within usable width and available length, respecting cut counts, grain, mirrored pieces, and relevant directional restrictions. Show missing inputs and supported alternatives.
+6. Sew: use instructions tied to the accepted pattern revision and selected technique. Follow prerequisite order, ask for the needed level of guidance, and remember progress.
+7. Export: once the required checks are satisfied, produce a versioned, scale-correct pattern, cutting list, materials, and construction package with calibration and assembly markings.
 
 ## Initial release scope
 

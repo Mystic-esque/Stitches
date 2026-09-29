@@ -1,5 +1,13 @@
 # Structured content model
 
+## Garment-first additions — approved September 29, 2026
+
+The browser's garment study is not a second content store. For an exact `patternVersion`, the validated snapshot now derives `garmentPieces` from `patternPiece`, `garmentConnections` from `seamConnection`, and prerequisite-ordered `assemblySteps` from `instructionStep`. Duplicate piece/step keys, broken or cross-version references, and prerequisite cycles fail resolution. The initial illustration is tied to the one demo blouse; titles, cut counts, joins, assembly order, and content fingerprint must come from the resolved content, not visual constants.
+
+Before expanding the catalog, author explicit display assets keyed to stable piece and garment IDs: front/back (and optional exploded/3D) views, visible regions, attribution/license, and an `illustrative`/`geometry-verified`/`maker-reviewed` status. Add style options with allowed pattern versions, incompatible combinations, required measurements, affected piece/connection IDs, and instruction variants. A UI option is enabled only when a deterministic operation registry can implement it for the selected version. Measurements and personal designs remain owner-private. The Knowledge Base purpose includes garment construction and editorial sources; its prose does not override exact numeric constraints from reviewed structured records.
+
+Acceptance demonstration: change an authored seam or instruction relationship in the dedicated Stitches development dataset, refresh and apply Knowledge Base issues, then show the changed served entry and a changed explorer/agent consequence. A fixture edit and a KB creation with zero entries do not satisfy this live gate.
+
 ## Why this model matters
 
 A shoulder adjustment touches a shoulder point, an armhole, a sleeve relationship, one or more sewing steps, and a fabric placement. These are explicit, versioned links. Gemini retrieves them and explains the consequences; deterministic code executes approved operations and validates the result.
