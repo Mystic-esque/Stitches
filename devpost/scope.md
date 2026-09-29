@@ -1,73 +1,43 @@
 ---
 doc: scope
-status: approved
+status: revised-for-full-application
+revision: studio-1.0
 ---
 
-# Stitches
-
-## Approved scope update — September 29, 2026
-
-The Sanity-first entry is a garment-first creative studio. A maker starts with a supported finished garment, sees its authored pattern pieces and seams, follows the assembly story, makes a supported reversible customization, and gets revision-specific fabric and sewing consequences. The original shoulder-room scenario remains a proving case, not the whole product. The first fully connected family is the Everyday blouse; fake selectable gallery cards, invented fit simulation, and cut-ready claims are out. Actual Sanity Content Lake links, Context Knowledge Base retrieval, and an editorial correction changing observed behavior remain the primary judging proof. Devpost Basics is secondary.
-
-Garments you can understand, shape, and make—one connected piece at a time.
+# Stitches — scope
 
 ## Primary Goal
 
-Sanity Challenge Path One is the primary entry. Build With AI: Basics is a secondary entry using the same project and the Devpost Learn planning workflow. The Sanity demonstration determines the minimum acceptance criteria. The curriculum's suggested small experiment is a planning aid, not a reason to remove essential Sanity functionality or the established Stitches product ambition.
-
-This scope describes the first competition demonstration; `docs/PRODUCT.md` and `docs/BUILD-PLAN.md` retain the broader product and its release gates.
+Deliver the complete garment studio in ../docs/PRODUCT.md, with Sanity as a core dependency and a useful Gemini assistant. Sanity is the primary entry; Devpost is a second presentation of the same work. The owner explicitly requested a premium application and a detailed design and Sol implementation handoff. Routine product and technical decisions are delegated.
 
 ## The Unique Kernel
 
-A garment is traced through versioned pattern pieces, seam connections, assembly prerequisites, supported customization rules, source corrections, fabric consequences, and sewing instructions authored in Sanity. A Gemini agent retrieves applicable knowledge through actual Sanity Context MCP backed by a Knowledge Base, and bounded application tools validate its proposed navigation or change. The maker sees what makes the garment, why a part changes, which source governs it, and whether a proposal can be accepted.
+A maker changes one design and sees the connected consequences across the preview, pieces, seams, cloth, cutting, and sewing. The assistant executes supported tools to carry a multi-part brief through that process and recover from a failed constraint. Construction rules and evidence are maintained in Sanity; exact relationships and actual Context Knowledge Base retrieval both affect the result.
 
-Maintained content changes behavior: a reviewed correction can change the applicable operation or require a fresh check, without changing application code. A stored accepted version remains reproducible and affected projects are marked for review.
+## Target User
 
-## Who It's For
+A home sewist with basic machine skills and limited pattern-alteration confidence. Beginners can explore construction; experienced makers can inspect values and sources. Do not infer gender, body shape, or skill from a photo.
 
-A home sewist who can follow a pattern but lacks confidence adjusting one. Today they may alter a piece without knowing what dependent seams or instructions also need review.
+## Full First Release
 
-## The Core Loop
+Landing page; six supported looks across two qualified families; garment detail; photo analysis and template matching; guest projects; 3D construction and linked flat pieces; design options and measurements; an assistant using actual Sanity knowledge and deterministic tools; immutable revisions; feasible fabric placement; cutting preparation; scale-correct PDF/SVG and making package; focused sewing and saved progress; editorial correction evidence; recovery; polished desktop/mobile UI.
 
-The maker browses a supported finished garment, turns and dissects its view into authored flat pieces, follows connected seams and assembly order, asks for or selects a supported customization, compares the proposal with the original, and keeps or rejects the change. The accepted version guides the next fabric and sewing decisions.
+The two-family/six-look target is a release gate. Build the whole journey for the lead top first, then qualify the skirt and every preset. One family is a milestone, not the completed release. The former shoulder-only POC boundary is superseded.
 
-## Inspiration & Identity
+## Kept Out of This Release
 
-A quiet, tactile personal atelier: linen, olive, terracotta, editorial serif headings, and a pattern-centered workspace. The existing design reference is `references/stitches-interactive.html`; `docs/DESIGN.md` captures the visual decisions.
+No signup/accounts, collaboration, marketplace, body scanning, arbitrary photo/PDF-to-pattern conversion, or physical cloth simulation. No public deployment or submission is authorized. Guest isolation and backup are required. Shared Sanity content never stores personal measurements or reference photos.
 
-## Why This Matters to the Learner
+## Working Means
 
-The learner's primary goal is a useful Sanity entry that demonstrates why structured, connected, editable knowledge matters. Build With AI: Basics is a secondary opportunity, supported by actual use of its skills and planning records.
+A maker begins at a collection or photo, selects a supported look, inspects construction, supplies required measurements, makes meaningful changes, resolves a fabric or technique constraint with the assistant, retains a version, exports its cutting/making package, and follows its exact sewing steps.
 
-## What "Working" Looks Like
+Evidence establishes determinism, actual seam/layout validation, source bindings, stale refusal, live Gemini and Context, recovery, accessibility, and print scale. At least one documented physical make qualifies the lead family before a ready-to-cut claim; the second family cannot borrow that review. Real-world review may remain an explicit open gate but cannot be fabricated.
 
-The competition demonstration must show:
+## Constraints and Collaboration
 
-1. A maker opens the Everyday blouse, sees its finished illustrative form, selects pieces and seam partners, and follows an authored assembly sequence. The screen's labels, joins, order, and source trail come from the exact validated Sanity version rather than a disconnected visual catalog.
-2. The maker requests more shoulder room while preserving the neckline on that version. The live Gemini loop retrieves applicable evidence through Sanity Context and its Knowledge Base. Exact versioned relationships and constraints are validated against authored Sanity records before a supported operation runs.
-3. A deterministic, tested operation produces a proposal. The maker compares original and changed pieces, inspects source-linked reasons, and accepts or rejects a new revision. Related seam checks, fabric status, and affected sewing instructions update from those relationships.
-4. An editor corrects an applicable relationship, assembly step, rule, or source in Sanity. After a Knowledge Base refresh detects the change, issues are reviewed and applied and the served entry is verified. The same exploration/request then produces the appropriate changed trail, plan, or refusal. The demonstration records before/after content and retrieval evidence; it does not imply immediate indexing.
-5. A previously prepared proposal cannot be accepted using stale evidence. Accepted versions retain their snapshots; a new correction prompts review without silently rewriting them.
-6. An ambiguous, conflicting, or unsupported case produces a focused question or honest limitation. A provider outage leaves direct exploration, manual controls, and the original usable.
+Next.js/React/TypeScript, Sanity, Gemini, and the atelier identity remain. Paid-provider budget is $0. Use the allowlisted gemini-3.5-flash-lite within confirmed free quotas, with bounded calls and no paid fallback. Content writes stay in l4eeamth/development. Sol implements without recurring milestone approval requests. Verification and local commits are required. Physical making and external release are separately evidenced.
 
-Include a small fair comparison with keyword retrieval over the same source material: measure whether it finds the applicable version, source precedence, and complete dependency consequences. Report the result even if the advantage is absent. This is evidence for the structured-content claim, not a promise to beat every search system.
+## Planning and Event Records
 
-## The POC Boundary
-
-One fully connected, authorized garment family and one verified supported customization journey, including finished-form/flat-piece/assembly exploration, live Sanity Context/Knowledge Base retrieval, a working editorial correction flow, bounded Gemini tools, source and version bindings, deterministic proposal checks, and a visible Fit / Fabric / Sew consequence trail. These are required for the Sanity candidate, even if the work exceeds the curriculum's suggested duration.
-
-Sanity supplies maintained knowledge; the geometry engine supplies numerical results. A fixture-backed interface is an intermediate milestone. It does not satisfy the live retrieval or drafting gates. Unknown fabric feasibility stays unknown, and physical maker review remains mandatory before a ready-to-cut claim.
-
-## Later
-
-After the first competition demonstration: additional fully supported garments and adjustments, private measurement accounts, full fabric nesting, the expanded mobile sewing experience, and scale-correct export. Physical maker review is a release gate whenever cut-ready use is offered. The first demonstration already includes instruction changes tied to the accepted revision. These milestones remain in the Stitches product brief; this event scope does not cancel them.
-
-## Explicitly Cut
-
-Arbitrary PDF pattern interpretation, body scanning, photorealistic drape, a marketplace, and industrial grading. They do not help prove the first adjustment and connected-knowledge journey.
-
-## Event Evidence
-
-Sanity Path One evaluates meaningful Context and structured-content use, implementation, Knowledge Base use, and usability. Its deadline is October 4, 2026 at 11:59 p.m. PDT (October 5 at 7:59 a.m. Lagos time). Prepare the required DEV post, test instructions, and Sanity project ID, alongside the Devpost planning documents and demo package. Publication and submission require separate owner authorization.
-
-Official sources checked September 28, 2026: https://dev.to/challenges/sanity-2026-09-16 and https://dev.to/page/sanity-challenge-v26-09-16-contest-rules.
+Existing proof remains in Git and ../BUILD_LOG.md. Revised documents describe a larger target, not completed features. Legacy devpost/ paths remain canonical; the newer plugin's alternate state/directory layout is not silently initialized. Event requirements must be checked through the official workflow when submission preparation becomes active.

@@ -1,10 +1,12 @@
-# Start building Stitches
+# Start the Studio 1.0 implementation
 
-Continue development of Stitches in this folder. Read AGENTS.md and the linked product, design, architecture, content model, status, and build plan before coding. Inspect the desktop screenshot and interactive reference.
+Work in C:\\Users\\USER\\Desktop\\Stitches. Read AGENTS.md, docs/STATUS.md, then docs/SOL_HANDOFF.md and its linked documents. The product/design package is ready; the new full application is not implemented yet.
 
-Build the first milestone: a runnable Next.js, React, and TypeScript application reproducing the reference's warm sewing-studio identity and Fit / Fabric / Sew workflow. Use reusable components and a domain layer. Include the shoulder adjustment, original/proposed comparison, locked neckline, connected-piece explanation, version acceptance, fabric-width comparison, and persistent sewing progress. Support keyboard interaction and small screens.
+Build the premium garment-studio journey in devpost/prd.md using devpost/spec.md and devpost/checklist.md. Follow docs/DESIGN.md and inspect design/stitches-studio.html on desktop and phone. Preserve the current tested knowledge/provider adapters and explicit demo status; do not restart or turn the old shoulder spike into a production pattern.
 
-Sanity will hold structured pattern knowledge and Gemini will power interpretation and explanation. Begin with validated fixtures so local work does not depend on API keys, then prepare the provider interfaces for the real integrations. Label sample geometry and estimates honestly. The reference's drawing and yardage formulas must not become production drafting rules.
+Start W01 with full-pattern/source/license qualification and versioned capability manifests for a top and a skirt. Continue guest/UI work independently if physical expert evidence is unavailable. Implement small coherent tasks with real checks, update state/logs and local commits, and continue without routine re-approval.
 
-Run the appropriate checks, verify the main interactions in a browser, and update docs/STATUS.md with evidence and remaining work. Resolve routine implementation choices without stopping. If cloud access is needed later, explain the exact configuration needed and continue independent work. Preserve the existing brief and references.
+No signup; no paid provider spend; no production Sanity changes; no public deployment, messaging or final submission. Actual Sanity Content Lake + maintained Context KB and bounded Gemini tools remain essential. Keep review-only output honest until digital, source and physical gates qualify it.
+
+Success is a locally working two-family product with connected garment/pieces/assembly/customization/fabric/making/export, actual failure recovery and reviewable release evidence—not the static reference or a decorative gallery.
 

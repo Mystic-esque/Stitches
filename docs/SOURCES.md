@@ -1,5 +1,22 @@
 # Official sources
 
+## Studio 1.0 architectural research — September 29, 2026
+
+These primary sources informed the upgraded specification. They do not prove our implementation, qualify pattern rights, or replace maker testing. No new model call or cloud operation occurred during this design pass.
+
+- [Sanity Context source types](https://www.sanity.io/docs/ai/sanity-context-source-types) and [retrieval modes](https://www.sanity.io/docs/ai/sanity-context-retrieval-modes): keep exact dataset retrieval separate from the existing KB-only endpoint.
+- [Maintain a Knowledge Base](https://www.sanity.io/docs/ai/sanity-context-maintain-knowledge-base): change detection, application/rebuild and served-entry verification are distinct. Record the actual result rather than assuming refresh means current.
+- [Context CLI](https://www.sanity.io/docs/cli-reference/cli-context): documented maintenance surface; check installed CLI compatibility before use. No invented control-plane URLs.
+- [Sanity Functions](https://www.sanity.io/docs/functions) and [local testing](https://www.sanity.io/docs/functions/functions-local-testing): foundation for a prepared, locally rehearsed editorial-impact wrapper, not authorization to deploy it.
+- [Gemini 3.5 Flash-Lite](https://ai.google.dev/gemini-api/docs/models/gemini-3.5-flash-lite), [image understanding](https://ai.google.dev/gemini-api/docs/image-understanding), and [structured output](https://ai.google.dev/gemini-api/docs/structured-output): feasibility of bounded visible-feature extraction. Model access/free quotas and provider image-data terms still need task-time validation; image input is not pattern-generation competence.
+- [Three.js glTF](https://threejs.org/manual/pages/load-gltf.html), [picking](https://threejs.org/manual/pages/picking.html), and [responsive rendering](https://threejs.org/manual/pages/responsive.html): display, selection and responsive rendering building blocks. These do not provide a garment drafting or fit-physics system.
+- [FreeSewing developer portal](https://freesewing.dev/) and [design catalog](https://freesewing.eu/designs/): programmable pattern candidates. Exact package/source/license and generated-output rights remain W01 work; a repository host lookup did not complete qualification in this pass.
+- [Teagan](https://freesewing.eu/designs/teagan): a knit T-shirt candidate, not a woven blouse substitution. [Tamiko](https://freesewing.eu/docs/designs/tamiko/) and [Tina](https://freesewing.eu/docs/designs/tina/) document material/construction constraints that make casual relabeling inappropriate. [Sandy](https://freesewing.eu/docs/designs/sandy/) is a skirt candidate to evaluate; [Tiberius](https://freesewing.eu/designs/tiberius/) is a different tunic design, not an already qualified everyday top.
+
+The new spec intentionally does not repeat novelty claims from earlier discussion or claim superiority over existing garment tools without evidence. The differentiation to demonstrate is maintained, connected construction knowledge carrying a real design through making and correction.
+
+## Earlier reference review
+
 Reviewed September 28, 2026. Recheck provider SDK details and model availability when implementation starts. The architecture recommendations are design judgments, not guarantees from these vendors.
 
 - [Codex project instructions](https://learn.chatgpt.com/docs/agent-configuration/agents-md): how project-level AGENTS.md guidance is discovered and used.

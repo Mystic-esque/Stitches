@@ -1,127 +1,129 @@
 ---
 doc: prd
-status: approved
+status: implementation-ready-design
+revision: studio-1.0
 ---
 
-# Stitches — Product Requirements
+# Stitches — product requirements
 
-Stitches is a garment-first creative sewing studio for a maker who wants to understand how a finished design is built, shape a supported version, and carry its consequences through making. Sanity Challenge Path One is the primary entry. This document defines the first complete demonstration; the broader product remains in `docs/PRODUCT.md`.
+## Product Summary
 
-## Approved garment-studio direction — September 29, 2026
+A garment studio that lets a maker discover a design, understand its construction, shape a supported version, plan the cloth, and make it with a source-grounded assistant. This is the full application target. scope.md defines inclusion; ../docs/DESIGN.md defines presentation; spec.md defines execution. Acceptance IDs below are stable references for code and tests.
 
-The owner approved the gallery → interactive pieces → assembly → supported customization → making journey. The first catalog release has one fully connected Everyday blouse study, not fake selectable options. A construction illustration may be beautiful and interactive without claiming realistic drape, body fit, or printable pattern accuracy. This section supersedes older wording below that opens directly on Fit or treats the shoulder request as the complete product.
+## Target User and Core Journey
 
-The larger product is a design-to-making companion: a maker can describe a multi-part goal, the agent can coordinate garment choice, compatible changes, measurement questions, fabric and equipment constraints, and sewing guidance, and the result remains tied to one accepted version. The one-blouse/one-verified-operation competition demonstration is a proof slice of that ambition, not the end-state. Additional gallery families, meaningful options, full cutting/printing, and physically reviewed examples remain explicit product work; unsupported actions must not be simulated as available.
+Primary: a home sewist with basic machine skills and limited pattern-alteration confidence. The first visit offers Explore the collection and Start from a photo. A garment detail leads into an uncommitted guest project. Studio stages are **Explore → Design → Fabric → Make**. Measurements are contextual tasks in Design; cutting and export are the first tasks in Make. My projects resumes exact revisions and progress. No login.
 
-Sources: `scope.md > The Unique Kernel`, `Who It's For`, `The Core Loop`, `What "Working" Looks Like`, and `The POC Boundary`.
+## E01 — Discovery and collection
 
-## The Core Journey
+As a maker, I want to begin with something I would like to wear and understand what I can change.
 
-1. The maker opens a garment gallery with one supported woven-top study, selects its exact version, and sees the finished-form illustration, its readiness status, and the next useful task. Sample measurements and fabric are identified as demo inputs until a private profile exists.
-2. In Explore, the maker turns the garment front/back, selects a visible part, inspects its corresponding flat pattern piece and seam partners, then advances through prerequisite-ordered assembly steps. Each label and relationship is tied to the authored version and source.
-3. In Fit, the maker requests more shoulder room while keeping the neckline, or uses the available manual control. If the amount or required measurements are missing, Stitches asks for the one missing input or clearly labels a suggested amount before preparing a proposal.
-4. Stitches shows the operation, amount, neckline constraint, applicable source and rule, changed pieces, and checks that remain open. The proposal overlays the original; the maker can select a piece to learn why it changed. A proposal is never labeled ready to cut merely because an outline appears.
-5. The maker rejects the proposal or selects “Keep this version.” Acceptance creates a new revision; the original remains available. The accepted revision changes the status of dependent seam checks, fabric planning, and relevant sewing instructions.
-6. In Fabric, the maker sees whether their specified width and length are sufficient, insufficient, or still unknown, with assumptions and missing inputs. In Sew, they see steps tied to the accepted revision and can mark progress.
-7. For the Sanity demonstration, an editor corrects a relevant seam, assembly step, source, or rule. Once the authored change and applied Knowledge Base issue are served, the explorer or assistant shows the changed consequence. A proposal based on older evidence cannot be accepted. An already accepted revision remains visible and is marked for review if affected.
+- **P01.1** Landing explains garment-to-making with a product demonstration and primary collection action; no unsupported fit or instant-pattern claims.
+- **P01.2** At least six distinct supported looks across two qualified families. Every card names its family, techniques/level, fabric class, supported options, and readiness. Presets differ structurally, not just by color.
+- **P01.3** Filters use published catalog attributes. Empty results name active constraints, allow removing one, and offer clearly identified nearby options.
+- **P01.4** Detail shows front/back or rotatable construction, pieces, measurements needed, materials, techniques, options, source/creator attribution, and Make this design. Exploration needs no project.
+- **P01.5** Starting a project records the exact version/preset. Removed templates remain viewable through existing accepted snapshots.
 
-## Screens and Layout
+## E02 — Inspiration photo
 
-The studio opens to a garment study and its next action. Explore shows finished form, flat-piece identities, seam partners, and assembly progression. Fit then uses a pattern canvas in the center, garment/piece context beside it on wide screens, and a proposal panel next to changed geometry. Fabric and Sew are stages of the same project and accepted revision. On small screens, the active task comes first; sewing steps have a focused reading view rather than a squeezed desktop inspector. Editorial correction happens in Sanity and appears through a refreshed relationship, explanation, or restriction.
+As a maker, I want a buildable starting point from a garment image.
 
-Source: `scope.md > The Core Loop` and `Inspiration & Identity`.
+- **P02.1** Accept one JPEG/PNG/WebP within the published size limit. Show local preview, crop/reselect/remove, and explicit Analyze with a concise provider/data-use notice. Choosing a file alone does not send it.
+- **P02.2** Return visible category, approximate silhouette, visible neckline/sleeve/length/pockets, and uncertainty. Do not infer measurements, fabric composition, hidden seams, back construction, or cutting geometry.
+- **P02.3** Maker corrects observations before matching. Return up to three supported matches with Similar, Different, and available edits. Avoid uncalibrated probability percentages.
+- **P02.4** No match, multiple garments, unclear image, unsupported category, timeout, and quota offer crop, manual attributes, or collection recovery. A match never auto-accepts a design.
+- **P02.5** Photos stay outside shared Sanity and routine logs, with explicit deletion. Geometry always comes from the chosen template engine.
 
-## Look and Feel
+## E03 — Construction explorer
 
-The maker should feel they are at a quiet, well-organized sewing table. Use the established linen, olive, and terracotta direction, editorial serif headings, readable practical controls, and a pattern-centered workspace. Mark changed geometry with terracotta and the original with a neutral dashed outline; give both text labels so color is not the only signal. Preserve the hierarchy of `references/stitches-interactive.html` and the design decisions in `docs/DESIGN.md`, improving its smallest labels and mobile ergonomics.
+As a maker, I want to connect visible garment parts to their pieces and seams.
 
-Source: `scope.md > Inspiration & Identity`.
+- **P03.1** A 3D construction view has orbit, front/back/side presets, reset, zoom, and explode. Selecting a flat piece highlights the corresponding panel and named partners. A complete 2D/text alternative works without WebGL.
+- **P03.2** Piece selection exposes cut count, role, grain/fold, seam partners, and relevant instruction. Seam selection identifies both ends, orientation, and assembly step. Labels and line styles accompany colors.
+- **P03.3** Assembly follows authored prerequisites; independent branches remain independent. Animation and diagrams share stable piece/edge IDs. Show this step opens its pose/selection.
+- **P03.4** Construction preview is distinct from fit simulation. Length, sleeve, and pocket choices agree between garment/piece views. Missing bindings produce an explicit unavailable state.
+- **P03.5** Keyboard, reduced motion, touch, loading, and renderer failure preserve meaningful actions.
 
-## Features and Behavior
+## E04 — Measurements and design
 
-### Garment Discovery and Dissection
+As a maker, I want meaningful changes with clear effects and control.
 
-The maker enters through a finished-garment study, not a chat transcript. The selected version exposes each authored piece's title and cut role, every linked seam endpoint, and a prerequisite-safe assembly timeline. Selecting a part keeps its identity consistent between garment illustration, flat piece, connection trail, and sewing step. The first catalog contains only the Everyday blouse until another garment has equally complete authored and supported content. Unsupported catalog items are not presented as working choices.
+- **P04.1** The top supports body length, one sleeve treatment/length operation, and patch-pocket add/remove with allowed placement. The second family supports two source-qualified operations. Incompatible combinations explain why.
+- **P04.2** Measurement collection comes from the selected family/operation: name, diagram, how-to, units, requirement, source-qualified envelope. Metric/imperial round-trip without silent internal changes. Sample values are explicit.
+- **P04.3** Missing/implausible values are identified beside the field. Only relevant fields are requested. Body measurement, wearing ease, and finished-garment measurement are distinct.
+- **P04.4** One preview updates affected paths, markings, panels, cut counts, instructions, and downstream status. Locks are verified numerically or refused.
+- **P04.5** Original/proposed comparison, undo/discard, and Keep version work. A change card names changes, affected steps, and open checks. Drag feedback is immediate; authoritative validation has its own state.
+- **P04.6** Keeping creates one immutable revision. Stale project/content/measurement/equipment inputs prevent acceptance. A review draft may be retained while making checks remain unresolved; it cannot become cut-ready.
 
-Observable success: changing a piece, seam, or assembly record in the validated source changes the corresponding UI trail without hardcoded copy changes; broken links or cycles fail visibly. The illustration is marked as illustrative until geometry and maker review qualify it.
+## E05 — Assistant carrying a brief
 
-### Coordinated Design Briefs
+As a maker, I want the assistant to use studio tools to finish a design within my constraints.
 
-The maker can express a goal in ordinary language and provide constraints such as available cloth, equipment, experience, or features to preserve. The agent decomposes it into only registered garment and operation choices, asks for missing inputs, previews supported alternatives, and shows why a constraint fails or passes using deterministic tool results. The user can make the same choices manually and retains final acceptance authority. The first competition proof handles the supported blouse adjustment; multi-operation briefs, pocket/length variants, and cross-garment recommendations must be added only when their authored compatibility and engines exist.
+- **P05.1** Assistant beside the canvas and in Make: brief, focused clarification, compact action plan, observable tool outcomes. Never expose internal chain-of-thought.
+- **P05.2** A real multi-part brief triggers actual Context retrieval, exact graph inspection, drafting/checking, fabric planning, and instruction selection as applicable. Return concrete alternatives or a reviewable proposal.
+- **P05.3** After a failed first fabric candidate, compare at most three supported alternatives with recomputed results. Do not silently relax a lock. Maker chooses the tradeoff.
+- **P05.4** Equipment questions use authored methods. No overlocker selects an applicable supported method or explains the gap, updating relevant steps.
+- **P05.5** Sources/tool receipts are inspectable and revision-bound. Show on garment navigates only to valid piece/seam IDs.
+- **P05.6** Cancel, timeout, quota, missing KB, contradictory evidence, malformed call, and interruption preserve accepted work. Resume reuses only current results. A recorded walkthrough is explicitly labeled.
 
-Observable success for the mature product: a multi-part brief produces an inspectable sequence of supported decisions, a recoverable response to at least one failed constraint, and a revision-specific construction package. It cannot appear complete when geometry, fabric placement, instructions, or physical review is unknown.
+## E06 — Fabric and cutting
 
-### Pattern and Project Context
+As a maker, I want to know whether this version fits my cloth and how to cut it.
 
-The maker selects a specific supported pattern version. The worktable distinguishes the accepted revision from an unaccepted proposal and identifies whether the current content is reviewed, illustrative, incomplete, or affected by a later correction. A first-time maker gets a guided starting action. Personal measurements and inventory never appear as shared pattern knowledge.
+- **P06.1** Collect usable width, available length, units, shrinkage/prewash assumptions, direction/nap, fold mode, and optional exclusion zones. Missing inputs remain visible.
+- **P06.2** Expand physical cut instances respecting mirror/fold/grain/clearance. A feasible result includes placement coordinates and checks. Search exhaustion means No layout found within the limit, not proof of impossibility.
+- **P06.3** Cloth view includes labels, dimensions, selvage/fold, grain, and unplaced pieces. Distinguish proven necessary impossibility, feasible arrangement, incomplete inputs, and bounded search failure. No optimality claim.
+- **P06.4** Changed design/fabric inputs invalidate old layouts. Width/version comparison recomputes. Area alone never proves fit.
+- **P06.5** Cutting preparation includes authored cloth prep, print calibration, piece/count inventory, right/wrong-side conventions, fold/mirror reminders, and marking transfer.
 
-Observable success: changing the selected pattern version changes the applicable rules and supported options; a missing or unreviewed version cannot produce a verified proposal.
+## E07 — Make and learn
 
-Source: `scope.md > The Unique Kernel` and `The Core Loop`.
+As a maker, I want the next action for my exact version.
 
-### Fit Proposal and Explanation
+- **P07.1** Focused step: revision, title, pieces, orientation diagram, authored seam/allowance, method/equipment, micro-actions, and outcome check. Brief instructions first, optional detail.
+- **P07.2** Pocket variants insert steps before dependent seams; omitted components remove irrelevant work. Only affected completed steps require review after a kept change.
+- **P07.3** Mark done, undo, revisit, pause, and reload work. Prerequisite conflicts explain the required step.
+- **P07.4** Explain this uses current step/source scope and points to the diagram. Help preserves position; phone controls are reachable.
+- **P07.5** Completion records notes/photo and offers reuse. User-marked completion is not automatically a pattern quality certification.
 
-The maker can request or manually select the supported shoulder adjustment. Stitches shows the interpreted amount, units, locked neckline, affected pieces, and a concise reason for each effect. Selecting a changed piece reveals the linked rule, relationship, and source. The preview keeps the original available and clearly separates a proposed outline from passed checks. Unsupported changes, missing measurements, and source conflicts return a focused next action rather than a guessed edit.
+## E08 — Export and continuity
 
-Observable success: the same supported input and content version give the same proposed change and checks; changing the rule relationship changes the computed effect trail. The maker can understand why the front, back, or sleeve was touched without reading an agent transcript.
+As a maker, I want a portable package and the ability to return.
 
-Source: `scope.md > The Unique Kernel`, `The Core Loop`, and `What "Working" Looks Like`.
+- **P08.1** Guest projects support rename, duplicate, backup, validated import, and explicit delete. Storage/retention and session limits are explained without signup.
+- **P08.2** Package includes A4/Letter tiled patterns, full-size SVG/PDF, calibration, labeled pieces/notches/grain/counts, cutting plan, materials, exact sewing guide, attribution, and version manifest.
+- **P08.3** Internal millimetres and 100% print scale. Mathematical and physical calibration checks; no clipping, missing margins/tiles, duplicate pieces, or swapped labels.
+- **P08.4** Geometry, instruction, placement, and maker-review evidence govern labels. With open gates, only a clearly marked review package is available.
+- **P08.5** Concurrent tabs, duplicate clicks, network failure, and server restart cannot silently corrupt accepted revisions.
 
-### Revision Acceptance and Dependency Status
+## E09 — Maintained Sanity knowledge
 
-Only an explicit maker action accepts a proposal. The result is a new revision with its original preserved. The accepted version identifies the content and assumptions used. If the project, content, or measurement basis changes while a proposal is open, acceptance refuses that stale proposal and offers a fresh preview. Fabric and instruction results that depend on the old version become visibly due for review rather than silently current.
+As an editor, I want one correction to improve applicable designs while preserving prior work.
 
-Observable success: rejecting leaves the accepted revision unchanged; accepting advances it once; attempting to accept an old proposal after a correction is refused; reopening the project shows the accepted revision and unresolved work.
+- **P09.1** Catalog/options/measurements/seams/assembly/methods/sources are structured. A qualified preset added in Sanity appears without UI code changes.
+- **P09.2** Retrieve actual Stitches-only Context KB evidence and reconcile with exact records. Stale/contradictory prose cannot authorize an action.
+- **P09.3** A corrected shared method changes at least two looks. Pending proposals become stale; accepted snapshots remain reproducible with targeted review notices.
+- **P09.4** Editorial workflow shows validation, affected records, refresh/rebuild state, and served-entry verification. Maintenance failure preserves a recoverable last-good state. Do not imply a Function was deployed or a rebuild automated unless observed.
 
-Source: `scope.md > The Core Loop` and `What "Working" Looks Like`.
+## E10 — Quality and review
 
-### Fabric and Sewing Consequences
+- **P10.1** Verify collection → studio → measurements → multi-operation proposal → constraint recovery → retained revision → cut plan → export → sewing in a real browser.
+- **P10.2** Meet DESIGN.md at 1440/1024/768/390/320 px: no overflow, canvas-only essential action, clipped focus, or unreadable control. Keyboard and reduced-motion rehearsals required.
+- **P10.3** Distinguish live Gemini/Context, fixtures, render checks, numerical checks, physical print, and physical make. Benchmark identical task/corpus versions and report failures.
+- **P10.4** No secrets in browser/logs/exports. Test guest isolation. Prepare a reviewable local release before separate deployment/submission authorization.
 
-Fabric shows usable width and available length alongside requirements of the accepted pattern revision. The result is “feasible” only after an actual placement check; otherwise it is “insufficient” or “unknown,” with the reason. Sew shows the instructions and prerequisite order applicable to that same revision. An affected step is called out when the fit revision changes. Completed steps remain readable and can be revisited.
+## Edge Cases and Language
 
-Observable success: after accepting a fit change, prior fabric and affected instruction results no longer appear current; the maker can identify what to recheck and which instruction applies now.
+Every screen covers first use, loading, empty, partial, failure, retry, and restored state. Preserve unsaved input when recovery is possible. Use “This version needs a sleeve check,” “This piece is wider than your usable cloth,” and “I couldn't finish the calculation. Your kept version is safe.” Evidence appears behind View checks or Pattern notes. Avoid debug IDs, raw hashes, invented confidence, perfect-fit promises, and repeated technical caveats.
 
-Source: `scope.md > The Unique Kernel` and `What "Working" Looks Like`.
+## What We Are Building
 
-### Maintained Knowledge Demonstration
+All E01–E10 behavior is the Studio 1.0 target. At least two families/six presets, multiple real edits, image matching, guest persistence, 3D exploration, full cutting/sewing/export, live tool use, and editorial impact are included. The previous one-slider proof remains evidence of progress only.
 
-An editor can correct a reviewed source, applicability rule, or precedence decision. Once the update is available, the maker sees the resulting change in the supported action or an explicit limitation, including the source that caused it. Previous accepted versions stay intact and affected projects show a review notice. The demonstration includes the before and after result and a fair comparison with keyword retrieval over the same source material; any claimed advantage must match the observed result.
+## What We Would Add Later
 
-Observable success: the same maker request yields a traceably different result after a relevant correction without changing application behavior by hand. The maker can see which source governs the updated answer.
+Accounts/sync, collaboration, arbitrary pattern import, physics-based drape/fit, broader garment classes, community marketplace, automatic photo-to-exact-pattern reconstruction. Do not defer the core making workflow to this list.
 
-Source: `scope.md > The Unique Kernel`, `What "Working" Looks Like`, and `Event Evidence`.
+## Submission Proof Points and Completion
 
-## States and Boundaries
-
-- **First use:** clear sample project and starting action; sample measurements and illustrative geometry are labeled.
-- **Waiting or incomplete:** a real calculation or knowledge refresh displays its progress; missing measurements, unknown seam constraints, unknown fabric inputs, or a pending knowledge refresh do not appear successful.
-- **Unsupported or conflicting:** the maker sees the limitation and its source, with a focused question or available supported alternative.
-- **Stale:** acceptance is refused if its pattern, content, or project basis changed; the maker can request a current proposal without losing the accepted version.
-- **Provider unavailable:** manual controls and previously accepted work remain usable; no invented agent explanation appears.
-- **Accepted:** the new revision and its exact basis are visible; dependent tasks show current or needs-review status.
-- **Readiness:** “demo,” “proposal,” “geometry checked,” and “ready to cut” are distinct. Ready to cut requires the documented pattern and physical review gates.
-
-## Product Decisions
-
-- Sanity entry first, Devpost Basics second — the live structured knowledge journey sets the required demonstration.
-- Garment and its linked pattern are the central objects, with Explore / Fit / Fabric / Sew stages — the agent assists beside the work rather than replacing it with a chat screen.
-- One fully connected woven-top family and one verified customization first — this is the smallest coherent example of a design propagating through pieces, seams, assembly, fabric, and instructions.
-- Preserve original and explicit acceptance — the maker stays in control and can compare the consequence before committing.
-- Keep private maker information out of shared pattern content — authored knowledge and personal measurements have different audiences.
-
-## What We're Building
-
-The complete garment-to-making journey above, live authored knowledge and agent retrieval, one verified supported adjustment, a visible editorial correction consequence in both the explorer and assistant, stale-proposal refusal, and clear incomplete/unavailable states. A fixture-only or illustrative result is an intermediate build state, not the final Sanity entry.
-
-## Deferred From the POC
-
-Additional garment families and edits, private account management, full fabric nesting, scale-correct export, and expanded mobile sewing guidance. Each needs its own validation; they do not prove the first connected-content journey. They remain in the product plan. Physical maker review is required before any ready-to-cut claim.
-
-## Non-Goals
-
-Arbitrary PDF interpretation, body scanning, photorealistic drape, a marketplace, and industrial grading. None is needed to show the first adjustment and knowledge correction responsibly.
-
-## Open Questions
-
-- The exact authorized pattern design and validated shoulder operation are feasibility decisions for the technical plan and build. Until reviewed, no numerical demo range is a cut-ready promise.
-- Account-based persistence and full printing remain release milestones; the competition demo can use clearly labeled sample project data while preserving the accepted-version interaction.
+The signature brief in PRODUCT.md must complete a real tool sequence and recover from one failed constraint. Capture an editorial correction affecting multiple looks, meaningful comparison evidence, actual desktop/mobile screenshots, maker and print records, and exact local setup. Every open real-world gate remains named. Licensing/physical review gaps do not stop independent engineering, but prevent calling the whole release complete.

@@ -1,0 +1,210 @@
+{
+  "kind": "design-reference-only",
+  "checkedAt": "2026-09-29T16:43:54.609Z",
+  "viewports": [
+    {
+      "screen": "landing",
+      "width": 1440,
+      "overflow": false,
+      "title": "See how it’s made.Make it yours."
+    },
+    {
+      "screen": "collection",
+      "width": 1440,
+      "overflow": false,
+      "title": "Your next makestarts with a little curiosity."
+    },
+    {
+      "screen": "studio",
+      "width": 1440,
+      "overflow": false,
+      "title": "A little more you."
+    },
+    {
+      "screen": "fabric",
+      "width": 1440,
+      "overflow": false,
+      "title": "A plan for the fabric you have."
+    },
+    {
+      "screen": "make",
+      "width": 1440,
+      "overflow": false,
+      "title": "Give your pocket its shape."
+    },
+    {
+      "screen": "inspiration",
+      "width": 1440,
+      "overflow": false,
+      "title": "Start with a shapethat caught your eye."
+    },
+    {
+      "screen": "landing",
+      "width": 1024,
+      "overflow": false,
+      "title": "See how it’s made.Make it yours."
+    },
+    {
+      "screen": "collection",
+      "width": 1024,
+      "overflow": false,
+      "title": "Your next makestarts with a little curiosity."
+    },
+    {
+      "screen": "studio",
+      "width": 1024,
+      "overflow": false,
+      "title": "A little more you."
+    },
+    {
+      "screen": "fabric",
+      "width": 1024,
+      "overflow": false,
+      "title": "A plan for the fabric you have."
+    },
+    {
+      "screen": "make",
+      "width": 1024,
+      "overflow": false,
+      "title": "Give your pocket its shape."
+    },
+    {
+      "screen": "inspiration",
+      "width": 1024,
+      "overflow": false,
+      "title": "Start with a shapethat caught your eye."
+    },
+    {
+      "screen": "landing",
+      "width": 768,
+      "overflow": false,
+      "title": "See how it’s made.Make it yours."
+    },
+    {
+      "screen": "collection",
+      "width": 768,
+      "overflow": false,
+      "title": "Your next makestarts with a little curiosity."
+    },
+    {
+      "screen": "studio",
+      "width": 768,
+      "overflow": false,
+      "title": "A little more you."
+    },
+    {
+      "screen": "fabric",
+      "width": 768,
+      "overflow": false,
+      "title": "A plan for the fabric you have."
+    },
+    {
+      "screen": "make",
+      "width": 768,
+      "overflow": false,
+      "title": "Give your pocket its shape."
+    },
+    {
+      "screen": "inspiration",
+      "width": 768,
+      "overflow": false,
+      "title": "Start with a shapethat caught your eye."
+    },
+    {
+      "screen": "landing",
+      "width": 390,
+      "overflow": false,
+      "title": "See how it’s made.Make it yours."
+    },
+    {
+      "screen": "collection",
+      "width": 390,
+      "overflow": false,
+      "title": "Your next makestarts with a little curiosity."
+    },
+    {
+      "screen": "studio",
+      "width": 390,
+      "overflow": false,
+      "title": "A little more you."
+    },
+    {
+      "screen": "fabric",
+      "width": 390,
+      "overflow": false,
+      "title": "A plan for the fabric you have."
+    },
+    {
+      "screen": "make",
+      "width": 390,
+      "overflow": false,
+      "title": "Give your pocket its shape."
+    },
+    {
+      "screen": "inspiration",
+      "width": 390,
+      "overflow": false,
+      "title": "Start with a shapethat caught your eye."
+    },
+    {
+      "screen": "landing",
+      "width": 320,
+      "overflow": false,
+      "title": "See how it’s made.Make it yours."
+    },
+    {
+      "screen": "collection",
+      "width": 320,
+      "overflow": false,
+      "title": "Your next makestarts with a little curiosity."
+    },
+    {
+      "screen": "studio",
+      "width": 320,
+      "overflow": false,
+      "title": "A little more you."
+    },
+    {
+      "screen": "fabric",
+      "width": 320,
+      "overflow": false,
+      "title": "A plan for the fabric you have."
+    },
+    {
+      "screen": "make",
+      "width": 320,
+      "overflow": false,
+      "title": "Give your pocket its shape."
+    },
+    {
+      "screen": "inspiration",
+      "width": 320,
+      "overflow": false,
+      "title": "Start with a shapethat caught your eye."
+    }
+  ],
+  "interactions": {
+    "sheet": true,
+    "exploded": true,
+    "piece": true,
+    "pocketRemoved": true,
+    "length": true,
+    "back": true,
+    "scripted": true,
+    "honestSave": true,
+    "filtering": true,
+    "stepping": true,
+    "matches": true,
+    "reducedMotion": true
+  },
+  "runtimeErrors": [],
+  "externalRequests": [],
+  "screenshots": "14 actual browser captures; sample reference, not production app",
+  "notVerified": [
+    "3D rendering",
+    "pattern geometry",
+    "live Gemini or Sanity",
+    "physical cutting or sewing",
+    "full keyboard/screen-reader audit"
+  ]
+}

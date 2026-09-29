@@ -1,71 +1,64 @@
-# Product brief
+# Stitches — product direction
 
-## Approved product direction — September 29, 2026
+Design revision: Studio 1.0, September 29, 2026. This describes the target application. Actual implementation evidence lives in STATUS.md. It replaces the earlier one-adjustment competition scope.
 
-Stitches is now a **garment-first creative sewing studio**, not chiefly a shoulder-adjustment demo. A maker should be able to discover a supported finished garment, turn it over, inspect its linked flat pieces and seams, understand the assembly order, make a supported change with ordinary controls or natural language, and see revision-specific consequences across the garment, fabric questions, and sewing guide. The agent is a knowledgeable studio assistant beside this direct-manipulation workflow; it is not the whole product.
+## The product
 
-The first complete family is the Everyday blouse. A one-garment release is honest only if the journey from garment to pieces to assembly to safe customization genuinely works. More garment cards may be authored later through Sanity; do not pad the gallery with fake selectable patterns. Sanity is essential to the garment/piece/seam/instruction graph, the compatibility rules, editorial provenance, and the Context Knowledge Base that grounds the assistant. A published content correction must change an observed decision or explanation. Gemini interprets requests and narrates verified tool output, but does not draft freehand geometry or infer cut-readiness.
+**See how it is made. Make it yours.**
 
-The visual experience may use an attractive rotatable or exploded illustration, with a future Three.js viewer if useful. Until true graded geometry and fabric simulation are verified, label rendered garments and flat shapes as construction illustrations, not accurate drape or body fit. User measurements should shape only operations supported by a reviewed pattern adapter; missing measurements lead to a focused question, not invented coordinates. This approved direction supersedes any reading of the older signature scenario below as the whole product scope.
+Stitches is an interactive garment studio for people who can use a sewing machine but want help turning an idea into a garment they understand and can make. It connects discovery, visual construction, supported design changes, measurements, fabric planning, cutting, and sewing in one project. An assistant carries a brief through those tools and helps recover when a choice fails.
 
-The full product ambition is a maker's design-to-making partner, not a lookup assistant with one slider. A brief such as “make this top longer, keep its neckline, use my available fabric, and guide me through a sleeve I have never sewn” should become a coordinated plan: identify supported design options, request only necessary measurements, run deterministic pattern and fabric tools, expose tradeoffs and unknowns, retain a revision, then teach the exact construction sequence for that version. The agent may choose, sequence, and inspect allowed tools, while the maker can perform the same supported actions directly. A failed constraint should lead to a specific recoverable alternative, never an invented feasible result.
+The distinctive experience is continuity: the garment, pieces, options, fabric layout, instructions, and exported package are views of the same version. A pocket is a visible object with pattern geometry, a placement rule, fabric consumption, and an instruction prerequisite. Removing it updates every relevant view. An editor's correction to its construction rule changes applicable guidance across the collection.
 
-The connected wardrobe can grow to multiple reviewed garment families and variations as their Sanity-authored piece graphs, visual mappings, compatibility rules, sources, and deterministic operations are completed. The first blouse is the competition's coherent proof slice, not a permanent one-garment product limit. A future pattern/cutting/instruction package must correspond to the same accepted revision; visual renderings alone cannot qualify it. A physically made example is needed before claiming a cut-ready garment.
+Sanity maintains shared design knowledge and relationships. Its actual Context Knowledge Base supplies construction evidence. Exact structured records and deterministic tools establish what is supported and what passed. Gemini interprets goals, selects tools, compares results, asks focused questions, and explains outcomes.
 
-Success for the refreshed MVP: a visitor can move through one visually polished garment study; select a piece and see its real authored seam links; scrub an authored, prerequisite-safe assembly story; request or directly set a supported customization; compare original/proposal; save an immutable revision; see stale fabric and sewing evidence re-evaluated; and receive a bounded, cited agent explanation from actual Context retrieval in live mode. The current fixture is only the first illustrative slice of that loop.
+## The experience to deliver
 
-## Product and audience
+1. **Discover.** A welcoming landing page leads to a collection of supported looks. Filter by type, techniques, fabric class, and options.
+2. **Bring inspiration.** Optionally upload a garment photo. Review visible features, correct uncertain observations, and choose a related supported template. A single image does not establish hidden pattern pieces, scale, body measurements, or exact construction.
+3. **Understand.** Orbit a construction preview; separate its panels; select a seam; move between the garment, flat pieces, and assembly. Selection follows the same object across views.
+4. **Design.** Change length, a supported sleeve treatment, and patch pockets. Enter only required measurements with diagrams and units. Compare and keep a version.
+5. **Solve constraints.** Give the assistant cloth, equipment, skill, and feature constraints. It tries supported alternatives, shows consequences, and asks before relaxing a goal.
+6. **Prepare and cut.** Inspect actual placement, piece counts, grain, folds, calibration, and cutting preparation. Download a package for this revision.
+7. **Make.** Follow one action, diagram, orientation, seam, checkpoint, and next step. Ask for help and resume progress later.
 
-Stitches helps home sewists adapt a supported pattern to their preferences, understand the consequences, plan the fabric, and follow instructions for the accepted version. The initial audience is a maker who can follow a sewing pattern but lacks confidence adjusting one. More experienced makers can inspect the same geometry and constraints in greater detail.
+## Release composition
 
-The product is a personal sewing studio. The pattern is the central object; the agent works beside it. The distinctive value comes from structured relationships and validated operations, not from searching sewing prose and generating generic advice.
+The full first application includes a landing page; at least six genuinely distinct supported looks across at least two qualified families; photo-to-template matching; a guest project library; 3D construction with a 2D fallback; measurements; multiple supported operations; a tool-using assistant; feasible cutting layouts; revision-specific sewing; and scale-correct exports.
 
-## Signature scenario
+The lead family is a relaxed everyday top; a simple skirt is the second family. Exact sources and options are selected by the early engine/licensing gate, not by the old shoulder drawing. Target top operations: body length, supported sleeve length/treatment, patch-pocket add/remove and allowed placement. Skirt operations: supported length and fullness/waist construction from its source. Color alone is not a distinct look. Every option requires authored compatibility and a tested engine implementation.
 
-The maker selects the Everyday blouse and asks, "Give me more room at the shoulders, but keep the neckline." Stitches identifies a supported shoulder adjustment, clarifies the amount if necessary, retrieves the correct version's rules and relationships, drafts a proposal, and highlights the affected front, back, and sleeve. The user can compare the original, inspect why each piece is affected, and keep the proposal as a new version.
+No accounts for this release. A guest workspace remembers projects through an isolated session, offers backup/import, and explains storage/retention. Account synchronization and collaboration come later. Public hosting, production Sanity writes, paid resources, and submissions still require separate owner authorization.
 
-The accepted change invalidates any outdated seam checks, fabric layout, and affected instruction variants. Stitches recomputes what it can and clearly identifies unresolved checks. It never uses the presence of a drawing as evidence that a pattern is ready to cut.
+## Signature demonstration
 
-## Core journey
+“Make this top longer with a patch pocket. I have this fabric and a basic sewing machine. Keep the neckline, and help me with the sleeves.”
 
-1. Discover and Explore: choose a genuinely supported garment, turn its finished illustration, select flat pattern pieces and seam partners, and follow an authored assembly story.
-2. Worktable: pick up a project or start from that garment's exact pattern version. Show the next useful task.
-3. Setup: confirm required measurements and units, choose supported fit/style preferences, and optionally add fabric and available equipment.
-4. Shape: adjust manually or describe a multi-part goal. Preview only supported operations while preserving the original. Inspect affected pieces, compatibility, and the reason for each dependency.
-5. Fabric: calculate a feasible placement of final pieces within usable width and available length, respecting cut counts, grain, mirrored pieces, and relevant directional restrictions. Show missing inputs and supported alternatives.
-6. Sew: use instructions tied to the accepted pattern revision and selected technique. Follow prerequisite order, ask for the needed level of guidance, and remember progress.
-7. Export: once the required checks are satisfied, produce a versioned, scale-correct pattern, cutting list, materials, and construction package with calibration and assembly markings.
+Stitches identifies compatible options, requests missing measurements, drafts and checks the candidate, finds the first cutting plan does not fit, then offers supported alternatives with recomputed results. The maker keeps one. The pocket appears in the garment, piece tray, cutting list, and assembly before the side seams close. The maker exports that revision and enters its guide. A later shared construction correction causes a pending proposal to require review; the accepted version remains reproducible.
 
-## Initial release scope
+This is the required story. The existing shoulder fragment and assembly-note proof are foundations, not substitutes for this journey.
 
-- One authorized, parameterized woven-top family, selected after a drafting and licensing feasibility review.
-- One carefully verified fit operation first, with neckline preservation explicitly supported or rejected by the engine.
-- Metric internal coordinates with explicit unit conversion at input and display boundaries.
-- Reversible proposals, immutable accepted versions, and an inspectable dependency trail.
-- A finite, validated set of agent tools.
-- Pattern library content in Sanity; private project data in owner-scoped storage.
-- Desktop fitting and an intentionally focused mobile sewing experience.
+## Quality bar
 
-The first application milestone uses an illustrative fixture. A verified pattern family, trustworthy fabric layout, printable output, and physical maker review are separate completion gates. Arbitrary PDF interpretation, body scanning, photorealistic drape simulation, a pattern marketplace, and industrial grading are future research areas rather than assumed launch features.
+- A precise creative tool: generous garment imagery, readable controls, restrained chrome, responsive manipulation, and an assistant that acts on the work.
+- Direct controls and assistant use the same operations. Provider failure preserves manual capabilities and saved work.
+- Catalog, preview, pieces, and instructions identify the same version. An independently generated beauty image cannot represent an engine result.
+- Pattern checks, a sewn sample, and ready-to-cut status have separate evidence. Physical maker trials are required before cut-ready claims; personal fit is never guaranteed.
+- New makers can explore without terminology. Experienced makers reach measurements, seam values, sources, and export quickly.
+- Sanity's value is visible in behavior; debug identifiers belong in an evidence drawer.
 
-## Behavior requirements
+## Boundaries
 
-Ambiguous requests must result in one focused question or an explicitly labeled suggested amount. No silent guess becomes an accepted edit. Unsupported requests explain the limitation and offer only supported alternatives. Conflicting rules must be surfaced with provenance. Missing source records, measurements, or seam constraints must produce an incomplete result, not a green check.
+Photo-to-exact-pattern reconstruction, body scanning, arbitrary PDF conversion, cloth-physics fit prediction, industrial grading, marketplaces, accounts, and social features are outside Studio 1.0. Inspiration analysis and useful 3D construction views are in scope now.
 
-Changing measurements, pattern version, fabric assumptions, or an accepted revision must invalidate dependent results. A result should describe the revision and assumptions it applies to. A new editorial rule must not silently rewrite an already accepted user project.
+## Canonical documents
 
-The user can change ordinary controls without using the agent. A Gemini outage must leave manual editing and previously saved work usable.
-
-## Success evidence
-
-- A single shoulder change visibly propagates through the graph, draft, checks, layout status, and relevant instruction steps.
-- Every affected-piece explanation points to actual rule and relationship records.
-- A stale or invalid proposal cannot overwrite an accepted revision.
-- Users can explain the proposed change and recover their original without assistance.
-- The same input snapshot yields the same geometry and checks.
-- A verified pattern passes numerical tests and a documented physical sewing review before being offered as ready to cut.
-
-## Product language
-
-Use "more room," "your preferred fit," "proposed change," and "check needed." Do not frame bodies as problems to fix. Avoid unsupported claims of perfect fit, optimization, or verification. Technical details appear when they help a maker make a decision.
+- ../devpost/scope.md: release boundary.
+- ../devpost/prd.md: observable behavior and acceptance IDs.
+- DESIGN.md: screen, interaction, copy, responsive, and visual contracts.
+- ../devpost/spec.md: implementation contracts.
+- CONTENT-MODEL.md: Sanity authoring and maintenance.
+- ../devpost/checklist.md: executable work packages.
+- SOL_HANDOFF.md: starting instructions and implementation discipline.
+- ../design/stitches-studio.html: interactive visual reference, with illustrative reference data.
 

@@ -1,66 +1,59 @@
-# Structured content model
+# Content model — shared garment intelligence
 
-## Garment-first additions — approved September 29, 2026
+Studio 1.0 target. See spec C01/C02/C08/C10. The currently seeded 13 records are illustrative; a schema document does not qualify sewing content.
 
-The browser's garment study is not a second content store. For an exact `patternVersion`, the validated snapshot now derives `garmentPieces` from `patternPiece`, `garmentConnections` from `seamConnection`, and prerequisite-ordered `assemblySteps` from `instructionStep`. Duplicate piece/step keys, broken or cross-version references, and prerequisite cycles fail resolution. The initial illustration is tied to the one demo blouse; titles, cut counts, joins, assembly order, and content fingerprint must come from the resolved content, not visual constants.
+## Existing core and extensions
 
-Before expanding the catalog, author explicit display assets keyed to stable piece and garment IDs: front/back (and optional exploded/3D) views, visible regions, attribution/license, and an `illustrative`/`geometry-verified`/`maker-reviewed` status. Add style options with allowed pattern versions, incompatible combinations, required measurements, affected piece/connection IDs, and instruction variants. A UI option is enabled only when a deterministic operation registry can implement it for the selected version. Measurements and personal designs remain owner-private. The Knowledge Base purpose includes garment construction and editorial sources; its prose does not override exact numeric constraints from reviewed structured records.
+Keep existing stable references/version checks while adding the following semantic structure. Names below are proposed app/schema contracts, not claims that these document types are already deployed.
 
-Acceptance demonstration: change an authored seam or instruction relationship in the dedicated Stitches development dataset, refresh and apply Knowledge Base issues, then show the changed served entry and a changed explorer/agent consequence. A fixture edit and a KB creation with zero entries do not satisfy this live gate.
-
-## Why this model matters
-
-A shoulder adjustment touches a shoulder point, an armhole, a sleeve relationship, one or more sewing steps, and a fabric placement. These are explicit, versioned links. Gemini retrieves them and explains the consequences; deterministic code executes approved operations and validates the result.
-
-The sample fixture illustrates this structure. Its rules and ranges are original demonstration data, not validated pattern-making advice. Do not import them as reviewed or cut-ready content.
-
-## Sanity document types
-
-| Type | Important fields and references |
+| Record | Important fields and relationships |
 | --- | --- |
-| `pattern` | Title, slug, garment category, creator, license metadata, available versions |
-| `patternVersion` | Pattern reference, semantic version, engine adapter/version, required measurements, supported operation IDs, review status, source references |
-| `patternPiece` | Pattern-version reference, stable piece key, title, role, edge definitions, cut count/mirroring/fold rules, grain metadata, source references |
-| `seamConnection` | Pattern-version reference, first and second piece references with edge IDs, intended ease relation, tolerance, notch rules, review status, source references |
-| `adjustmentRule` | Pattern-version reference, operation ID, input units and reviewed bounds, supported locks, directly affected piece references, related seam references, dependent rule references, instruction references, source references |
-| `instructionStep` | Pattern-version reference, stable step key, body/diagram, piece references, prerequisite step references, affected-by rule references, revision applicability |
-| `fabricRequirement` | Pattern-version reference, construction class, required fabric behavior, grain/direction constraints, source references; no user's personal inventory |
-| `sourceDocument` | Title, URL or authorized asset, author/publisher, version/date, locator, permission/license notes, review date and status, supersedes/conflicts references |
+| garmentDesign | Public title/slug, family, creator/rights, supported pattern versions, cover and view assets |
+| garmentPreset | Exact version, authored option values, distinct silhouette/components, suitable fabric classes, required techniques, readiness |
+| patternVersion | Immutable semantic version, engine adapter/version/hash, measurement definitions, pieces, joins, options, methods, review evidence |
+| patternPiece | Stable piece role/ID, named edges, cut-instance rule, fold/grain/notch semantics; numerical generated paths come from engine |
+| seamConnection | Version-bound edge endpoints, join relation, intended ease, source-backed tolerance and method |
+| measurementDefinition | Body landmark, how-to diagram/text, units, requiredness, reviewed range, relation to ease; never a user's value |
+| styleOperation | Registered tool/operation ID, typed bounds/options, affected/locked roles, prerequisites, compatibility and invalidation dependencies |
+| compatibilityRule | Declarative typed predicates over known options/material/method IDs; reason and source; no executable JS or free-form model code |
+| fabricRequirement | Qualified fabric classes/behavior, direction/nap/fold limitations, layout assumptions and source |
+| constructionMethod | Reusable technique, supported equipment/material classes, ordered micro-actions, authored numerical references, diagrams, prerequisites, sources |
+| instructionStep | Piece/edge and method refs, prerequisites, conditions, side/orientation, action/checkpoint, diagram binding and semantic version |
+| garmentView / previewBinding | View assets, named panel/edge bindings, topology hash, supported parameter mapping, authored exploded/step poses, limitations |
+| sourceReference | Author, title, locator/date, license/attribution, applicable version/method, review status and curated excerpt |
+| reviewEvidence | Reviewer consent/role, exact family/version/options/material, digital checks vs physical trial, evidence locations, limitations |
 
-Use Sanity `reference` values for links and `_key` values for array objects. Keep stable domain identifiers separate from display titles. Restrict published runtime content to reviewed versions; retain draft/illustrative content only for explicitly labeled development workflows.
+Do not store private measurements, guest designs or uploaded inspiration photographs in this shared graph. A public review excerpt may be authored with consent, never implicitly extracted from a guest project.
 
-Numeric fields need units. Unknown measurements, tolerances, or evidence must remain unknown; zero is not a substitute. Store prose explanations alongside structured conditions and effect links so editors can maintain both. Do not put an executable JavaScript expression into a content field.
+## Separate authorship from computation
 
-## Pattern edges and joins
+Sanity authors meaning, relationships and qualified operating envelopes. The deterministic adapter produces exact curves, dimensions and check results from those inputs. Store adapter identity and reproducible source definitions, not giant per-person generated paths in Content Lake. Preview assets identify the same pieces and edges; art alone cannot establish readiness.
 
-Edges require stable IDs, such as `front.shoulder`, `front.armhole`, `back.armhole`, and `sleeve.cap`. A join may connect a sleeve cap to a composite front/back armhole. Represent composite joins as a list of endpoints with orientation and segment metadata rather than forcing every relationship into a two-edge equality.
+Each capability manifest must resolve to installed engine, option and renderer adapters. Publishing unsupported IDs fails runtime validation even if Studio permits it.
 
-For each relationship record, define the intended relation (equal, eased, gathered, or another supported construction), the allowed difference or ratio where applicable, and the evidence for that constraint. Leave unreviewed constraints unresolved. The engine must reject a ready-to-cut claim when required relation information is missing.
+## Validation at the server boundary
 
-## Retrieval contract
+Required checks include unique IDs, version ownership, no dangling/cross-family edges, closed dependency graph, DAG acyclicity, valid conditional references, typed option constraints, compatible fabric/method combinations, source-backed bounds, asset rights and complete adapter bindings. Sanity authoring validation helps editors; it does not replace server checks.
 
-Given an allowed `patternVersionId`, retrieve the exact pattern, pieces, related joins, supported rules, prerequisites, and provenance. Expand linked data into one bounded, validated context object. Derive the dependency closure server-side; detect cycles in instruction prerequisites and broken or cross-version references.
+Hash canonically sorted semantic fields, not query time. Keep geometry semantics, instruction semantics, and editorial-only presentation changes identifiable so precise invalidation is possible. An accepted revision records the exact relevant snapshot rather than a mutable reference alone.
 
-Rules can depend on other rules, but effect traversal must be cycle-safe. A discovered dependency is not automatically an edit: the operation registry decides whether to redraft, recheck, invalidate, or request input for each dependent object.
+## Sanity as a core dependency
 
-Every explanatory statement about an effect should carry source/rule IDs. Show a concise reason in the interface, with details available on request. A direct link alone does not prove an operation is geometrically valid.
+A pocket is not a keyword in a paragraph. It refers to a real optional piece, placement constraints, changed cutting instances, a method, a sequence before closing its supporting seams, and applicable sources. The same method may serve several presets. Exact graph traversal determines consequences; Context provides maintained explanation.
 
-## Version and conflict policy
+First maintenance demonstration: a source-backed correction to a shared pocket/edge method affects at least two looks, invalidates relevant pending proposals and prompts review of specific making steps. Keep previous versions available. Refresh/rebuild/review the KB and read the actual served entry before claiming the explanation has caught up.
 
-- Select a specific pattern version before adjustment. Do not mix rules from incompatible versions.
-- Editorial publication should validate outgoing references, units, operation registry compatibility, supported ranges, and applicable source review.
-- Store resolved content snapshots and hashes with accepted project versions.
-- Later content corrections mark potentially affected projects for review without rewriting them silently.
-- Record explicit source precedence where an authored erratum supersedes a rule. If a conflict has no documented precedence, surface the conflict and withhold the affected operation.
-- A sample source saying "illustrative" never becomes manufacturing authority through a model's explanation.
+## Knowledge Base compilation guidance
 
-## Personal project data
+Include garment identity/version, piece/seam vocabulary, option constraints, material/equipment methods, prerequisites and curated sources. Keep instructions concise and source-scoped. Require generated assembly descriptions/diagrams to preserve the exact DAG; parallel steps must not be rewritten as sequential dependency claims. Do not include secrets, private project state or arbitrary visitor prompts.
 
-Keep user measurements, fit preferences, project inputs, actual fabric inventory, notes, proposal state, and instruction progress in private application storage. A measurement profile has an owner, unit system, measured-at date, source/method where relevant, and explicit values. Collect only the fields required by the selected pattern.
+The endpoint remains KB-only. Fixed parameterized Content Lake queries are a separate adapter. Record statuses for source change, graph verification, KB update requested, entry reviewed and served entry verified.
 
-## Structured-content demonstration
+## Development migration safety
 
-Use the fixture to show the sequence: select the shoulder rule, traverse to the front and back shoulder records, find the armhole/sleeve relationship, identify steps requiring review, and invalidate the old layout. Then modify the relationship or applicable version and show that the explanation and pending checks change.
+Target only project l4eeamth / dataset development. Produce an exact dry-run ID/type list, snapshot old documents, apply revision preconditions, then validate the entire relevant graph and read it back. Use separate read/editor tokens. Preserve current fixture IDs/history until new resolved catalog parity is proven. Production stays untouched. A schema extract or dry run does not count as a successful migration.
 
-The production acceptance test requires this result to be computed from retrieved structured content, rather than embedding a hardcoded "three pieces changed" string in the UI.
+## Content required for the full application
+
+Two qualified families; six genuinely distinct presets; all mandatory measurements; complete physical pieces including allowances/notches/grain/counts; supported options and combinations; material/equipment constraints; every making prerequisite and method; all display/diagram bindings; source/license metadata; and separate numerical/physical review evidence. Missing content must surface as an authoring issue or explicit unsupported state, not be improvised by Gemini.
 

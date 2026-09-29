@@ -1,166 +1,225 @@
 ---
 doc: spec
-status: approved
+status: implementation-ready-design
+revision: studio-1.0
 ---
 
-# Stitches — Technical Spec
+# Stitches — technical specification
 
-## Approved garment-studio technical amendment — September 29, 2026
+## Overview and authority
 
-The owner approved a garment gallery, interactive piece/assembly views, supported customization, and an agent carrying a design through making. The first complete family remains the Everyday blouse. Build from one exact versioned Sanity graph shared by the explorer, deterministic operations, and bounded assistant. This amendment supersedes older passages that open directly on Fit, describe the shoulder operation as the whole product, or recommend Gemini 3.8/3.7.
+Implements PRD E01–E10. This replaces the earlier narrow technical spec. The current code at local commit 84e3b54 is an illustrative, tested foundation. Do not restart the repository or relabel that evidence. See ../docs/SOL_HANDOFF.md for exact module migration and ../docs/DESIGN.md for the visual contract.
 
-`gemini-3.5-flash-lite` is the sole selected local preview candidate. A read-only model list confirmed `generateContent` access, not a free-tier allocation or a successful inference. The installed SDK implementation uses a bounded `generateContent` function-calling loop, not the draft `interactions.create` flow below. The $0 gate remains closed until account-specific verification.
+No signup/accounts in Studio 1.0. Introduce isolated guest sessions; defer Supabase/Auth. Keep the current Next.js/React/TypeScript app, Sanity Content Lake and actual Context KB, and Gemini 3.5 Flash-Lite. Add Three.js as a progressive renderer and deterministic geometry/layout/export tools. Public deployment remains a prepared artifact requiring later authorization.
 
-## How This Works, In Plain Language
+## Stack and dependency policy
 
-Sanity holds the reviewed pattern, its pieces, joins, adjustment rules, sewing instructions, and the sources behind them. Its Knowledge Base gives the agent a navigable explanation of applicable knowledge. The application also reads the exact current pattern records, because a summary cannot prove a seam length or authorize an operation. Gemini interprets the maker's request and asks for one of a small set of permitted actions. A separate drafting engine calculates the proposed pieces and checks them. The maker sees the result and decides whether to keep it. The server saves each accepted version and refuses a proposal whose pattern or knowledge has changed since it was prepared.
+Existing pins: Next.js 16.3.5, React 19.3.0, TypeScript 5.9.3, Sanity 6.15.0, @sanity/client 8.6.2, @google/genai 2.24.0, zod 4.6.5, Vitest 5.0.1, pnpm 11.19.0. Verify installed files/lock before use. Read the installed Next.js guides before writing routes or changing framework behavior.
 
-When an editor corrects a rule, Sanity retains the authored change. A Knowledge Base refresh detects it; an editor reviews and applies the resulting issues before the new entry is served. Stitches checks the new evidence and current records before making another proposal. Earlier accepted versions keep their original evidence and gain a review notice if affected.
+Use plain Three.js with a small React lifecycle wrapper; avoid adding a second scene state system. Dynamically load the viewer. Use existing React reducers/context until concrete shared-state pressure warrants a small store. Use SVG for exact 2D paths and technical diagrams. A versioned FreeSewing adapter is preferred if an appropriate design qualifies; otherwise an original scoped drafting adapter requires authored construction authority and maker review. Select and pin a maintained PDF library during export work, validating vector output rather than taking canvas screenshots.
 
-This separation is the answer to the learner's expressed Sanity question: Context is a read-only window into maintained knowledge; the linked Content Lake records supply exact constraints; the application owns the agent loop, geometry, and project revisions. See [Sanity Context](https://www.sanity.io/docs/ai/sanity-context), [Context MCP tools](https://www.sanity.io/docs/ai/sanity-context-mcp-tools), and [Knowledge Base maintenance](https://www.sanity.io/docs/ai/sanity-context-maintain-knowledge-base).
+Guest persistence uses a repository contract with transactional SQLite on the local Node server. Choose a supported binding against installed Node at implementation; native package compatibility must be smoke-tested on Windows before committing. The existing JSON demo store remains isolated for historical fixture rehearsals. Do not deploy either local store to a stateless hosting runtime.
 
-## The Core Journey Through the System
+No new hosted service, vector database, paid provider, or cloud job queue is required for the local application.
 
-1. A garment study loads the selected exact version's bounded, validated Sanity snapshot. Explore maps the finished illustration to flat pieces, seam partners, and prerequisite-safe assembly; fixture mode uses the same domain shape and is visibly labeled. The maker then moves into the version's project worktable. Implements `prd.md > Garment Discovery and Dissection` and `Pattern and Project Context`.
-2. The maker enters a shoulder request. The server first checks the project revision, measurements, and allowed operation. The Gemini adapter can read a relevant Context Knowledge Base entry and call only registered application tools. A direct, parameterized Sanity read supplies exact rule and relationship records. Missing or conflicting evidence stops the proposal. Implements `prd.md > Fit Proposal and Explanation`.
-3. The deterministic engine drafts the change, checks the locked neckline and related seams, and returns coordinates, check results, source IDs, and a proposal ID. The canvas overlays original and proposed pieces; the inspector explains each affected object. Implements `prd.md > Fit Proposal and Explanation`.
-4. Acceptance goes to the server, which compares the proposal's base revision and content fingerprint with the current project and reviewed content. A mismatch returns stale. A match saves one immutable accepted snapshot and marks dependent fabric and instruction results for review. Implements `prd.md > Revision Acceptance and Dependency Status` and `Fabric and Sewing Consequences`.
-5. An editor changes an applicable Sanity record. The Knowledge Base detects the source change, its issues are reviewed and applied, and the served entry is checked. Repeating the request retrieves the new knowledge and records; an earlier open proposal is stale, while an accepted snapshot stays intact. Implements `prd.md > Maintained Knowledge Demonstration`.
+## Architecture and responsibilities
 
-## Stack
+Browser routes → typed server application services → exact Sanity snapshot + Context evidence → registered deterministic tools → immutable project revisions → renderer/layout/instructions/export.
 
-- [Next.js App Router](https://nextjs.org/docs/app) with React and TypeScript for the worktable and server routes. The project handoff selected this stack; use a Node.js runtime for provider calls and local demo persistence. Pin compatible installed versions and the lockfile when scaffolding.
-- [Sanity Studio and Content Lake](https://www.sanity.io/docs/studio) for editorial records; [@sanity/client](https://www.sanity.io/docs/apis-and-sdks/js-client-querying) for allowlisted, parameterized reads; actual [Context MCP](https://www.sanity.io/docs/ai/sanity-context-mcp) in Knowledge Base mode for agent retrieval. Studio schema deployment is needed if a GROQ-mode Context endpoint is later used; the primary Knowledge Base endpoint is configured with Knowledge Base sources only.
-- [Google GenAI SDK](https://ai.google.dev/gemini-api/docs/function-calling) for a server-only bounded `generateContent` tool loop. The selected local candidate is `gemini-3.5-flash-lite`; model listing confirms access but not an account-specific free allocation. No paid model or provider spend is authorized.
-- SVG rendering and a pure TypeScript geometry engine. A FreeSewing adapter is a candidate only after confirming its specific design, license, adjustment behavior, and testability. The handoff's illustrative SVG formulas are not the engine.
-- Runtime schemas at API, Sanity, and model boundaries; [Vitest](https://vitest.dev/guide/) for domain and adapter contracts; [Playwright](https://playwright.dev/docs/intro) for the maker journey and responsive checks. Pin versions during the build.
-- A local, server-owned demo project store for sample measurements, proposals, revisions, and sewing progress. It is single-user and bound to local development. The planned private multi-user service remains the separate Supabase milestone.
+- Browser owns selection, camera, expanded panels, transient drag state, and an optional local backup mirror.
+- Server owns guest session isolation, canonical project state, input validation, operation eligibility, authoritative draft/checks, acceptance, provider access, and artifact generation.
+- Sanity owns shared catalog, pattern metadata, relationships, qualified bounds, methods, instructions, assets, and sources. It never owns guest measurements.
+- Engine owns numerical pattern geometry and check results. Renderer consumes it; Gemini never creates coordinates.
+- Context supplies maintained explanations and sources. It does not execute tools, write projects, or replace structured constraints.
 
-## Where It Runs and How Someone Tries It
+## C01 — Catalog and exact knowledge graph
 
-The application runs locally on Node.js with the pinned pnpm lockfile. Use the verified scripts in `package.json` and `README.md`; `docs/STATUS.md` records real build, test, and browser results. The local Studio source is not a published Studio or a completed schema-deployment proof.
+Implements E01, E03, E09. Extend the existing resolver/repository, preserving validation of duplicates, references, versions, prerequisite cycles, and fingerprints. Return a CatalogCard projection separately from a full GarmentSnapshot to avoid fetching all geometry for the collection.
 
-Fixture mode needs no credentials and is clearly marked illustrative. Live mode requires a dedicated Stitches Sanity project/dataset or an explicitly selected Stitches-only dataset, reviewed content, a built Knowledge Base and MCP endpoint, an organization Context Viewer token, a project read token if the dataset is private, and a Gemini key. A public deployment has not been authorized. For Devpost Basics, a short working demo video and a public repository are required; a live deployment is optional. Sanity Path One requires a DEV entry and the Sanity project ID or public dataset URL. See [Devpost event](https://learn-ai-basics.devpost.com/) and [Sanity Challenge](https://dev.to/challenges/sanity-2026-09-16).
+CatalogCard: id, slug, familyId, versionId, title, presetId, cover asset, techniqueIds, fabricClassIds, optionSummary, readiness, creator/license summary. Only publish buildable presets when their capability manifest resolves to installed engine and preview adapters.
 
-## Look and Feel
+GarmentSnapshot contains catalog metadata, measurement definitions, piece/edge roles, join constraints, operation definitions, compatibility rules, method choices, instruction DAG, preview bindings, sources, review evidence, and canonical fingerprint. Sort canonically; include semantics and relevant authored revisions, not volatile query timestamps.
 
-Carry forward `prd.md > Look and Feel`: warm linen surfaces, olive actions, terracotta change marks, restrained panel chrome, editorial serif headings, and a practical sans-serif for controls. Build named CSS tokens from `docs/DESIGN.md`, use the supplied reference as visual guidance, and keep the pattern larger than the agent panel. Add text and line-style labels for original versus proposal, visible keyboard focus, adequate mobile targets, and reduced-motion behavior.
+Keep the Stitches Context MCP endpoint Knowledge Base-only. Exact reads use fixed parameterized GROQ through @sanity/client. Adding a dataset source to the same MCP can change its retrieval mode; do not mix sources to simulate both roles. Initial Context paths are discovered from the actual outline and selected server-side.
 
-## Components
+## C02 — Pattern qualification and engine
 
-### Garment Graph and Explorer
+Implements E04, E06, E08. Start here before building more pretend operations.
 
-`patternVersion` binds a finished garment study to stable piece keys, seam endpoints, assembly steps, supported options, source IDs, and a content fingerprint. The server validates references, version consistency, duplicate keys, supported operations, and prerequisite cycles before rendering. The first `GarmentExplorer` uses an illustrative SVG front/back view keyed to the demo blouse; labels, cut counts, seam partners, and assembly order come from `PatternSnapshot`. Editing those records changes the explorer after reload, while an invalid graph yields an unavailable state rather than a fixture fallback in live mode.
+Evaluate the exact design package, version, code license, generated-pattern rights, attribution, documented fabric requirements, measurements, option envelope, seams, markings, and instructions. Record the selected commit/package and all licenses. FreeSewing is a toolkit, not proof that any chosen garment meets our brief. Tamiko and Tina documentation currently describes knit-oriented garments; they must not be relabeled as the woven lead top. Teagan is a useful separate knit candidate. Sandy is a circle-skirt candidate to evaluate. An original relaxed woven top remains a legitimate path only with explicit source/review evidence.
 
-Later catalog expansion needs Sanity-authored view assets and part-region bindings, option compatibility records, required measurement definitions, and instruction variants. The renderer may be SVG or Three.js, but it never supplies pattern coordinates or drape/fit proof. A second gallery item is selectable only after its graph, visual mapping, operation support, and tests are complete. Private measurements stay outside public Sanity content.
+Create a capability manifest for each family:
+- engineId/version; patternDefinitionHash; source/license IDs;
+- measurement definition IDs and reviewed bounds;
+- registered operations, options, lock support, compatible fabrics/methods;
+- piece/edge topology, cut counts, seam allowances and intended ease;
+- numeric regression envelope and physical-review status;
+- preview adapter and instruction resolver versions.
 
-The direct-control and agent paths call the same server-side operation registry. `get_garment_context`, `explain_connection`, `get_assembly_step`, and `preview_supported_change` are proposed bounded tool responsibilities, not claims that those tools exist yet. Each must validate an exact version and fingerprint; no model-supplied arbitrary query, coordinate, shell command, or acceptance action is permitted.
+PatternAdapter.draft(snapshot, normalizedMeasurements, options) returns PatternArtifact:
+- id/hash, basis, units:mm, engine/version;
+- pieces with stable IDs, closed stitch/cut paths, named edges, grain, notches, fold lines, labels and cut-instance rules;
+- joins with intended relation, measured lengths/ease, source tolerance, pass/fail/unknown;
+- changes, locked-region checks, added/removed pieces and instruction dependencies;
+- readiness components, not one opaque boolean.
 
-For a later multi-part design brief, maintain a server-owned plan with requested goals, locked features, garment-version scope, required measurements, available fabric/equipment, candidate operations, and per-step checked/unknown/refused results. Gemini may propose the next allowlisted tool call and explain results but does not mark a plan feasible. Direct controls produce the same plan transitions. Each accepted edit invalidates dependent geometry, layout, and instruction evidence; a failed fabric or technique constraint yields only authored supported alternatives. No independently generated image can stand in for the accepted pattern revision.
+Do not invent manufacturing tolerances. Curve integration/offset approximation error is a computational property with separate tests; seam fit/ease tolerances come from qualified content. Validate finite values, dimensional plausibility, closure, intersections, offset joins, notch correspondence, counts, orientation and lock preservation. Inspect all generated pieces, including facing/binding/pocket, not only front/back.
 
-### Worktable and Stage Navigation
+Operations redraft from canonical inputs, never successively distort previous output. Target IDs: top.length, top.sleeve, top.patchPocket, skirt.length and a source-supported skirt shape/waist option. UI derives supported values from the manifest; never hardcode the old 0–20 shoulder range into a production operation.
 
-Shows the selected garment/project, exact pattern/accepted revision, readiness label, and Explore / Fit / Fabric / Sew stages. The local store restores sample progress after restart. Implements `prd.md > Garment Discovery and Dissection`, `Pattern and Project Context`, and `Screens and Layout`.
+## C03 — Shared design state and preview
 
-### Pattern Canvas and Piece Inspector
+Implements E03/E04. A DesignBasis includes projectId, baseRevision, patternVersionId, knowledgeFingerprint, measurementHash, optionHash, fabricHash, methodHash, engineVersion, previewAdapterVersion. Each tool declares which inputs it depends on. Changing an input invalidates only dependent results, but stale acceptance compares the complete proposal basis.
 
-Renders engine-owned SVG paths, an original/proposed overlay, grain and piece labels, selection, and the relationship/source trail for the selected piece. It never treats a rendered outline as proof of sewability. Implements `prd.md > Fit Proposal and Explanation` and `Look and Feel`.
+Scene generation consumes PatternArtifact + PreviewBinding. A binding maps piece/edge IDs to panel mesh/UV/assembled pose/explode vector/step pose. Variable dimensions regenerate the mesh through a versioned preview adapter; optional pockets introduce real identified panels. No scaling a whole glTF blindly while the cutting pattern stays unchanged.
 
-### Proposal Controls
+Three.js handles rendering, raycasting, orbit and authored assembly animation. Prefer generated low-poly panel meshes or a glTF with stable named submeshes and explicit parameter mapping. No cloth simulation in this release. Show Construction preview. Render 2D/SVG immediately, load 3D on demand, cap pixel ratio, dispose resources, suspend on hidden tabs, and recover from context loss. All selectable objects also exist as accessible buttons/list items.
 
-Accepts bounded manual input or a natural-language request, shows interpreted units and neckline lock, and presents one explicit “Keep this version” action. The server returns clarification, unsupported, pending, checked, or stale states. Implements `prd.md > Fit Proposal and Explanation` and `Revision Acceptance and Dependency Status`.
+Geometry is immutable server output. Local drag may use a worker for responsive provisional visualization, but acceptance and export require server recomputation/checks with matching hashes.
 
-### Fabric and Sewing Panels
+## C04 — Guest project and revisions
 
-Fabric shows usable width/length, assumptions, and feasible/insufficient/unknown results. A true feasible result requires a verified placement; otherwise unknown is shown. Sew selects steps for the accepted revision, marks affected steps for review, and stores demo progress. Implements `prd.md > Fabric and Sewing Consequences`.
+Implements E08 and E04. No identity provider or signup. Issue an opaque random guest-session secret in an HttpOnly SameSite=Lax cookie (Secure outside loopback). Store only its hash server-side. Every project/run/artifact query scopes by that session; never accept a caller-supplied owner ID. Same-origin checks and CSRF protection apply to mutations.
 
-### Sanity Editorial Surface
+SQLite tables: guest_sessions, projects, revisions, proposals, measurement_sets, fabric_inputs, instruction_progress, agent_runs, agent_steps, artifacts, knowledge_impacts. Use transactions, unique idempotency keys, optimistic revision sequence comparison, and an explicit migration version. Keep raw measurements/photos out of ordinary logs. Database files are ignored. Local guest projects persist until explicit deletion; before any public release define and implement its retention policy in the UI and deployment package. Browser backup/import provides portability when cookies are cleared.
 
-Sanity Studio edits linked pattern and source records with form validation and review status. A demonstrated correction updates the dataset; the Knowledge Base is refreshed and its resulting issues applied before a changed retrieval is claimed. Implements `prd.md > Maintained Knowledge Demonstration`.
+Proposal states: created → calculating → needs_input | invalid | reviewable → kept | discarded | stale. A reviewable design can be kept with unresolved physical review, retaining its status. Cut readiness is a separate derived gate. Accept atomically: check session, basis/current source, operation results, idempotency; save immutable snapshot and artifact; advance sequence; mark dependent progress/layout for review.
 
-### Sanity Snapshot Repository
+A subsequent content correction never overwrites a kept artifact. It records affected source IDs and offers Review updated guidance / Redraft with current rules. Cross-tab updates broadcast a revision notice; stale local drafts remain recoverable but cannot overwrite.
 
-Runs fixed, parameterized GROQ projections for the selected pattern version and resolves references into a bounded validated snapshot. Rejects broken, conflicting, cross-version, or unreviewed required records. Produces a canonical fingerprint from relevant content. Implements `prd.md > Pattern and Project Context`, `Fit Proposal and Explanation`, and `Maintained Knowledge Demonstration`.
+## C05 — Bounded studio assistant
 
-### Context Knowledge Base Adapter
+Implements E05. Extend the existing fit-loop and Gemini adapter behind a generic dispatcher; keep the old spike test as historical regression. AgentRun is durable and resumable: request, normalized brief, basis, pending clarification, step receipts, provider cursor/history, status, budgets and last error. Never persist or expose private model reasoning as a user explanation.
 
-Connects to the Stitches Knowledge Base MCP endpoint with an organization token. Reads `initial_context` and relevant entries with `knowledge_base_read`; records KB ID, entry paths, source provenance, and retrieval outcome. No result from a fixture counts as a live Context call. Implements `prd.md > Fit Proposal and Explanation` and `Maintained Knowledge Demonstration`.
+Tool registry:
+| Tool | Validated result |
+| --- | --- |
+| find_templates | bounded catalog matches with supported capability IDs |
+| inspect_design | current exact snapshot, choices, missing measurements |
+| read_construction_notes | actual selected Context paths + evidence receipt |
+| preview_design | registered operations → server proposal |
+| check_pattern | deterministic geometry/join/lock report |
+| plan_cutting | physical instances and bounded placement result |
+| compare_alternatives | <=3 authored supported option sets with checked outcomes |
+| resolve_making_steps | exact revision + equipment → instruction DAG |
+| explain_piece_or_step | known IDs + scoped notes + UI selection hint |
 
-### Gemini Agent and Tool Dispatcher
+No arbitrary query, URL fetch, file path, shell, code execution, coordinate tool, Sanity mutation, or keep_revision tool. Explicit user interface acceptance is separate. Unknown operation IDs fail before execution.
 
-One bounded loop presents the maker request and selected version to Gemini, validates function calls, and runs only whitelisted application tools. It can ask for clarification and explain actual tool results; it cannot send arbitrary GROQ, JavaScript, coordinates, or an acceptance command. Implements `prd.md > Fit Proposal and Explanation` and `States and Boundaries`.
+Budgets: at most 4 model requests and 10 tool executions per run, at most 3 alternatives, <=120s active computation across resumable steps. Each model request gets a <=30s timeout (also bounded by remaining run time, preserving the existing successful provider timeout), no automatic paid retry, bounded input/outputs, and exact provider call identity/signature preservation. Tune only from measured live evidence. One HTTP advance processes one bounded unit and returns a checkpoint; cancellation and budget checks happen before every subsequent unit. Tool receipts are keyed by canonical input hash to avoid duplicate deterministic work. Retry of a timed-out provider request is explicit and counts against the run budget.
 
-### Geometry and Check Engine
+Prefer one intent/plan request, deterministic tool execution, then one explanation/correction request. The model may ask for a missing field. The server determines feasibility and readiness. Keep the free-tier model allowlist and global/session request limits; a rate-limit response supplies a retry time and leaves manual tools usable. Never silently switch providers/models.
 
-An authorized pattern adapter accepts normalized measurements, operation ID, amount, and locks. It returns versioned coordinates, seams, notches, affected pieces, and explicit pass/fail/unknown checks. Validate the full supported measurement envelope and fail closed on unsupported cases. Implements `prd.md > Fit Proposal and Explanation`.
+Expose compact action status and verifiable output, not chain-of-thought. Explanations cite resolved source records and receipt IDs. If KB conflicts with structured constraints, use the exact graph for safe navigation and withhold the unsupported reasoning/action.
 
-### Revision Service and Local Demo Store
+## C06 — Inspiration analysis
 
-Stores the initial and accepted snapshots, proposals, content fingerprints, and an idempotency key. The server enforces acceptance and staleness; its local single-user store is replaceable by an owner-scoped private adapter in the later account milestone. Implements `prd.md > Revision Acceptance and Dependency Status` and `States and Boundaries`.
+Implements E02. Separate typed service from the tool loop. Browser validates type/size, previews and optionally crops; explicit Analyze sends a downscaled re-encoded image. Defaults: one JPEG/PNG/WebP, <=8MB original, <=25 megapixels decoded, <=1600px long edge for inference. Strip EXIF; validate actual decoded format server-side; reject SVG/URLs/archives.
 
-## Data Model
+Use the selected model's documented image input plus structured output, with one bounded call. Output schema: visible category, silhouette enum, neckline enum, sleeve enum, length class, visible component list, occluded/unknown fields, concise observations. Every attribute permits unknown; model values must map to app vocabulary. Do not infer body measurements or nonvisible construction.
 
-Sanity records follow `docs/CONTENT-MODEL.md`: `pattern`, `patternVersion`, `patternPiece`, `seamConnection`, `adjustmentRule`, `instructionStep`, `fabricRequirement`, and `sourceDocument`. Stable IDs and references connect them; review status and source precedence decide applicability. A Knowledge Base built from scoped, reviewed Stitches records and authorized sources provides navigable evidence. The runtime never stores personal measurements in shared Sanity documents.
+Maker confirms/corrects attributes. Deterministic filters/weighted feature matching operate over published Sanity capabilities and return <=3 templates with reasoned differences. Candidate scores are internal ranking values, not calibrated confidence. No match is a first-class result.
 
-A resolved pattern snapshot contains the version ID, reviewed rules, affected pieces and joins, instruction dependencies, source IDs, `_rev` values, and a canonical hash. A proposal contains the project base revision, snapshot hash, engine version, normalized inputs, locks, geometry result, checks, Context evidence, and expiration/stale state. An accepted revision retains its full resolved snapshot and result. The local project store persists these sample records on the development machine; the browser keeps only transient interaction state. On return, the server reloads the accepted revision and progress. When the authoritative Sanity records change, only affected pending proposals become stale; accepted records remain reproducible and are flagged for review.
+Keep uploaded bytes in private temporary storage with <=15min TTL and deletion on cancel/complete; if a maker explicitly retains a reference in their guest project, record that choice. Do not send original bytes to Sanity. Before public use verify current provider data-use terms and show the concise notice; free-tier availability does not imply private model processing.
 
-## File Structure
+## C07 — Fabric placement
 
-Planned, subject to minor scaffold naming changes:
+Implements E06. Expand cut instances from the artifact, with named piece IDs, mirrored orientation, on-fold constraints, grain angle, nap restrictions and allowances. Layout includes cut lines, not only stitch lines. Normalize usable cloth after explicit shrinkage/selvage assumptions.
 
-```text
-Stitches/
-├── src/app/                    # worktable, stages, and server routes
-│   ├── api/agent/turn/route.ts
-│   ├── api/patterns/[versionId]/route.ts
-│   ├── api/projects/[projectId]/route.ts
-│   └── api/proposals/         # preview and explicit acceptance
-├── src/components/studio/      # worktable, SVG canvas, panels, states
-├── src/domain/                 # pattern types, geometry, checks, revisions
-├── src/server/knowledge/       # fixture, Sanity, and Context adapters
-├── src/server/agent/           # Gemini adapter and bounded dispatcher
-├── src/server/projects/        # local demo store; private adapter later
-├── sanity/schemaTypes/         # authored content schema and Studio config
-├── fixtures/                   # illustrative inputs; never live proof
-├── tests/                      # domain, contract, and browser checks
-├── devpost/                    # approved scope, PRD, spec, build checklist
-├── docs/                       # full Stitches brief, evidence, status
-├── .env.example                # names and placeholders, no credentials
-├── package.json
-└── pnpm-lock.yaml
-```
+Begin with deterministic bounded strip/skyline search over allowed orientations, with conservative polygon bounds for candidates and exact/conservatively error-bounded polygon intersection/containment verification. Bias to a feasible readable plan rather than dense packing. A conservative bounding-box placement can prove feasibility if full shapes are contained; failure of that search does not prove insufficiency.
 
-## External Services and Dependencies
+Result union: feasible(placements,usedLength,checks,basis); impossible(necessaryConstraint,evidence); not_found(searchBudget,unplaced); missing_inputs(keys); invalid(reason). A piece wider than every allowed orientation can prove a necessary impossibility; a heuristic timeout cannot. Flat-fold and mirrored-pair semantics must be explicit. Unsupported defects/pattern matching return missing/unsupported, never ignored.
 
-**Sanity exact read.** The server uses `@sanity/client` with an explicit project ID, dataset, API version, published perspective, `useCdn: false`, and a server-only read token when required. It calls `client.fetch(fixedGROQ, {versionId})`; the returned projection is validated before graph traversal. No model-written query is executed. The editorial write token is separate and is never exposed to the app agent. [Client querying guide](https://www.sanity.io/docs/apis-and-sdks/js-client-querying).
+An alternative design repeats engine and layout checks and retains locked features. Deterministic inputs produce deterministic candidate order and recorded seeds.
 
-**Sanity Context.** A Knowledge Base-only MCP endpoint is reached at `https://api.sanity.io/v1/context/organizations/:organizationId/mcp/:mcpEndpointName` with a server-only organization token carrying Context Viewer permission. The adapter performs MCP `tools/list`, then `tools/call` for `initial_context` with `{}` and `knowledge_base_read` with `{knowledgeBase: kbId, paths: [...]}`. Paths come verbatim from the outline and calls are bounded to relevant entries. It validates the returned content and keeps the cited paths. A 401, 403, empty tool set, unavailable KB, or missing entry is a visible unavailable/incomplete result. [MCP reference](https://www.sanity.io/docs/ai/sanity-context-mcp) and [tool reference](https://www.sanity.io/docs/ai/sanity-context-mcp-tools).
+## C08 — Instruction resolver and making mode
 
-**Sanity Knowledge Base maintenance.** Connect a scoped dataset source, build and inspect its entries, and resolve relevant conflicts. After an editorial correction, run change detection, review and apply the resulting issues, and confirm the updated entry is actually served. Refresh detection alone keeps old entries in service. Record before/after content and retrieval evidence. [Create](https://www.sanity.io/docs/ai/sanity-context-create-knowledge-base) and [maintain](https://www.sanity.io/docs/ai/sanity-context-maintain-knowledge-base) guides.
+Implements E07. Resolve an instruction DAG from the accepted artifact, enabled components, selected equipment/method and current retained content snapshot. Each step has stable ID, prerequisites, piece/edge IDs, action, allowance reference, orientation, diagram binding, checkpoint, technique references, and optional detail. Add pocket steps before closing their supporting seams. Detect cycles and dangling optional references.
 
-**Gemini.** The server uses the installed `@google/genai` SDK's bounded manual `generateContent` function-calling flow with `gemini-3.5-flash-lite`, scoped input, and declared tools. Each returned call is schema- and permission-checked, executed locally, and returned with its matching function-call identity and required model content; the loop has tool, time, and output limits. The current local preview is incomplete and disabled by default. Add garment navigation, compatibility, and multi-step brief handling only through deterministic server tools. Return typed clarification, quota, timeout, malformed, or unavailable states; verify this account's zero-cost inference eligibility before live calls. [Google function calling](https://ai.google.dev/gemini-api/docs/function-calling) and [model catalog](https://ai.google.dev/gemini-api/docs/models).
+Progress binds to revision + step semantic hash; unrelated editorial copy changes need not reset unrelated work, while changed method/geometry/prerequisites require review. Preserve previous completion history. A source correction offers explicit updated guidance without silently replacing an in-progress step.
 
-**Later private storage.** Supabase Auth/Postgres is planned for accounts, personal measurements, and owner-scoped revisions, with tested row-level security. It is not a prerequisite for the local sample demonstration. [Supabase documentation](https://supabase.com/docs).
+Diagrams are SVG or 3D poses from the same IDs. Use authored micro-actions and numerical values; model-generated explanations cannot replace missing construction instructions.
 
-## Important Failure Modes
+## C09 — Export
 
-- **Knowledge missing, conflicting, or not yet applied** → withhold the supported operation and show the source or pending review; retain the current accepted version.
-- **Provider timeout, quota, or malformed tool call** → show a retry/clarification state and leave manual supported controls usable.
-- **Unverified geometry or stale basis** → show failed/unknown checks or reject acceptance; never present a proposal as cut-ready.
-- **Insufficient or unknown fabric** → report the actual shortage or missing dimensions. A rough estimate is not called a feasible layout.
+Implements E08. Generate vector pattern.svg in mm with viewBox and explicit dimensions. Produce tiled A4 and US Letter with safe margins, registration marks, page labels/map, calibration, and source/revision footer; full-size PDF from exact dimensions. Retain curves if the library supports them; otherwise test approximation error. Do not screenshot the 3D canvas.
 
-## What Was Simplified and Why
+Making package: manifest.json, pattern.svg, pattern-a4.pdf, pattern-letter.pdf, full-size-pattern.pdf, cutting-plan.pdf, making-guide.pdf, materials.csv, attribution.txt, project-backup.json. Manifest hashes every artifact and binds pattern/engine/content/measurement/options/method/fabric basis. Export never includes tokens or original reference images by default.
 
-- A single supported woven-top family and shoulder operation establish the connected-content journey; additional garments and arbitrary edits remain in the full product roadmap.
-- The competition demo uses labeled sample measurements and a server-owned local project store. Multi-user accounts, private cloud storage, and tenant isolation remain a later release milestone.
-- Fabric feasibility remains unknown until a full placement engine has evidence. This keeps the Fit / Fabric / Sew consequence visible without misrepresenting an area estimate as a cutting layout.
-- Local recording can satisfy the Devpost demo requirement. Any public deployment or final submission requires the owner's separate authorization.
+Readiness is derived from required numerical checks, instruction completeness, fabric inputs/layout where applicable, rights, and family/variant maker evidence. Review exports watermark pages with the unresolved status; ready-to-cut export is unavailable until qualified. Test 100mm calibration geometry, page joins, real print scale, and labels/counts from the exact artifact.
 
-## Decisions and Open Issues
+## C10 — Sanity editorial maintenance and Functions
 
-- **Learner choices carried forward:** Stitches name and atelier design; Next.js/React/TypeScript/SVG; Sanity for structured pattern knowledge; Gemini for the application agent; primary Sanity Path One and secondary Devpost Basics; no paid model budget; no external publication yet. These appear in the approved scope, PRD, handoff, and conversation.
-- **Derived implementation details:** bounded MCP and Gemini adapters, fixed Sanity projections, canonical content fingerprints, and a local server-owned demo store. These serve the approved stale-proposal and privacy requirements; they are not attributed as new learner preferences.
-- **Useful uncertainty clarified:** the learner asked what Sanity contributes beyond keyword search. The live test will compare the same version/source corpus and score applicable rule, source precedence, and complete dependent effects. Context supplies maintained evidence; linked Sanity records establish exact relationships. The result will be reported even if the comparison shows no advantage.
-- **Early feasibility gate:** select a pattern design with verified permission and an operation that can preserve the neckline and pass reviewed seam/ease checks. If the candidate fails, select another authorized family or report the gate honestly. The illustrative reference cannot satisfy this gate.
-- **Configuration gate:** Stitches needs its own authorized Sanity content scope, Context KB/MCP, and valid server-only tokens. Existing Crossgrade credentials and its dedicated dataset are not assumed to authorize Stitches writes. The live integration remains unverified until configured and tested.
-- **Version gate:** package versions, Google SDK function-calling types, Sanity quotas/plan availability, and exact run scripts must be confirmed when dependencies are installed. No external integration or physical sewing trial has been run merely by writing this spec.
+Implements E09. Extend existing development schemas per CONTENT-MODEL.md. Keep the runtime read token separate from the editor token. All writes guard project l4eeamth and dataset development. A migration has dry run, explicit ID list, revision preconditions and a rollback snapshot. Current live records remain illustrative.
+
+Editorial impact service accepts a trusted document-change event, finds affected versions/presets/operations/steps, computes new semantic fingerprints, and marks pending proposals stale. Implement as a pure function with a local event fixture first. Prepare a Sanity Document Function/Blueprint wrapper and local test using the documented SDK/CLI when compatible; deploying it is an external publication and is not authorized. The app can compare fingerprints on request without requiring a deployed Function.
+
+Separate statuses: source changed; graph validated; KB refresh/rebuild requested; generated entry reviewed; served entry verified; applicable. Never equate source publication or refresh detection with a successful KB update. The existing real wrong-arrow recovery is a regression case. Use documented Context CLI/dashboard operations only, verifying installed CLI support before any call; no invented control-plane URLs. Expose editorial diagnostics in Studio/development review tools, not the maker's main interface.
+
+## Application API contracts
+
+These are proposed Stitches application routes, not vendor API names. Validate every request with strict schemas; forbid unexpected fields. Error envelope: {error:{code,message,retryable,fieldErrors?,currentBasis?},requestId}. No raw provider errors/secrets. Use 400 invalid, 403 guest/scope failure, 409 stale, 413 image limit, 422 unsupported/failed check, 429 quota, 503 unavailable. Long operations return 202 with a local run ID.
+
+| Method/path | Request | Result |
+| --- | --- | --- |
+| GET /api/catalog | filter enums/query, bounded page | cards/cursor |
+| GET /api/garments/[versionId] | authorized public version | validated snapshot/projection |
+| POST /api/guest | same-origin initiation | opaque cookie, workspace metadata |
+| GET/POST /api/projects | session / template+preset | list / project |
+| GET/PATCH/DELETE /api/projects/[id] | session; expected sequence for edit | project / result |
+| POST /api/projects/[id]/proposals | basis, normalized measurements/options/locks | proposal or needs_input |
+| POST /api/projects/[id]/proposals/[proposalId]/keep | base sequence, idempotency key | new immutable revision |
+| POST /api/projects/[id]/layout | revisionId, fabric input | typed layout result |
+| PATCH /api/projects/[id]/progress | revisionId, stepId, expected hash, complete | progress |
+| POST /api/agent/runs | projectId, basis, brief | runId/status |
+| POST /api/agent/runs/[id]/advance | checkpoint/idempotency | next checkpoint |
+| GET/DELETE /api/agent/runs/[id] | session | status / cancelled |
+| POST /api/inspiration/analyze | multipart validated image + user action | editable observations |
+| POST /api/inspiration/matches | confirmed attributes | supported matches |
+| POST /api/projects/[id]/exports | exact revision, package type | artifact or blocked gate |
+| GET /api/artifacts/[id] | owning guest session | bounded download |
+
+The old /api/demo/* and /api/agent/preview stay isolated until replacement parity is verified, then remain development-only or are removed in a named migration. No public code path should share the global demo project.
+
+## File structure
+
+- src/app/(marketing)/: landing, collection, garment detail and inspiration routes.
+- src/app/(studio)/: guest library and project/making routes.
+- src/components/catalog/: cards, filters, detail.
+- src/components/studio/: shell, controls, inspector, evidence drawer, revision review.
+- src/components/viewer/: ThreeScene wrapper, panel renderer, camera controls, SVG fallback.
+- src/components/making/: cutting preparation, diagram, step navigator.
+- src/domain/catalog/, patterns/, geometry/, layout/, instructions/, projects/, evidence/: pure types and algorithms.
+- src/server/knowledge/: extend existing resolver adapters and Context reader.
+- src/server/agent/: session adapter, tool registry, run service/checkpoints.
+- src/server/projects/: guest scope, repository, transactions and migration.
+- src/server/inspiration/, exports/, editorial/: bounded services.
+- sanity/schemaTypes/: catalog, pattern, method, asset and source documents.
+- tests/domain/, integration/, browser/, evaluations/: meaningful contracts and journeys.
+- evidence/: dated, labeled actual outcomes; design/ contains reference-only artifacts.
+
+## Verification and release evidence
+
+Meaningful tests: missing/cross-version graph references; wrong assembly arrow; option compatibility; full-envelope draft determinism; invariant locks; intentional seam ease; optional component counts; fold/mirror layout; search exhaustion distinction; stale and duplicate acceptance; cross-guest denial; expired image cleanup; quota/cancel/resume; malicious tool args; print scale; revision instruction invalidation.
+
+Benchmark: freeze a licensed same-version corpus and 24 authored tasks before running. Include version selection, dependency closure, pocket sequencing, equipment alternatives, source correction, fabric constraint, ambiguity and unsupported requests. Compare keyword retrieval over the same corpus against structured traversal plus Context/tool execution. Give both the same available evidence; separate retrieval-only metrics from end-to-end tool outcomes. Report precision/recall of dependencies, applicable rule/source accuracy, refusal correctness, task success, latency and call counts. Do not fabricate results or tune expected answers after seeing outputs.
+
+Live budget rehearsal: at least six representative runs spread within available free quotas, with explicit total calls/time, two interrupted/recovered cases, and manual fallback. One previous successful shoulder spike does not establish new-feature reliability.
+
+Release evidence includes actual screenshots, keyboard/reduced-motion checks, zero overflow at required sizes, no secret leakage, numerical layouts, printed calibration, each family's physical maker record, local restore rehearsal, and runbook. Performance targets (verify on stated hardware/network): usable initial content <=2.5s, direct-control visual feedback <=100ms, 3D >=30fps on tested midrange device, no long layout work on the UI thread. Treat as targets until measured.
+
+## Official references and limits
+
+- Sanity exact reads: https://www.sanity.io/docs/apis-and-sdks/js-client-querying
+- Context modes: https://www.sanity.io/docs/ai/sanity-context-retrieval-modes
+- KB maintenance: https://www.sanity.io/docs/ai/sanity-context-maintain-knowledge-base
+- Functions local testing: https://www.sanity.io/docs/functions/functions-local-testing
+- Context CLI: https://www.sanity.io/docs/cli-reference/cli-context
+- Gemini selected model: https://ai.google.dev/gemini-api/docs/models/gemini-3.5-flash-lite
+- Image input: https://ai.google.dev/gemini-api/docs/image-understanding
+- Function calling: https://ai.google.dev/gemini-api/docs/function-calling
+- Three.js picking: https://threejs.org/manual/pages/picking.html
+- glTF: https://threejs.org/manual/pages/load-gltf.html
+- FreeSewing: https://freesewing.dev/
+
+Sources were checked for architectural feasibility on September 29. They do not prove our adapters, licenses, or physical results. See SOURCES.md for candidate caveats.

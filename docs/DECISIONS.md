@@ -1,5 +1,22 @@
 # Implementation decisions
 
+## September 29, 2026 — Studio 1.0 product-lead upgrade (current)
+
+- The owner requested Astra's complete product/design/technical handoff for Sol, not full production implementation in this pass. The design reference is an inspectable static artifact; it is not application proof.
+- Preserve the garment-first ambition and broaden the release to six meaningful presets across two qualified families. Earlier one-blouse-only scope below describes the proof phase and is superseded for the final release, not permission to show unsupported gallery cards.
+- Keep the warm atelier identity; deepen forest contrast, enlarge the garment, collapse diagnostics and use focused phone sheets. Make gets its own step-first layout. No OpenAI affiliation or copied branding.
+- No signup in Studio 1.0. Add private isolated guest sessions and transactional local SQLite, with backup/import and stale-tab recovery. Do not deploy local SQLite to a stateless host.
+- Qualify pattern source, version, code/output rights and full geometry before production operations. Existing shoulder fragments remain illustrative. FreeSewing candidates are not qualified merely by being open source or looking similar.
+- Three.js is a progressive educational construction renderer with piece/edge bindings. It does not simulate fabric drape or establish body fit.
+- Photo input supports visible-feature analysis and confirmed matching to supported templates. It cannot promise hidden pattern reconstruction or body measurements.
+- Fabric/layout, exact export and revision-specific making are part of the full target, not indefinite follow-ons. Physical and printed validation remain explicit release gates.
+- Gemini selects bounded registered tools; server checks numerical validity and acceptance. Keep the empirically used <=30s per-request deadline within a <=120s active run budget. No paid fallback, implicit keep or arbitrary execution.
+- Sanity owns shared relationships/methods/sources; Context owns maintained explanation. Preserve KB-only MCP plus separate exact reads. Demonstrate a correction affecting two looks and review the actual served entry.
+- Prepare event-impact logic and a Sanity Function locally, without deployment. The app can compare fingerprints on requests without a hosted function.
+- Replace conflicting current scope/PRD/spec/checklist/product/architecture/content-model documents; preserve historical evidence below and in Git. Do not rewrite learner history or pretend the repository began empty.
+
+## Historical decisions (then-current; later decisions above take precedence)
+
 ## September 29, 2026 — Sanity isolation and proof boundaries
 
 - The old Fit-first checklist is superseded by the approved garment-first sequence. The existing revision store and illustrative Fit/Fabric/Sew work remain foundations, while a connected Explore stage is the new first user experience. One fully supported blouse is more credible than an unsupported multi-garment gallery; other garments remain unselectable until their versioned graphs and operations are real.

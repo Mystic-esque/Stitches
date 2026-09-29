@@ -1,58 +1,33 @@
-# Sequenced build plan
+# Build plan — Stitches Studio 1.0
 
-## Approved direction and immediate continuation — September 29, 2026
+The executable checklist is ../devpost/checklist.md. The implementation contracts are ../devpost/spec.md; the experience contract is DESIGN.md and ../design/stitches-studio.html. This file is the dependency map, not another competing checkbox ledger.
 
-Insert a garment-first vertical slice between milestones 1 and 2 without dropping any later gates: one browseable blouse study; front/back illustrative garment view; piece dissection; seam links; authored assembly timeline; direct supported fit control; revision-specific Fit/Fabric/Sew consequences. The current UI and validated snapshot begin this slice. Complete the remaining styling, accessibility, deterministic browser journey, and screenshot verification. Do not add fake gallery garments or a 3D simulation that implies tested fit.
+## Starting point
 
-Milestone 2 remains the critical Sanity proof: seed only the dedicated Stitches `development` dataset; attach it as a Context Knowledge Base source; select the intended published document types; build and inspect served entries; create a Stitches-only MCP endpoint and read credential; run actual read-only retrieval; then demonstrate an editorial correction through issue application and changed agent/explorer behavior. The empty Knowledge Base created on September 29 is setup progress, not a completed integration gate. Keep `production` untouched.
+Local commit 84e3b54 has the tested illustrative worktable and actual Sanity/Context/Gemini proofs. It is not a completed garment application. The September 29 product-lead package replaces the narrow Fit/Fabric/Sew scope with the approved full journey.
 
-Milestone 4 uses `gemini-3.5-flash-lite` as the selected candidate. `models.list` access passed, but live inference remains disabled pending confirmation of this project's $0 tier and a real KB-backed route. Verify actual quota for this account rather than assuming public RPM figures. Extend the bounded tools toward garment navigation, compatibility, and step explanation only after deterministic server operations exist; acceptance remains outside the model. Prior plans for 3.8/3.7 are superseded.
+## Sequence and dependencies
 
-This is an implementation sequence, not a time or cost estimate. Each milestone ends with evidence. Checkpoints do not require a new permission request for ordinary local work.
+| Package | Outcome | Requires |
+| --- | --- | --- |
+| W01 | Qualified top/skirt source, licenses and capability manifests | Existing repository; primary source research |
+| W02 | Isolated guest projects, durable revision/run storage | Existing server; no garment source dependency |
+| W03 | Versioned Sanity catalog/method/preview graph | W01 definitions; development-only migration guard |
+| W04 | Premium landing, collection, guest library, studio shell | Design reference; W02; W03 for real content |
+| W05 | Actual measurements and complete-piece customization | W01–W03 |
+| W06 | Linked 2D/3D construction experience | W04–W05; explicit preview bindings |
+| W07 | Verified fabric planning and alternatives | W05; fabric constraints in W03 |
+| W08 | Bounded multi-constraint assistant | W02/W03/W05; add W07 tools when ready |
+| W09 | Photo features → confirmed supported templates | W03/W04; safe image service and quota |
+| W10 | Revision-specific making and print/export package | W05/W07; authored instructions and methods |
+| W11 | Maintenance impact, fair benchmark and failure recovery | W03/W08/W10 |
+| W12 | Maker/user evidence, polish and release review | All above; human physical evidence |
 
-Sanity Challenge Path One is the primary competition target; Build With AI: Basics is secondary. The competition demonstration in `devpost/scope.md` requires live Context MCP and Knowledge Base use plus a tested drafting operation. The fixture milestone alone is not a submission candidate. Establish the Context connection and drafting feasibility early, before investing in the broader accounts and export work.
+Keep a working vertical slice while extending it. Build W02/W04 independently if W01 awaits expert review, but do not invent geometry to unblock a readiness badge. Skirt support is a real second-family obligation, not a recolor. No final milestone is complete with essential gates unknown.
 
-## 1. Runnable studio with fixtures
+## Milestone proof
 
-Scaffold the application in this folder while preserving the brief and references. Create reusable components for the header, project context, pattern canvas, proposal panel, fabric planner, and sewing steps. Introduce domain types and a fixture repository. Reproduce the reference's style and primary interactions. Persist demo revisions and progress locally.
+Each package records actual commands, result, screenshot/artifact paths, live-vs-fixture provenance, failures and next task. Fix a failed gate or report its precise limitation. Do not treat planned tests, a rendered reference or a provider model listing as live feature proof.
 
-Done when: the app starts without credentials; slider, original comparison, acceptance, width choice, and step completion work; state restores; keyboard operation and small screens work; the illustrative status is visible. Record exact commands and browser checks in STATUS.md.
-
-## 2. Sanity knowledge layer
-
-Implement the schema described in CONTENT-MODEL.md, with matching runtime validators. Add a seed script for a development dataset and parameterized repository queries. Validate reference existence and version consistency. Build the affected-object and source trail from records. Keep fixtures as the offline adapter.
-
-Also establish the real Context MCP connection to a curated Knowledge Base and exercise retrieval with a bounded agent spike. Use authorized pattern/source material with explicit provenance, applicability, and source precedence. Demonstrate an editorial correction, refresh detection, review and application of the resulting Knowledge Base issues, and a changed served entry; retain build and retrieval evidence where exposed by the documented API.
-
-Done when: changing a rule relationship in the development dataset changes the computed effect trail; invalid or cross-version records fail clearly; published production retrieval excludes illustrative/unreviewed content; fixture and Sanity adapters pass the same contract checks; and actual Context/Knowledge Base retrieval succeeds. Without credentials, finish code and fixture tests and record the live integration gate as blocked, not complete.
-
-## 3. Verified drafting operation
-
-Select an authorized, parameterized pattern family. Evaluate a FreeSewing adapter or a reviewed scoped drafting implementation. Add one supported operation, preserved regions, seam/ease validation, notches, and deterministic output. Establish reviewed parameter bounds. Implement explicit incomplete/failed checks.
-
-Done when: a measurement-envelope fixture suite passes; the original is preserved; locked geometry remains unchanged; required seam relations satisfy their actual intended constraints; unsupported combinations are rejected; source and engine versions are recorded. Physical maker review is required before a cut-ready label.
-
-## 4. Gemini-assisted editing
-
-Add the server-only Google SDK adapter, schema-validated intent, and bounded tool dispatcher. Route natural-language requests through the same operation registry as manual controls. Add clarification, grounded explanations, timeouts, quota handling, cancellation, and mock-provider tests. Keep acceptance outside the model.
-
-Done when: all agent evaluation cases pass with a deterministic test provider, selected live cases pass using configured Gemini and actual Context/Knowledge Base retrieval, each effect has supporting rule/tool evidence, malformed or unsupported actions cannot edit a project, and manual use works during provider failure. Include the before/after knowledge-correction case and a fair keyword-retrieval comparison using the same sources. Report mocked and live results separately and do not claim an advantage the comparison does not show.
-
-## 5. Private accounts and revisions
-
-Add authenticated projects, measurement profiles, inventory, and revision storage. Implement owner policies, atomic acceptance, idempotency, and stale-proposal rejection. Migrate demo data only after a deliberate user action. Add export/download authorization and deletion behavior.
-
-Done when: users cannot read or mutate one another's records; anonymous access is denied where intended; stale proposals cannot overwrite changes; accepted revisions reproduce the same result; raw measurements are absent from routine logs.
-
-## 6. Fabric, instructions, and printing
-
-Replace sample fabric estimates with a validated placement engine and explicit assumptions. Connect instruction variants/prerequisites to accepted revisions. Build a focused mobile sewing view. Produce scale-correct SVG/PDF output with calibration and version metadata.
-
-Done when: placements satisfy grain, piece count, mirroring/fold, usable width/length, and supplied restrictions; shortages and unknowns are honest; instruction dependencies update; saved progress survives reload; printed scale is checked. Never equate a feasible layout with global optimality.
-
-## 7. Release preparation
-
-Complete physical sewing trials for supported cases, accessibility checks, provider error handling, basic rate limits, monitoring, and content-authoring workflow. Document supported operations and limitations. Select hosting and configure secrets through appropriate project settings.
-
-Done when: the end-to-end journey is verified with live services and a reviewed pattern; deployment is separately authorized and its result verified; product claims match the evidence. No deployment or account creation is part of this handoff kit.
+Owner interaction is needed only for actual missing authority/access or physical maker evidence. No routine approval stop after every package. Public deployment, paid resources, production Sanity mutations and submission remain separately gated.
 
