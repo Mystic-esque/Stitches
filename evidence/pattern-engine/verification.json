@@ -1,0 +1,123 @@
+{
+  "checkedAt": "2026-10-01T17:00:36.594Z",
+  "provenance": "real-local-engine-synthetic-measurements",
+  "node": "v22.19.0",
+  "engineIdentity": {
+    "engine": "@freesewing/core",
+    "version": "4.10.2",
+    "design": "@freesewing/sandy",
+    "designVersion": "4.10.2"
+  },
+  "inventory": [
+    {
+      "name": "@freesewing/core",
+      "version": "4.10.2",
+      "declaredLicense": "MIT"
+    },
+    {
+      "name": "@freesewing/sandy",
+      "version": "4.10.2",
+      "declaredLicense": "MIT"
+    },
+    {
+      "name": "@freesewing/tina",
+      "version": "4.10.2",
+      "declaredLicense": "MIT"
+    },
+    {
+      "name": "@freesewing/plugin-transform",
+      "version": "4.10.2",
+      "declaredLicense": "MIT"
+    },
+    {
+      "name": "@freesewing/config",
+      "version": "4.10.2",
+      "declaredLicense": "MIT"
+    }
+  ],
+  "drafts": [
+    {
+      "input": {
+        "measurements": {
+          "waist": 720,
+          "hips": 960,
+          "waistToFloor": 1000,
+          "waistToHips": 200
+        },
+        "lengthRatio": 0.55,
+        "seamAllowanceMm": 10,
+        "waistbandShape": "straight"
+      },
+      "file": "evidence/pattern-engine/sandy-1-1f051bed5ecb6eea.json",
+      "hash": "1f051bed5ecb6eeae1877bd80a69c4cdebbd73981c47015d641ac422cd4b2986",
+      "repeatedDraftIdentical": true,
+      "join": {
+        "id": "sandy-waist-join",
+        "skirtEdgeId": "sandy.skirt/waist",
+        "waistbandEdgeId": "sandy.waistband/attachment",
+        "skirtStitchMm": 720.0015721564444,
+        "waistbandStitchMm": 720,
+        "overlapMm": 21.599999999999998,
+        "note": "Scalar comparison for one panel, single fold, zero gathering, straight waistband; not assembly or fit approval.",
+        "differenceMm": 0.0015721564443538227
+      },
+      "engineWarnings": []
+    },
+    {
+      "input": {
+        "measurements": {
+          "waist": 880,
+          "hips": 1100,
+          "waistToFloor": 1080,
+          "waistToHips": 220
+        },
+        "lengthRatio": 0.7,
+        "seamAllowanceMm": 10,
+        "waistbandShape": "straight"
+      },
+      "file": "evidence/pattern-engine/sandy-2-878fafbecce5dbc5.json",
+      "hash": "878fafbecce5dbc519c4c51afa0d39c133c023f4840f04005c8b556221612396",
+      "repeatedDraftIdentical": true,
+      "join": {
+        "id": "sandy-waist-join",
+        "skirtEdgeId": "sandy.skirt/waist",
+        "waistbandEdgeId": "sandy.waistband/attachment",
+        "skirtStitchMm": 880.001921524543,
+        "waistbandStitchMm": 880,
+        "overlapMm": 26.4,
+        "note": "Scalar comparison for one panel, single fold, zero gathering, straight waistband; not assembly or fit approval.",
+        "differenceMm": 0.0019215245430359573
+      },
+      "engineWarnings": []
+    }
+  ],
+  "distinctInputsChangedGeometry": true,
+  "equivalentInputOrderCanonical": true,
+  "scalarJoinResearchThresholdMm": 0.5,
+  "approvedSewingToleranceEstablished": false,
+  "stablePartAndPathIds": true,
+  "stableNotchIds": true,
+  "invalidInputRefusals": 5,
+  "zeroAllowanceLayerAbsent": true,
+  "rightsEvidence": {
+    "registryGitHead": "3d290d25d0b6a65852dd31aec125c97bc8ca6e2c",
+    "licenseUrl": "https://codeberg.org/freesewing/freesewing/raw/commit/3d290d25d0b6a65852dd31aec125c97bc8ca6e2c/LICENSE",
+    "localNotice": "tools/pattern-spike/FREESEWING-LICENSE.txt",
+    "noticeHash": "6ff0d0e03d3e16118f74bfdf74aba35576c1b7e1f56de96977872d2aeabdb430",
+    "commercialUseSource": "https://freesewing.eu/docs/about/faq/commercial-use/",
+    "secondPersonReviewEstablished": false
+  },
+  "curvedWaistbandConflict": {
+    "engineCount": 1,
+    "publishedPlanningCount": 2,
+    "status": "unresolved-source-version-conflict"
+  },
+  "completeQualificationPassed": false,
+  "appIntegrationEnabled": false,
+  "limitations": [
+    "Curved waistband engine cut count conflicts with published documentation/planning records.",
+    "No complete step DAG or named seam/notch counterpart map.",
+    "No independent allowance/layout/physical print/maker receipts.",
+    "Npm tarballs omit LICENSE; exact registry gitHead LICENSE retrieved successfully and notice retained. Independent rights review remains open."
+  ]
+}

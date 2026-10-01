@@ -1,0 +1,16 @@
+{
+  "name": "stitches-pattern-qualification",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "verify": "node verify.mjs"
+  },
+  "dependencies": {
+    "@freesewing/config": "4.10.2",
+    "@freesewing/core": "4.10.2",
+    "@freesewing/plugin-transform": "4.10.2",
+    "@freesewing/sandy": "4.10.2",
+    "@freesewing/tina": "4.10.2",
+    "@freesewing/toni": "4.10.2"
+  }
+}

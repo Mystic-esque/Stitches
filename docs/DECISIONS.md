@@ -1,5 +1,12 @@
 # Implementation decisions
 
+## October 1, 2026 — Isolate engine evidence and preserve source-version conflicts
+
+- Keep the experimental engine workspace out of production app dependencies until its exact design mapping qualifies. Pin direct dependencies and retain npm integrity locks; disable install scripts. Inspect actual imports when vendor metadata omits runtime dependencies rather than patching vendor code or guessing APIs.
+- A deterministic measured draft is useful progress but not a readiness promotion. Compute a narrow independent scalar check, state its technical threshold and unknowns, and retain named points/path/notch/cut/grain data separately from SVG rendering.
+- The real curved-waistband count differs between Sandy 4.10.2 engine and current maker documentation. Preserve both versions and mark the conflict; do not modify the reference answer or public planning record merely to agree with the installed engine.
+- A generated KB page can repair citations yet invent new material implications. Narrow the source-scoped instruction, verify all actual entries again, and keep failed prose snapshots. An eleven-check editorial pass still does not establish source review, maker testing or cut-ready geometry.
+
 ## October 1, 2026 — Inspect served prose after every knowledge update
 
 - An outline containing a new topic is not proof of a correct entry. A full live read exposed a not-tested → tension-comparison shortcut despite the exact graph's guard. Make outcome prerequisites explicit in the authored source; retain the original failed response and revision-bound source backup instead of rewriting evidence.

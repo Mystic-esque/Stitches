@@ -1,0 +1,43 @@
+{
+  "checkedAt": "2026-10-01T16:51:49.858Z",
+  "provenance": "actual-disposable-Chrome-engine-study",
+  "productionApplication": false,
+  "states": [
+    {
+      "width": 1440,
+      "noOverflow": true,
+      "partSelectionPassed": true,
+      "inputChangedMeasuredOutline": true
+    },
+    {
+      "width": 1024,
+      "noOverflow": true,
+      "partSelectionPassed": true,
+      "inputChangedMeasuredOutline": true
+    },
+    {
+      "width": 768,
+      "noOverflow": true,
+      "partSelectionPassed": true,
+      "inputChangedMeasuredOutline": true
+    },
+    {
+      "width": 390,
+      "noOverflow": true,
+      "partSelectionPassed": true,
+      "inputChangedMeasuredOutline": true
+    },
+    {
+      "width": 320,
+      "noOverflow": true,
+      "partSelectionPassed": true,
+      "inputChangedMeasuredOutline": true
+    }
+  ],
+  "runtimeErrors": [],
+  "externalRequests": 0,
+  "screenshots": [
+    "evidence/pattern-engine/engine-preview-1440.png",
+    "evidence/pattern-engine/engine-preview-390.png"
+  ]
+}

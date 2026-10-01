@@ -1,0 +1,72 @@
+{
+  "capturedAt": "2026-10-01T16:25:28.280Z",
+  "provenance": "live-content-lake-and-context-mcp",
+  "knowledgeBaseId": "kbkvu1vrPsLG",
+  "exactCatalog": [
+    {
+      "designKey": "sandy",
+      "fingerprint": "2da503f12b8f6007d4e1f6f46d4c70cf25fa33b229bf6b1aad01ec75d379abb0",
+      "reviewStatus": "pending",
+      "capability": "plan_only",
+      "diagnosticFingerprint": "0f087c6b048811f6b3dcc780f9584ad191b9a7a2a638e9545053f95cce3b1161"
+    },
+    {
+      "designKey": "tina",
+      "fingerprint": "68d6026c7f508a70de2255916003d91e3607f23eb3f3afefb3a05ea82e1f215f",
+      "reviewStatus": "pending",
+      "capability": "plan_only",
+      "diagnosticFingerprint": "0f087c6b048811f6b3dcc780f9584ad191b9a7a2a638e9545053f95cce3b1161"
+    }
+  ],
+  "outline": {
+    "sha256": "dbb53dad2768dce1fb0f09ea92803bbe77a24b2c4b9ce391568a303801f2ef01",
+    "file": "evidence/context-companion-review/outline-dbb53dad2768dce1.md",
+    "characters": 2431
+  },
+  "entries": [
+    {
+      "path": "sandy_skirt",
+      "sha256": "29bfc71941c6e534c7c39f546bf09c0f9adf88f2a8ba527aa450c311bf976e1c",
+      "file": "evidence/context-companion-review/sandy_skirt-29bfc71941c6e534.md",
+      "characters": 2925
+    },
+    {
+      "path": "tina_top",
+      "sha256": "6ccdd04d49f11066a9fb7a315081d154e3948b80af95faadedc8d1901746a764",
+      "file": "evidence/context-companion-review/tina_top-6ccdd04d49f11066.md",
+      "characters": 3144
+    },
+    {
+      "path": "seam_puckering",
+      "sha256": "57df87467c98fa82e938d657da3be2f1cb4310060b7cbaae455b6fead0011f9d",
+      "file": "evidence/context-companion-review/seam_puckering-57df87467c98fa82.md",
+      "characters": 4128
+    },
+    {
+      "path": "fabric_constraints",
+      "sha256": "382a21dec81f9cb6f3ad000edfc1ae4e4400a3cbe4eabe251b77bea0b4a21dd4",
+      "file": "evidence/context-companion-review/fabric_constraints-382a21dec81f9cb6.md",
+      "characters": 3490
+    }
+  ],
+  "checks": {
+    "bothDistinctCandidatesPresent": true,
+    "diagnosticPendingReviewDisclosed": true,
+    "diagnosticOriginAttributed": true,
+    "observedUntestedShortcutAbsent": true,
+    "garmentUnpickingProhibited": true,
+    "diagnosticStableSourceIdentities": true,
+    "planningStableSourceIdentities": true,
+    "planningPieceRowsMatchExactCatalog": true,
+    "planningMeasurementsPreserved": true,
+    "fabricStableSourceIdentities": true,
+    "fabricObservedUnsubstantiatedClaimsAbsent": false
+  },
+  "automatedChecksPassed": false,
+  "observedNotTestedBranch": "| **not-tested** | No controlled sample has been run | Perform the scrap-stitch-release test first; do not proceed to tension comparison |",
+  "diagnosticCitationIdentityReviewRequired": false,
+  "planningCitationIdentityReviewRequired": false,
+  "materialEditorialReviewRequired": true,
+  "makerReviewNotEstablished": true,
+  "importCountAndBuildJobNotVerified": true
+}
