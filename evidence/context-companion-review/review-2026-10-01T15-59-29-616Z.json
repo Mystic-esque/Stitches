@@ -1,0 +1,58 @@
+{
+  "capturedAt": "2026-10-01T15:59:29.616Z",
+  "provenance": "live-content-lake-and-context-mcp",
+  "knowledgeBaseId": "kbkvu1vrPsLG",
+  "exactCatalog": [
+    {
+      "designKey": "sandy",
+      "fingerprint": "2da503f12b8f6007d4e1f6f46d4c70cf25fa33b229bf6b1aad01ec75d379abb0",
+      "reviewStatus": "pending",
+      "capability": "plan_only",
+      "diagnosticFingerprint": "0f087c6b048811f6b3dcc780f9584ad191b9a7a2a638e9545053f95cce3b1161"
+    },
+    {
+      "designKey": "tina",
+      "fingerprint": "68d6026c7f508a70de2255916003d91e3607f23eb3f3afefb3a05ea82e1f215f",
+      "reviewStatus": "pending",
+      "capability": "plan_only",
+      "diagnosticFingerprint": "0f087c6b048811f6b3dcc780f9584ad191b9a7a2a638e9545053f95cce3b1161"
+    }
+  ],
+  "outline": {
+    "sha256": "dbb53dad2768dce1fb0f09ea92803bbe77a24b2c4b9ce391568a303801f2ef01",
+    "file": "evidence/context-companion-review/outline-dbb53dad2768dce1.md",
+    "characters": 2431
+  },
+  "entries": [
+    {
+      "path": "sandy_skirt",
+      "sha256": "a3b9e1c3ba29d037c9db7d28ef86c1597551cfe815eb74102111be66cd5e0ce9",
+      "file": "evidence/context-companion-review/sandy_skirt-a3b9e1c3ba29d037.md",
+      "characters": 3187
+    },
+    {
+      "path": "tina_top",
+      "sha256": "576c30ad27fbe2f3db50bf4a8a48fd1c84ebb943101269b99cfd3f297dabedec",
+      "file": "evidence/context-companion-review/tina_top-576c30ad27fbe2f3.md",
+      "characters": 2335
+    },
+    {
+      "path": "seam_puckering",
+      "sha256": "fd7bc21b882feed884939752ca560926915f3e44e815ce8da4e8b36e40bef626",
+      "file": "evidence/context-companion-review/seam_puckering-fd7bc21b882feed8.md",
+      "characters": 3575
+    }
+  ],
+  "checks": {
+    "bothDistinctCandidatesPresent": true,
+    "diagnosticPendingReviewDisclosed": true,
+    "diagnosticOriginAttributed": true,
+    "observedUntestedShortcutAbsent": true,
+    "garmentUnpickingProhibited": true
+  },
+  "automatedChecksPassed": true,
+  "observedNotTestedBranch": "| `not-tested` | Test has not been performed | Perform this test first; do not proceed |",
+  "citationIdentityReviewRequired": true,
+  "makerReviewNotEstablished": true,
+  "importCountAndBuildJobNotVerified": true
+}

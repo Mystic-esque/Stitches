@@ -1,0 +1,82 @@
+{
+  "capturedAt": "2026-10-01T15:44:59.397Z",
+  "target": "l4eeamth/development",
+  "documents": [
+    {
+      "_createdAt": "2026-10-01T07:30:43Z",
+      "_id": "companion-remedy-sample-lower-tension-20261001",
+      "_rev": "U0do4JIPBO5TTWeOyWeFj8",
+      "_type": "remedy",
+      "_updatedAt": "2026-10-01T07:30:43Z",
+      "confirmationCheck": "Does the new sample lie flatter while both sides still form a balanced, secure stitch? If not, stop this path and seek another cause.",
+      "irreversible": false,
+      "issues": [
+        {
+          "_ref": "companion-issue-tension-pucker-20261001",
+          "_type": "reference"
+        }
+      ],
+      "remedyKey": "sample-lower-tension",
+      "requiredTests": [
+        {
+          "_ref": "companion-test-scrap-stitch-release-20261001",
+          "_type": "reference"
+        }
+      ],
+      "reviewStatus": "pending",
+      "riskNotes": "This is a test-sample experiment, not authorization to alter, unpick or restitch the finished garment.",
+      "safeAction": "On another scrap seam only, try a modestly lower upper-thread tension while maintaining a balanced stitch. Change one setting at a time and compare it with the original sample.",
+      "sources": [
+        {
+          "_ref": "companion-source-coats-pucker-20261001",
+          "_type": "reference"
+        }
+      ],
+      "title": "Compare a lower-tension sample"
+    },
+    {
+      "_createdAt": "2026-10-01T07:30:42Z",
+      "_id": "companion-test-scrap-stitch-release-20261001",
+      "_rev": "9aIbic2FIRsxr4O0psT2DG",
+      "_type": "diagnosticTest",
+      "_updatedAt": "2026-10-01T07:30:42Z",
+      "distinguishes": [
+        {
+          "_ref": "companion-issue-tension-pucker-20261001",
+          "_type": "reference"
+        },
+        {
+          "_ref": "companion-issue-unresolved-pucker-20261001",
+          "_type": "reference"
+        }
+      ],
+      "howToCheck": "Use scrap material only. Sew a short sample with the same machine, thread and settings. Carefully release both threads along a small section without pulling or damaging the fabric; compare the released and still-stitched sections.",
+      "makerQuestion": "On a short, sacrificial seam made from matching scrap fabric, do the ripples flatten when you carefully remove a few centimetres of stitches?",
+      "possibleOutcomes": [
+        "relaxes",
+        "unchanged",
+        "not-tested"
+      ],
+      "reviewStatus": "pending",
+      "riskNotes": "Do not remove stitches from the actual garment for this preliminary test; stop if the sample fabric is being damaged.",
+      "sources": [
+        {
+          "_ref": "companion-source-coats-pucker-20261001",
+          "_type": "reference"
+        }
+      ],
+      "testKey": "scrap-stitch-release",
+      "title": "Does a test seam relax when the stitches are released?"
+    }
+  ],
+  "candidateFingerprints": [
+    {
+      "designKey": "sandy",
+      "fingerprint": "a0d6cc334c54a5f83dc0f13fdf94662713c53867fbc9c1c03a01c0bec1ec936a"
+    },
+    {
+      "designKey": "tina",
+      "fingerprint": "b61e490a4f9379508d93d31cceda3143964387dfa01033aea991f4f0469699aa"
+    }
+  ]
+}

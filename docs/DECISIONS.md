@@ -1,5 +1,12 @@
 # Implementation decisions
 
+## October 1, 2026 — Inspect served prose after every knowledge update
+
+- An outline containing a new topic is not proof of a correct entry. A full live read exposed a not-tested → tension-comparison shortcut despite the exact graph's guard. Make outcome prerequisites explicit in the authored source; retain the original failed response and revision-bound source backup instead of rewriting evidence.
+- After a real shared source correction, verify exact Content Lake read-back and both candidate fingerprint changes separately from the owner's KB rewrite and actual served result. No inference call or model-generated prose can promote pending review to making/cutting readiness.
+- Generated citation numbers may mismatch the appended source list. Use a source-scoped instruction with stable source titles/document IDs, then review the real rewrite. The diagnostic's second rewrite now passes a sixth, separate identity check; the candidate planning entries still require the same correction. Automated safety/presence/identity checks do not confer maker approval or qualify cutting.
+- CLI inspection is a bounded read-only fallback, not a license to invent hidden control-plane endpoints. Record a timeout without claiming import counts or build state. Keep source snapshots, scripts and exact next actions resumable when browser control is unavailable.
+
 ## October 1, 2026 — Shared diagnosis is observational, conditional and source-versioned
 
 - The same `constructionProcedure`/`issuePattern`/`diagnosticTest`/`remedy` graph may apply to two distinct project candidates only when exact development records name both candidates and validate every reference. This shared graph participates in **both** candidate fingerprints: one corrected method can stale both saved project bases, unlike candidate-specific piece corrections.

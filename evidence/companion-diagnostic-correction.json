@@ -1,0 +1,32 @@
+{
+  "checkedAt": "2026-10-01T15:45:01.429Z",
+  "target": "l4eeamth/development",
+  "sourceReadBackVerified": true,
+  "records": [
+    {
+      "id": "companion-remedy-sample-lower-tension-20261001",
+      "revision": "5t4L2U1ELwzqa2TQsW5zzE"
+    },
+    {
+      "id": "companion-test-scrap-stitch-release-20261001",
+      "revision": "5t4L2U1ELwzqa2TQsW5zzE"
+    }
+  ],
+  "candidateFingerprints": [
+    {
+      "designKey": "sandy",
+      "before": "a0d6cc334c54a5f83dc0f13fdf94662713c53867fbc9c1c03a01c0bec1ec936a",
+      "after": "2da503f12b8f6007d4e1f6f46d4c70cf25fa33b229bf6b1aad01ec75d379abb0",
+      "changed": true
+    },
+    {
+      "designKey": "tina",
+      "before": "b61e490a4f9379508d93d31cceda3143964387dfa01033aea991f4f0469699aa",
+      "after": "68d6026c7f508a70de2255916003d91e3607f23eb3f3afefb3a05ea82e1f215f",
+      "changed": true
+    }
+  ],
+  "pendingReview": true,
+  "servedKbCorrectionNotYetVerified": true,
+  "actualGuestProjectRecoveryNotYetVerified": true
+}

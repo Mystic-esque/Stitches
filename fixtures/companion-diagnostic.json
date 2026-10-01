@@ -45,7 +45,7 @@
       "_id": "companion-test-scrap-stitch-release-20261001", "_type": "diagnosticTest",
       "testKey": "scrap-stitch-release", "title": "Does a test seam relax when the stitches are released?",
       "makerQuestion": "On a short, sacrificial seam made from matching scrap fabric, do the ripples flatten when you carefully remove a few centimetres of stitches?",
-      "howToCheck": "Use scrap material only. Sew a short sample with the same machine, thread and settings. Carefully release both threads along a small section without pulling or damaging the fabric; compare the released and still-stitched sections.",
+      "howToCheck": "Use scrap material only. Sew a short sample with the same machine, thread and settings. Carefully release both threads along a small section without pulling or damaging the fabric; compare the released and still-stitched sections. Outcome rules: not-tested means perform this scrap-stitch-release test first; do not proceed to a tension comparison. Unchanged means the cause remains unresolved; do not recommend a machine adjustment. Only relaxes permits considering the separate lower-tension comparison on another scrap sample.",
       "possibleOutcomes": ["relaxes", "unchanged", "not-tested"],
       "distinguishes": [
         { "_type": "reference", "_ref": "companion-issue-tension-pucker-20261001" },
@@ -62,7 +62,7 @@
       "safeAction": "On another scrap seam only, try a modestly lower upper-thread tension while maintaining a balanced stitch. Change one setting at a time and compare it with the original sample.",
       "confirmationCheck": "Does the new sample lie flatter while both sides still form a balanced, secure stitch? If not, stop this path and seek another cause.",
       "irreversible": false,
-      "riskNotes": "This is a test-sample experiment, not authorization to alter, unpick or restitch the finished garment.",
+      "riskNotes": "This is a test-sample experiment, not authorization to alter, unpick or restitch the finished garment. Eligibility requires the scrap-stitch-release test result relaxes. If the result is not-tested or unchanged, this comparison is not eligible; return to the test or seek another cause.",
       "reviewStatus": "pending", "sources": [{ "_type": "reference", "_ref": "companion-source-coats-pucker-20261001" }]
     }
   ]
