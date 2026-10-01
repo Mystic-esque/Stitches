@@ -109,20 +109,33 @@ try {
   await evaluate("document.querySelectorAll('input[name=waistband-shape][type=radio]')[1]?.click()");
   const switchedPieces = await evaluate("document.querySelector('.piece-study')?.textContent.includes('Seamless skirt section') && document.querySelector('.piece-study')?.textContent.includes('Place on a double fold') && document.querySelector('.piece-study')?.textContent.includes('Curved waistband') && !document.querySelector('.piece-study-list')?.textContent.includes('Straight waistband')");
   if (!switchedPieces) throw new Error('Sandy option controls did not switch the source-derived cut list');
+  const diagnosticReady = await evaluate("document.querySelector('.diagnostic-study')?.textContent.includes('On a short, sacrificial seam') && document.querySelector('.diagnostic-study')?.textContent.includes('Coats')");
+  if (!diagnosticReady) throw new Error('Shared source-linked diagnostic did not appear on the current project');
+  await evaluate("document.querySelectorAll('.diagnostic-choices button')[1]?.click()");
+  const conditionalRemedy = await evaluate("document.querySelector('.diagnostic-outcome.possible-tension')?.textContent.includes('lower upper-thread tension')");
+  if (!conditionalRemedy) throw new Error('Observed sample relief did not unlock only the scrap comparison');
+  await evaluate("document.querySelectorAll('.diagnostic-choices button')[2]?.click()");
+  const uncertainStops = await evaluate("!!document.querySelector('.diagnostic-outcome.unresolved') && !document.querySelector('.diagnostic-outcome')?.textContent.includes('lower upper-thread tension')");
+  if (!uncertainStops) throw new Error('Unchanged sample still exposed the tension remedy');
+  await evaluate("document.querySelector('.diagnostic-study-foot button')?.click()");
+  if (!await evaluate("document.querySelector('.maker-journal textarea')?.value.includes('No visible change')")) throw new Error('Diagnostic observation did not prepare a project-basis journal note');
   const studyShot = await call('Page.captureScreenshot', { format: 'png', captureBeyondViewport: true, fromSurface: true });
   await writeFile(join(output, 'project-piece-study-1440.png'), Buffer.from(studyShot.data, 'base64'));
   await evaluate("(()=>{window.__sourceFetch=window.fetch;window.fetch=(input,init)=>String(input).includes('/api/catalog')?Promise.reject(new Error('disposable source transport failure')):window.__sourceFetch(input,init);window.dispatchEvent(new Event('focus'));return true})()");
   let pausedOnFailure = false;
   for (let i = 0; i < 120; i++) {
-    pausedOnFailure = await evaluate("!!document.querySelector('.source-binding.unavailable') && !document.querySelector('.piece-study')");
+    pausedOnFailure = await evaluate("!!document.querySelector('.source-binding.unavailable') && !document.querySelector('.piece-study') && !document.querySelector('.diagnostic-study')");
     if (pausedOnFailure) break;
     await pause(250);
   }
-  if (!pausedOnFailure) throw new Error('Source transport failure left cached cut-list guidance visible');
+  if (!pausedOnFailure) {
+    const state = await evaluate("({binding:[...document.querySelectorAll('.source-binding')].map(x=>x.className),study:[...document.querySelectorAll('.piece-study')].map(x=>({tag:x.tagName,connected:x.isConnected,parent:x.parentElement?.className,text:x.textContent?.slice(0,80)})),diagnostic:[...document.querySelectorAll('.diagnostic-study')].map(x=>({parent:x.parentElement?.className,text:x.textContent?.slice(0,80)})),appRoots:document.querySelectorAll('.companion-app').length,alert:document.querySelector('.project-alert')?.textContent})");
+    throw new Error(`Source transport failure left cached guidance visible: ${JSON.stringify(state)}`);
+  }
   await evaluate("(()=>{window.fetch=window.__sourceFetch;window.dispatchEvent(new Event('focus'));return true})()");
   let recoveredFromFailure = false;
   for (let i = 0; i < 120; i++) {
-    recoveredFromFailure = await evaluate("!!document.querySelector('.source-binding.current') && !!document.querySelector('.piece-study')");
+    recoveredFromFailure = await evaluate("!!document.querySelector('.source-binding.current') && !!document.querySelector('.piece-study') && !!document.querySelector('.diagnostic-study')");
     if (recoveredFromFailure) break;
     await pause(250);
   }
@@ -183,7 +196,7 @@ try {
   if (!imported) throw new Error('Backup import did not restore the journal and provenance');
   const staleBinding = await evaluate("document.querySelector('.source-binding.stale')?.textContent.includes('Source changed')");
   if (!staleBinding) throw new Error('Outdated source binding was not shown as stale');
-  if (await evaluate("!!document.querySelector('.piece-study')")) throw new Error('Stale source still exposed the educational cut list');
+  if (await evaluate("!!document.querySelector('.piece-study') || !!document.querySelector('.diagnostic-study')")) throw new Error('Stale source still exposed source-linked teaching');
   const staleShot = await call('Page.captureScreenshot', { format: 'png', captureBeyondViewport: true, fromSurface: true });
   await writeFile(join(output, 'project-source-stale-1440.png'), Buffer.from(staleShot.data, 'base64'));
   await evaluate("document.querySelector('.source-binding button').click()");
@@ -194,7 +207,7 @@ try {
     await pause(250);
   }
   if (!refreshed) throw new Error('Source rebase did not restore the current binding');
-  if (!await evaluate("!!document.querySelector('.piece-study')")) throw new Error('Rebased source did not restore the linked piece study');
+  if (!await evaluate("!!document.querySelector('.piece-study') && !!document.querySelector('.diagnostic-study')")) throw new Error('Rebased source did not restore linked teaching');
   const recoveredShot = await call('Page.captureScreenshot', { format: 'png', captureBeyondViewport: true, fromSurface: true });
   await writeFile(join(output, 'project-source-recovered-1440.png'), Buffer.from(recoveredShot.data, 'base64'));
   await call('Emulation.setDeviceMetricsOverride', { width: 390, height: 900, deviceScaleFactor: 1, mobile: true });
@@ -203,7 +216,7 @@ try {
   const mobileShot = await call('Page.captureScreenshot', { format: 'png', captureBeyondViewport: true, fromSurface: true });
   await writeFile(join(output, 'project-390.png'), Buffer.from(mobileShot.data, 'base64'));
   if (errors.length) throw new Error(`Browser runtime errors: ${JSON.stringify(errors)}`);
-  const report = { kind: 'production-nextjs-ui', checkedAt: new Date().toISOString(), base, observations, sanityCatalog: { exactContentLakeCards: 2, projectSourceShown: sourceReady, educationalPieceStudy: pieceStudyReady, conditionalPiecesSwitched: switchedPieces, simulatedTransportFailurePausedAdvice: pausedOnFailure, simulatedTransportRecovery: recoveredFromFailure, staleBindingObserved: staleBinding, sourceRebased: refreshed, contextKbRebuild: false }, projectJourney: { created, saved, noted, resumed, backupVersion: 2, imported, mobileNoOverflow: true }, runtimeErrors: errors, screenshots: ['home-1440.png', 'home-390.png', 'project-1440.png', 'project-piece-study-1440.png', 'project-journal-1440.png', 'project-source-stale-1440.png', 'project-source-recovered-1440.png', 'project-390.png'], notVerified: ['cut-ready geometry', 'maker review', 'agent', 'Sanity Context revalidation', 'keyboard and screen-reader audit'] };
+  const report = { kind: 'production-nextjs-ui', checkedAt: new Date().toISOString(), base, observations, sanityCatalog: { exactContentLakeCards: 2, projectSourceShown: sourceReady, educationalPieceStudy: pieceStudyReady, conditionalPiecesSwitched: switchedPieces, sharedPendingDiagnostic: diagnosticReady, conditionalScrapRemedy: conditionalRemedy, unresolvedPathStops: uncertainStops, simulatedTransportFailurePausedAdvice: pausedOnFailure, simulatedTransportRecovery: recoveredFromFailure, staleBindingObserved: staleBinding, sourceRebased: refreshed, contextKbRebuild: false }, projectJourney: { created, saved, noted, resumed, backupVersion: 2, imported, mobileNoOverflow: true }, runtimeErrors: errors, screenshots: ['home-1440.png', 'home-390.png', 'project-1440.png', 'project-piece-study-1440.png', 'project-journal-1440.png', 'project-source-stale-1440.png', 'project-source-recovered-1440.png', 'project-390.png'], notVerified: ['cut-ready geometry', 'maker review', 'agent', 'Sanity Context revalidation', 'keyboard and screen-reader audit'] };
   await writeFile(join(root, 'evidence', 'companion-runtime-verification.json'), JSON.stringify(report, null, 2) + '\n');
   console.log(JSON.stringify(report, null, 2));
 } finally { socket?.close(); chrome.kill(); }

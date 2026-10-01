@@ -37,11 +37,11 @@ Exit: two distinct source-qualified candidates and one fully mapped vertical jou
 Exit: two sessions cannot cross-read; actual project resumes after restart; stale/duplicate transitions deterministic.
 
 ## W03 — Sanity intelligence graph
-- Verified partial: four source/candidate records plus nine conditional planning-piece records, all pending review in `l4eeamth/development`, are read through an exact Content Lake catalog API. Candidate guest projects pin the full candidate/piece fingerprint; an old binding is visibly stale and can be refreshed into a new revision without rewriting prior notes. Failed reads pause the source-linked study. This is not a reviewed procedure/diagnostic graph, cut-ready piece map or served Context KB update.
+- Verified partial: four source/candidate records, nine conditional planning-piece records, and six shared diagnostic/source records, all pending review in `l4eeamth/development`, are read through an exact 19-ID Content Lake catalog API. Candidate guest projects pin the candidate/piece **and shared-method** fingerprint; an old binding is visibly stale and can be refreshed into a new revision without rewriting prior notes. Failed reads pause both source-linked studies. The dedicated KB source has 21 confirmed documents, plus a 32-document preview/selection still reconciling; its old eight-entry outline remains served. This is not a reviewed procedure/diagnostic, cut-ready piece map or verified updated Context KB.
 - [ ] Extend existing schema with components, technique, equipment/fabric classes, procedures, issue patterns, diagnostic tests and remedies; preserve current pattern/step refs.
 - [ ] Seed only qualified shared facts into project l4eeamth/development after dry-run exact IDs, backups, revision guards and complete graph validation.
 - [ ] Maintain separate fixed exact Content Lake reads and actual KB-only Context; no private maker data in Sanity.
-- [ ] Author at least one shared method and diagnostic applicable to both distinct projects with source/review status.
+- [x] Author one shared, source-linked seam-puckering method and diagnostic applicable to both distinct projects, explicitly marked pending review and scrap-only. Live Content Lake read-back passed; reviewed status and served KB are separate open gates.
 Exit: exact graph queries validate, served KB separately verified, content absence/contradiction visible. Schema code alone is not live content.
 
 ## W04 — Companion UI and pattern literacy
@@ -60,6 +60,7 @@ Exit: maker can explain how one selected piece is cut and joined on a qualified 
 Exit: meaningful numerical/domain tests and browser change → checked consequence → keep → resume. No arbitrary formula or fabricated yardage.
 
 ## W06 — Step-focused Make and “I'm stuck”
+- Verified partial only: a source-bound, pending-review scrap-seam diagnostic asks for one discriminating observation, conditionally shows a sample-only comparison, stops on an unchanged sample, and prepares a basis-linked journal note. No step DAG, actual garment adjustment, confirmed remedy or maker trial exists yet.
 - [ ] Resolve authored prerequisite DAG to a revision-specific plan with diagrams, orientation, micro-actions and checkpoints.
 - [ ] Save step progress; show active step context in help; symptoms lead through authored discriminating tests to source-backed remedies.
 - [ ] Record observations/attempts and distinguish confirmed fix from hypothesis; preserve history on source or project changes.

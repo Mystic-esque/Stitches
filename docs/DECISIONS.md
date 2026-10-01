@@ -1,5 +1,11 @@
 # Implementation decisions
 
+## October 1, 2026 — Shared diagnosis is observational, conditional and source-versioned
+
+- The same `constructionProcedure`/`issuePattern`/`diagnosticTest`/`remedy` graph may apply to two distinct project candidates only when exact development records name both candidates and validate every reference. This shared graph participates in **both** candidate fingerprints: one corrected method can stale both saved project bases, unlike candidate-specific piece corrections.
+- A seam symptom does not identify its cause. The first branch is a reversible sacrificial-scrap observation; a relaxed sample permits only a lower-tension comparison on another scrap. No result authorizes stitches to be removed from the actual garment or a real-garment adjustment. An unchanged sample stops that remedy path. The note handoff is user-reviewed and saved separately against the current project basis.
+- Pending-review Content Lake records may support explicitly labeled educational planning, but neither they nor an old Context outline certify cutting/making readiness. The agent must use exact structured records for applicability and transitions, and the maintained Context KB for cited explanation only after its rebuild and live read are verified. When the KB source selection or purpose changes, preserve the old served-entry status until the actual updated MCP entry is observed. Keep scheduled refresh Off during free-quota development; use a scoped manual build after purpose changes.
+
 ## October 1, 2026 — Educational cut-list before qualified geometry
 
 - `planningPiece` records are intentionally not `patternPiece` artifacts. They represent conditional, source-linked teaching facts (cut count, fold, mirroring, material), not measured outlines, placement, grainlines, allowances or approved cutting instructions. The project UI can teach these distinctions while the engine/rights/maker gates remain open.

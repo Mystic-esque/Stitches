@@ -1,0 +1,40 @@
+{
+  "checkedAt": "2026-10-01T07:30:52.202Z",
+  "target": "l4eeamth/development",
+  "status": "published-content-lake-only",
+  "records": [
+    {
+      "id": "companion-issue-tension-pucker-20261001",
+      "type": "issuePattern",
+      "revision": "U0do4JIPBO5TTWeOyWeEp8"
+    },
+    {
+      "id": "companion-issue-unresolved-pucker-20261001",
+      "type": "issuePattern",
+      "revision": "U0do4JIPBO5TTWeOyWeFV8"
+    },
+    {
+      "id": "companion-procedure-scrap-seam-check-20261001",
+      "type": "constructionProcedure",
+      "revision": "JH6ySKRUnqJAVaqfCPgUJn"
+    },
+    {
+      "id": "companion-remedy-sample-lower-tension-20261001",
+      "type": "remedy",
+      "revision": "U0do4JIPBO5TTWeOyWeFj8"
+    },
+    {
+      "id": "companion-source-coats-pucker-20261001",
+      "type": "sourceDocument",
+      "revision": "JH6ySKRUnqJAVaqfCPgU8V"
+    },
+    {
+      "id": "companion-test-scrap-stitch-release-20261001",
+      "type": "diagnosticTest",
+      "revision": "9aIbic2FIRsxr4O0psT2DG"
+    }
+  ],
+  "pendingReview": true,
+  "testOnScrapOnly": true,
+  "noMakerReviewOrKbRebuildClaim": true
+}

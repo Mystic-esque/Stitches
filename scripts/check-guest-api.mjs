@@ -22,6 +22,9 @@ assert.ok(catalog.data.cards.every((item) => item.capability === 'plan_only' && 
 assert.deepEqual(catalog.data.cards.map((item) => item.pieceStudy.length), [5, 4]);
 assert.equal(catalog.data.cards[0].pieceStudy.find((item) => item.condition === 'seamless').fold, 'double');
 assert.equal(catalog.data.cards[1].pieceStudy.find((item) => item.pieceKey === 'back').fold, 'single');
+assert.ok(catalog.data.cards.every((item) => item.diagnosticStudy.capability === 'sample_check_only' && item.diagnosticStudy.reviewStatus === 'pending'));
+assert.equal(catalog.data.cards[0].diagnosticStudy.fingerprint, catalog.data.cards[1].diagnosticStudy.fingerprint);
+assert.ok(catalog.data.cards[0].diagnosticStudy.sourceUrl.startsWith('https://www.coats.com/'));
 
 const key = randomUUID();
 const createBody = { title: 'Disposable local API rehearsal', brief: 'No personal information.', source: { kind: 'own_idea' }, idempotencyKey: key };

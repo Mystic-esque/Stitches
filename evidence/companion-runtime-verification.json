@@ -1,6 +1,6 @@
 {
   "kind": "production-nextjs-ui",
-  "checkedAt": "2026-10-01T07:22:15.759Z",
+  "checkedAt": "2026-10-01T08:30:19.943Z",
   "base": "http://127.0.0.1:3100",
   "observations": [
     {
@@ -34,6 +34,9 @@
     "projectSourceShown": true,
     "educationalPieceStudy": true,
     "conditionalPiecesSwitched": true,
+    "sharedPendingDiagnostic": true,
+    "conditionalScrapRemedy": true,
+    "unresolvedPathStops": true,
     "simulatedTransportFailurePausedAdvice": true,
     "simulatedTransportRecovery": true,
     "staleBindingObserved": true,

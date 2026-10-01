@@ -4,7 +4,9 @@ import { COMPANION_CATALOG_QUERY, createCompanionCatalogClient, loadCompanionCat
 
 const fixture = JSON.parse(readFileSync(new URL("../../../fixtures/companion-candidates.json", import.meta.url), "utf8"));
 const pieceFixture = JSON.parse(readFileSync(new URL("../../../fixtures/companion-piece-studies.json", import.meta.url), "utf8"));
-const published = [...fixture.documents, ...pieceFixture.documents].map((item: Record<string, unknown>, index: number) => ({ ...item, _rev: `published-${index}` }));
+const diagnosticFixture = JSON.parse(readFileSync(new URL("../../../fixtures/companion-diagnostic.json", import.meta.url), "utf8"));
+const published = [...fixture.documents, ...pieceFixture.documents, ...diagnosticFixture.documents]
+  .map((item: Record<string, unknown>, index: number) => ({ ...item, _rev: `published-${index}` }));
 
 describe("Sanity-backed planning catalog", () => {
   it("requires both distinct source/candidate pairs and keeps every card plan-only", () => {
@@ -15,6 +17,8 @@ describe("Sanity-backed planning catalog", () => {
     expect(cards[0].requiredMeasurements).toHaveLength(4);
     expect(cards[1].requiredMeasurements).toHaveLength(14);
     expect(cards.map((item) => item.pieceStudy.length)).toEqual([5, 4]);
+    expect(cards.every((item) => item.diagnosticStudy.capability === "sample_check_only" && item.diagnosticStudy.reviewStatus === "pending")).toBe(true);
+    expect(cards[0].diagnosticStudy.fingerprint).toBe(cards[1].diagnosticStudy.fingerprint);
     const corrected = published.map((item: Record<string, unknown>) => item._type === "planningCandidate" && item.designKey === "sandy"
       ? { ...item, cuttingCaveat: `${item.cuttingCaveat} Check a sample first.`, _rev: "new-editorial-revision" } : item);
     expect(resolveCompanionCatalog(corrected)[0].fingerprint).not.toBe(cards[0].fingerprint);
@@ -23,6 +27,9 @@ describe("Sanity-backed planning catalog", () => {
       ? { ...item, _rev: "editor-piece-correction" } : item);
     expect(resolveCompanionCatalog(pieceCorrection)[0].fingerprint).not.toBe(cards[0].fingerprint);
     expect(resolveCompanionCatalog(pieceCorrection)[1].fingerprint).toBe(cards[1].fingerprint);
+    const sharedCorrection = published.map((item: Record<string, unknown>) => item._id === "companion-remedy-sample-lower-tension-20261001"
+      ? { ...item, _rev: "new-method-revision" } : item);
+    expect(resolveCompanionCatalog(sharedCorrection).every((item, index) => item.fingerprint !== cards[index].fingerprint)).toBe(true);
   });
 
   it("fails closed on missing, duplicated, dangling or rejected Sanity content", () => {
@@ -36,6 +43,8 @@ describe("Sanity-backed planning catalog", () => {
     const badCount = published.map((item: Record<string, unknown>) => item._id === "companion-piece-tina-front-20261001"
       ? { ...item, cutCount: 0 } : item);
     expect(() => resolveCompanionCatalog(badCount)).toThrow(/malformed/);
+    const wrongRemedy = published.map((item: Record<string, unknown>) => item._type === "remedy" ? { ...item, requiredTests: [{ _ref: "wrong" }] } : item);
+    expect(() => resolveCompanionCatalog(wrongRemedy)).toThrow(/diagnostic references/);
     const rejected = published.map((item: Record<string, unknown>) => item._type === "sourceDocument" && item._id === "companion-source-tina-20261001"
       ? { ...item, reviewStatus: "rejected" } : item);
     expect(() => resolveCompanionCatalog(rejected)).toThrow(/malformed/);
@@ -45,7 +54,7 @@ describe("Sanity-backed planning catalog", () => {
     let actualQuery = "";
     const cards = await loadCompanionCatalog({ fetch: async (query: string, params: Record<string, unknown>) => {
       actualQuery = query;
-      expect(params.ids).toHaveLength(13);
+      expect(params.ids).toHaveLength(19);
       return published;
     } } as never);
     expect(actualQuery).toBe(COMPANION_CATALOG_QUERY);
