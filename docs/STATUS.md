@@ -2,6 +2,39 @@
 
 Updated: October 1, 2026.
 
+## Active W02 — reusable private maker profile
+
+Contract: C01/C04/C06/C09. Implemented one named guest profile with typed body notes, experience, equipment and immutable SQLite revisions. Explicit fill-missing copy checks both saved bases and writes a new project revision; no live link, automatic overwrite or measurement aliases. Profile backup is plain private JSON, staged before explicit reviewed import. Existing project backup preserves copy history without profile access. Ordinary plan edits cannot forge copy provenance.
+
+Files: domain schemas/copy helper, guest repository, `/api/profile` and `/api/projects/[id]/profile`, collapsible profile notebook/review UI, domain/API/browser rehearsals. Acceptance: owner isolation, stale/replay behavior, unit/zero/conflict preservation, restart restore and profile-change independence. Rollback: revert milestone code only, preserving private SQLite data and all immutable records.
+
+Verification complete for this slice: five new profile tests, focused profile/project suite 14/14, full deterministic suite **73 passed / one opt-in live skipped**. Typecheck and final production Webpack build exit 0. Actual profile API at 18:43:22Z passed owner/Origin denial, strict units, stale/replay, reviewed restore, profile independence and forged-provenance rejection. Existing project/journal/backup/live-development-catalog API rerun at 18:43:39Z passed. Actual disposable Chrome production run at 18:44:41Z passed form save, keyboard summary, review/copy, retained conflict/zero, unsaved-copy denial, review-before-import, resume, delayed-response draft preservation and expanded/collapsed layouts at 1440/1024/768/390/320. Zero runtime errors/overflow/broken images. Selected profile review text ratios 5.95–11.88:1 under explicit dark system preference; this is a targeted check, not full app accessibility certification. Fresh desktop/phone captures visually inspected.
+
+Observed recovery: initial keyboard rehearsal stopped before acceptance; a verified focus/full Enter event plus awaited native toggle passed without forcing the keyboard result. Subsequent screenshot inspection found pale inherited demo-dark-theme ink on the light profile card. Fixed with a scoped fixed-ink/light-control boundary; failed captures retained as `maker-profile-contrast-failed-*.png`, and the final actual screenshot/contrast checks pass. One intermediate rebuild was intentionally interrupted after adding draft safeguards; it is not counted as a successful build. No assertion was waived.
+
+Evidence: `evidence/maker-profile-api-verification.json`, `evidence/guest-api-verification.json`, `evidence/companion-runtime-verification.json`, `evidence/screenshots/companion-runtime/maker-profile-copy-{1440,390}.png`. All test inputs are synthetic; personal data remains private. Local preview runs at `http://127.0.0.1:3100` (`npm run start -- --hostname 127.0.0.1 --port 3100`). No new dependency, Sanity write, Gemini inference, deployment or physical maker claim.
+
+**Next executable task:** persist source-bound scrap-test observations/attempts so recovery survives reload and stale source/project changes, with explicit user-reported outcomes and safe unresolved states. Do not promote pending-review scrap content to an actual-garment remedy or guided-making receipt. Exact engine/step/rights, print and physical cutting qualification remain open.
+
+### Checklist snapshot — completed slices versus full packages
+
+No W01–W10 release package is fully closed yet; checked slices are real finished work, not completion percentages.
+
+| Package | Verified work | Still open |
+| --- | --- | --- |
+| W01 | Two distinct planning sources; real measured Sandy/edge spike | Complete Tina/source/rights/step mapping, count/notch conflicts, physical qualification |
+| W02 | Private projects/profiles/revisions/journal, units, explicit copy, stale/replay/isolation, restart tests and backups | Step-specific progress, cleanup, deployable durability |
+| W03 | Exact scoped catalog, actual maintained Context entries, shared pending scrap diagnostic, correction/read-back | Independent review and complete making graph; import-job metadata |
+| W04 | Landing/library/intake/planning UI and source-linked educational piece studies; five-width real captures | Qualified technical pattern board and full access audit |
+| W05 | Dimension-aware body notes and isolated redraft research | Production checked variation, layout and calibrated exports |
+| W06 | Conditional shared scrap diagnostic and journal preparation | Persistent attempts next; authored active-step journey and confirmed recovery |
+| W07 | Not implemented | Consent/private temporary photo observations and manual fallback |
+| W08 | Preserved historical scoped illustrative Gemini tool loop | Full project-aware agent, durable runs, quota/cancel/resume and live task proof |
+| W09 | Real shared-content correction, changed fingerprints, verified served KB recovery | Complete two-project advice/proposal correction demo and frozen fair benchmark |
+| W10 | Real software/API/browser verification and screenshots | Physical print/maker trials, three user tests, complete local release/submission package |
+
+Sections below are prior milestones; their then-current next tasks and missing-feature descriptions are historical where superseded above.
+
 ## Active W02/W05 source-specific private measurement slice
 
 - Basis: C01/C03/C06/C09; current exact Sanity candidate measurement lists and the existing private project/backup/revision store. Found and fixed a real UI data-loss path: `planFor` previously reconstructed only waist/bust/hip and discarded other saved measurements on any save.

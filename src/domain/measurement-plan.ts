@@ -36,6 +36,10 @@ export function measurementFields(requiredLabels?: string[]) {
   }
   return { fields, unmappedLabels };
 }
+export function profileMeasurementFields(): MeasurementField[] {
+  return [...sourceFields, { key: "bust", label: "Bust (personal note; not chest)", unit: "cm" },
+    { key: "hip", label: "Hip (personal note; not hips)", unit: "cm" }];
+}
 export function measurementDraftFor(plan: ProjectPlan): MeasurementDraft {
   return { lengths: Object.fromEntries(Object.entries(plan.measurementsMm).map(([key, value]) => [key, String(value / 10)])),
     angles: Object.fromEntries(Object.entries(plan.measurementsDegrees ?? {}).map(([key, value]) => [key, String(value)])) };

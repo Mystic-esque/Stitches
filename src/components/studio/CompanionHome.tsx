@@ -7,6 +7,7 @@ import type { CompanionCatalogCard } from "@/server/knowledge/companion-catalog"
 import { PieceStudy } from "./PieceStudy";
 import { DiagnosticStudy } from "./DiagnosticStudy";
 import { MeasurementPlan } from "./MeasurementPlan";
+import { MakerProfilePanel } from "./MakerProfilePanel";
 import { applyMeasurementDraft, measurementDraftFor, type MeasurementDraft } from "@/domain/measurement-plan";
 
 const starts = [
@@ -193,6 +194,13 @@ export function CompanionHome() {
     active.knowledgeFingerprint === sourceCard.fingerprint ? "current" : "stale";
   return <div className="companion-app">
     <header className="companion-nav"><a href="/" className="companion-logo" aria-label="Stitches home">stitches<span>.</span></a><nav aria-label="Main navigation"><a href="/#how-it-works">How it works</a><a href="/#collection">Explore starts</a><a href="/demo">Pattern study ↗</a></nav><button type="button" onClick={() => active ? back() : document.getElementById("collection")?.scrollIntoView({ behavior: "smooth" })} className="nav-action">{active ? "All projects" : "Start making"} ↗</button></header>
+    {!loading && <MakerProfilePanel project={active} projectBusy={busy} projectDirty={unsavedChanges} onCopied={(project) => {
+      // A response must not erase edits made while its transaction was in flight.
+      setDraft((current) => current && active && JSON.stringify(current) !== JSON.stringify(draftFor(active)) ? current : draftFor(project));
+      setActive(project); setRevisions((current) => [...current, project]);
+      setProjects((current) => current.map((item) => item.id === project.id ? project : item));
+      setNotice("Profile copy saved. Any edits made while copying remain unsaved; review your working brief before saving.");
+    }} />}
     {active && draft ? <main className="companion-project">
       <div className="project-topline"><button type="button" onClick={back}>← All projects</button><span>Private guest project · revision {active.sequence}</span><button type="button" onClick={downloadBackup}>Download latest-state backup ↓</button></div>
       <div className="project-head"><div><p className="companion-kicker">YOUR MAKING COMPANION / 01</p><h1>{active.title}</h1><p>Carry your idea, materials and decisions in one place. Every save becomes a reviewable revision.</p></div><span className="capability-chip">Planning only · no cutting yet</span></div>

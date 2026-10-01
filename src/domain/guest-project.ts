@@ -22,6 +22,10 @@ export const projectPlanSchema = z.object({
     structure: z.enum(["unknown", "woven", "knit"]),
   }).strict(),
   equipment: labels,
+  experience: z.enum(["beginner", "comfortable", "experienced"]).optional(),
+  // A copied snapshot, not a permission or live profile link. Optional preserves old hashes.
+  profileBasis: z.object({ profileId: z.string().uuid(), name: label(100), sequence: z.number().int().min(1),
+    basisHash: z.string().regex(/^[a-f0-9]{64}$/) }).strict().optional(),
 }).strict();
 
 export const createGuestProjectSchema = z.object({

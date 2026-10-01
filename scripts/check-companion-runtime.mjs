@@ -142,7 +142,7 @@ try {
   if (!recoveredFromFailure) throw new Error('Source transport recovery did not restore the current piece study');
   const projectShot = await call('Page.captureScreenshot', { format: 'png', captureBeyondViewport: true, fromSurface: true });
   await writeFile(join(output, 'project-1440.png'), Buffer.from(projectShot.data, 'base64'));
-  if (await evaluate("document.querySelectorAll('.measurement-grid input').length") !== 4) throw new Error('Sandy did not expose its four exact source-listed measurements');
+  if (await evaluate("document.querySelectorAll('.measurement-plan .measurement-grid input').length") !== 4) throw new Error('Sandy did not expose its four exact source-listed measurements');
   for (const [key, value] of Object.entries({ waist: '72', hips: '96', waistToFloor: '100', waistToHips: '20' }))
     await evaluate(`(()=>{const field=document.querySelector('[name="measure-${key}"]');Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value').set.call(field,${JSON.stringify(value)});field.dispatchEvent(new Event('input',{bubbles:true}));return true})()`);
   await evaluate("document.querySelector('.save-row button').click()");
@@ -223,7 +223,7 @@ try {
   await call('Page.navigate', { url: `${base}/?project=${tinaId}` });
   let measurementsReady = false;
   for (let i = 0; i < 240; i++) {
-    measurementsReady = await evaluate("document.querySelectorAll('.measurement-grid input').length===14 && document.querySelector('[name=measure-shoulderSlope]')?.value==='14'");
+    measurementsReady = await evaluate("document.querySelectorAll('.measurement-plan .measurement-grid input').length===14 && document.querySelector('[name=measure-shoulderSlope]')?.value==='14'");
     if (measurementsReady) break;
     await pause(250);
   }
@@ -244,7 +244,7 @@ try {
   const measurementLayouts = [];
   for (const width of [1440, 1024, 768, 390, 320]) {
     await call('Emulation.setDeviceMetricsOverride', { width, height: 900, deviceScaleFactor: 1, mobile: width < 500 });
-    const layout = await evaluate("({width:innerWidth,scrollWidth:document.documentElement.scrollWidth,fields:document.querySelectorAll('.measurement-grid input').length})");
+    const layout = await evaluate("({width:innerWidth,scrollWidth:document.documentElement.scrollWidth,fields:document.querySelectorAll('.measurement-plan .measurement-grid input').length})");
     if (layout.scrollWidth > width || layout.fields !== 14) throw new Error('Measurement layout failed: ' + JSON.stringify(layout));
     if (width === 1440 || width === 390) {
       await evaluate(width === 1440 ? "document.querySelector('.measurement-plan').scrollIntoView()" : "document.querySelector('[name=measure-shoulderSlope]').scrollIntoView({block:'center'})");
@@ -258,6 +258,86 @@ try {
   if (errors.length) throw new Error(`Browser runtime errors: ${JSON.stringify(errors)}`);
   const report = { kind: 'production-nextjs-ui', checkedAt: new Date().toISOString(), base, observations, sanityCatalog: { exactContentLakeCards: 2, projectSourceShown: sourceReady, educationalPieceStudy: pieceStudyReady, conditionalPiecesSwitched: switchedPieces, sharedPendingDiagnostic: diagnosticReady, conditionalScrapRemedy: conditionalRemedy, unresolvedPathStops: uncertainStops, simulatedTransportFailurePausedAdvice: pausedOnFailure, simulatedTransportRecovery: recoveredFromFailure, staleBindingObserved: staleBinding, sourceRebased: refreshed, contextKbRebuild: false }, projectJourney: { created, saved, noted, resumed, backupVersion: 2, imported, mobileNoOverflow: true }, runtimeErrors: errors, screenshots: ['home-1440.png', 'home-390.png', 'project-1440.png', 'project-piece-study-1440.png', 'project-journal-1440.png', 'project-source-stale-1440.png', 'project-source-recovered-1440.png', 'project-390.png'], notVerified: ['cut-ready geometry', 'maker review', 'agent', 'Sanity Context revalidation', 'keyboard and screen-reader audit'] };
   report.measurementJourney = measurementJourney;
+  // Real profile form/copy/backup journey, in this disposable guest only. No maker or provider claim.
+  await call('Emulation.setDeviceMetricsOverride', { width: 1440, height: 900, deviceScaleFactor: 1, mobile: false });
+  async function waitFor(expression, label) {
+    for (let i = 0; i < 240; i++) { if (await evaluate(expression)) return; await pause(250); }
+    throw new Error(label);
+  }
+  await waitFor("!!document.querySelector('[name=profile-name]') && !document.querySelector('.maker-profile-panel fieldset').disabled", 'Profile form unavailable');
+  const profileSummaryFocused = await evaluate("(()=>{const s=document.querySelector('.maker-profile-panel>details>summary');s.focus();return document.activeElement===s})()");
+  if (!profileSummaryFocused) throw new Error('Native profile summary did not receive focus');
+  await call('Input.dispatchKeyEvent', { type: 'keyDown', key: 'Enter', code: 'Enter', text: '\r', unmodifiedText: '\r', windowsVirtualKeyCode: 13 });
+  await call('Input.dispatchKeyEvent', { type: 'keyUp', key: 'Enter', code: 'Enter', windowsVirtualKeyCode: 13 });
+  await waitFor("document.querySelector('.maker-profile-panel>details').open", 'Keyboard did not open native profile summary');
+  await evaluate("document.querySelector('.profile-body').open=true;(()=>{const change=(name,value)=>{const el=document.querySelector('[name='+name+']');Object.getOwnPropertyDescriptor((el.tagName==='SELECT'?HTMLSelectElement:el.tagName==='TEXTAREA'?HTMLTextAreaElement:HTMLInputElement).prototype,'value').set.call(el,value);el.dispatchEvent(new Event(el.tagName==='SELECT'?'change':'input',{bubbles:true}));};change('profile-name','Synthetic maker notebook');change('profile-experience','comfortable');change('profile-equipment','Machine\\nIron');change('profile-measure-waist','72');change('profile-measure-shoulderSlope','17.25');})()");
+  await evaluate("document.querySelector('.maker-profile-panel form button[type=submit]').click()");
+  await waitFor("document.querySelector('.maker-profile-panel [role=status]')?.textContent.includes('Profile revision 1 saved')", 'Profile did not save');
+  const initialProfile = await evaluate("(async()=>{const r=await fetch('/api/profile');return (await r.json()).profile})()");
+  if (initialProfile.name !== 'Synthetic maker notebook' || initialProfile.experience !== 'comfortable' || initialProfile.measurementsMm.waist !== 720 || initialProfile.measurementsDegrees.shoulderSlope !== 17.25) throw new Error('Multi-field profile input lost a value or changed its units');
+  const profileProjectId = await evaluate("(async()=>{const r=await fetch('/api/projects',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({title:'Synthetic profile copy',brief:'No personal values.',source:{kind:'own_idea'},plan:{features:[],openQuestions:[],measurementsMm:{waist:780},measurementsDegrees:{shoulderSlope:0},fabric:{description:'',widthMm:null,lengthMm:null,structure:'unknown'},equipment:['Iron']},idempotencyKey:crypto.randomUUID()})});return (await r.json()).project.id})()");
+  await call('Page.navigate', { url: `${base}/?project=${profileProjectId}` });
+  await waitFor("document.querySelector('.profile-copy-preview')?.textContent.includes('waist: kept 78 cm')", 'Copy preview did not retain conflicting waist');
+  await evaluate("document.querySelector('.maker-profile-panel>details').open=true");
+  if (!await evaluate("document.querySelector('.profile-copy-preview')?.textContent.includes('shoulderSlope: kept 0 degrees')")) throw new Error('Zero angle disappeared from review');
+  await evaluate("document.querySelector('.profile-copy button').click()");
+  await waitFor("document.querySelector('.project-topline')?.textContent.includes('revision 2')", 'Explicit profile copy did not create a revision');
+  const copiedProfileProject = await evaluate(`(async()=>{const r=await fetch('/api/projects/${profileProjectId}');return (await r.json()).project})()`);
+  if (copiedProfileProject.plan.measurementsMm.waist !== 780 || copiedProfileProject.plan.measurementsDegrees.shoulderSlope !== 0 || copiedProfileProject.plan.profileBasis.sequence !== 1 || copiedProfileProject.plan.equipment.length !== 2) throw new Error('Copied profile values/basis wrong');
+  await evaluate("document.querySelector('.profile-body').open=true;(()=>{const e=document.querySelector('[name=profile-measure-waist]');Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value').set.call(e,'80');e.dispatchEvent(new Event('input',{bubbles:true}));})()");
+  if (!await evaluate("document.querySelector('.profile-copy button').disabled")) throw new Error('Unsaved profile enabled copying');
+  await evaluate("document.querySelector('.maker-profile-panel form button[type=submit]').click()");
+  await waitFor("document.querySelector('.maker-profile-panel [role=status]')?.textContent.includes('Profile revision 2 saved')", 'Edited profile did not save');
+  const projectIndependent = await evaluate(`(async()=>{const r=await fetch('/api/projects/${profileProjectId}');const p=(await r.json()).project;return p.sequence===2&&p.plan.measurementsMm.waist===780&&p.plan.profileBasis.sequence===1})()`);
+  if (!projectIndependent) throw new Error('Profile edit silently changed project');
+  const privateBackup = await evaluate("(async()=>{const original=URL.createObjectURL;let blob;URL.createObjectURL=(value)=>{blob=value;return original(value)};document.querySelectorAll('.profile-actions button')[1].click();URL.createObjectURL=original;return JSON.parse(await blob.text())})()");
+  if (privateBackup.profile.measurementsMm.waist !== 800 || privateBackup.profile.measurementsDegrees.shoulderSlope !== 17.25 || privateBackup.profile.id !== undefined) throw new Error('Private profile backup units/format wrong');
+  const importedProfile = { ...privateBackup, profile: { ...privateBackup.profile, name: 'Restored synthetic notes' } };
+  await evaluate(`(()=>{const file=new File([JSON.stringify(${JSON.stringify(importedProfile)})],'maker.json',{type:'application/json'});const transfer=new DataTransfer();transfer.items.add(file);const input=document.querySelector('.profile-actions input[type=file]');input.files=transfer.files;input.dispatchEvent(new Event('change',{bubbles:true}));})()`);
+  await waitFor("document.querySelector('.maker-profile-panel [role=status]')?.textContent.includes('Backup loaded for review only')", 'Import did not enter review');
+  if (await evaluate("(async()=>{const r=await fetch('/api/profile');return (await r.json()).profile.sequence})()") !== 2) throw new Error('Backup import saved without review');
+  await evaluate("document.querySelector('.maker-profile-panel form button[type=submit]').click()");
+  await waitFor("document.querySelector('.maker-profile-panel [role=status]')?.textContent.includes('Profile revision 3 saved')", 'Reviewed backup did not save');
+  await call('Page.navigate', { url: `${base}/?project=${profileProjectId}` });
+  await waitFor("document.querySelector('.profile-copy-preview')?.textContent.includes('waist: kept 78 cm')", 'Profile did not resume');
+  await evaluate("document.querySelector('.maker-profile-panel>details').open=true;document.querySelector('.profile-body').open=false");
+  // Use actual computed foreground/background colours, not a design-token assertion. Legacy demo dark mode must not leak.
+  await call('Emulation.setEmulatedMedia', { features: [{ name: 'prefers-color-scheme', value: 'dark' }] });
+  const profileContrast = await evaluate(`(()=>{
+    const luminance=(rgb)=>{const c=rgb.slice(0,3).map(v=>{v/=255;return v<=.04045?v/12.92:((v+.055)/1.055)**2.4});return .2126*c[0]+.7152*c[1]+.0722*c[2]};
+    const rgb=(text)=>text.match(/[\\d.]+/g).map(Number);
+    const selectors=['.profile-copy h3','.profile-copy-preview h4','.profile-copy-preview p','.profile-copy-preview li','.profile-actions label','.profile-body summary','.profile-copy .companion-kicker'];
+    return selectors.flatMap(selector=>[...document.querySelectorAll(selector)].map(el=>{let at=el,bg;while(at){bg=rgb(getComputedStyle(at).backgroundColor);if(bg.length===3||bg[3]!==0)break;at=at.parentElement}const foreground=luminance(rgb(getComputedStyle(el).color)),background=luminance(bg);return {selector,ratio:(Math.max(foreground,background)+.05)/(Math.min(foreground,background)+.05)}}));
+  })()`);
+  if (profileContrast.length<7 || profileContrast.some(item=>item.ratio<4.5)) throw new Error('Profile text contrast failed: '+JSON.stringify(profileContrast));
+  const profileLayouts = [];
+  for (const width of [1440, 1024, 768, 390, 320]) {
+    await call('Emulation.setDeviceMetricsOverride', { width, height: 900, deviceScaleFactor: 1, mobile: width < 500 });
+    await evaluate("document.querySelector('.profile-copy').scrollIntoView({block:'center'})");
+    const layout = await evaluate("({width:innerWidth,scrollWidth:document.documentElement.scrollWidth,inputs:document.querySelectorAll('.maker-profile-panel input[type=number]').length})");
+    if (layout.scrollWidth > width || layout.inputs !== 19) throw new Error('Profile layout failed: '+JSON.stringify(layout));
+    if (width === 1440 || width === 390) {
+      const screenshot = await call('Page.captureScreenshot', { format: 'png', fromSurface: true });
+      await writeFile(join(output, `maker-profile-copy-${width}.png`), Buffer.from(screenshot.data, 'base64'));
+    }
+    await evaluate("document.querySelector('.profile-body').open=true");
+    if (await evaluate("document.documentElement.scrollWidth") > width) throw new Error('Expanded profile body notes overflow');
+    await evaluate("document.querySelector('.profile-body').open=false");
+    profileLayouts.push({ width, expandedAndCollapsedNoOverflow: true });
+  }
+  if (errors.length) throw new Error(`Browser runtime errors: ${JSON.stringify(errors)}`);
+  report.makerProfile = { savedViaForm: true, keyboardSummaryOpened: true, explicitCopy: true, conflictsAndZeroPreserved: true,
+    unsavedCopyRefused: true, projectIndependent, plainPrivateBackup: true, importReviewedBeforeSaving: true, resumed: true, layouts: profileLayouts, contrastPreference: 'dark', textContrast: profileContrast };
+  // Disposable response delay demonstrates that an in-flight copy cannot discard a newly typed brief.
+  await evaluate("window.profileOriginalFetch=window.fetch;window.fetch=async(...args)=>{const r=await window.profileOriginalFetch(...args);if(String(args[0]).endsWith('/profile')&&args[1]?.method==='POST')await new Promise(done=>setTimeout(done,2000));return r};document.querySelector('.profile-copy button').click()");
+  await evaluate("(()=>{const el=document.querySelector('.project-form textarea');Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype,'value').set.call(el,'Unsaved edit during profile copy');el.dispatchEvent(new Event('input',{bubbles:true}));})()");
+  await waitFor("document.querySelector('.project-topline')?.textContent.includes('revision 3')", 'Delayed profile copy did not finish');
+  const concurrentDraftPreserved = await evaluate("document.querySelector('.project-form textarea').value==='Unsaved edit during profile copy' && document.querySelector('.journal-warning')?.textContent.includes('Save your plan')");
+  await evaluate("window.fetch=window.profileOriginalFetch;delete window.profileOriginalFetch");
+  if (!concurrentDraftPreserved) throw new Error('Profile response erased an in-flight brief edit');
+  report.makerProfile.concurrentDraftPreserved = concurrentDraftPreserved;
+  if (errors.length) throw new Error(`Browser runtime errors: ${JSON.stringify(errors)}`);
+  report.screenshots.push('maker-profile-copy-1440.png', 'maker-profile-copy-390.png');
   report.screenshots.push('project-measurements-tina-1440.png', 'project-measurements-tina-390.png');
   await writeFile(join(root, 'evidence', 'companion-runtime-verification.json'), JSON.stringify(report, null, 2) + '\n');
   console.log(JSON.stringify(report, null, 2));

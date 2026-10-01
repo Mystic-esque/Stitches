@@ -1,5 +1,12 @@
 # Implementation decisions
 
+## October 1, 2026 — Profiles are private reusable notes, not mutable project dependencies
+
+- Initial slice is one named profile per guest, using the existing transaction/owner boundary and separate immutable profile revisions. Length and degree maps retain their semantics; experience and tools are explicitly supplied, not inferred from a garment image or model.
+- Copy is explicit, reviewed and fill-missing only. Preserve existing project values and a zero angle; do not alias chest/bust or hip/hips. Exact tool names are unioned within the existing validated limit. Bind both saved bases transactionally and record the copied name/version/hash; later profile edits cannot rewrite a kept project or journal.
+- Ordinary project edits may preserve but not forge/change profile provenance. Importing a project backup retains historical copy provenance without granting source-profile access. Maker backup import is staged for review and saved as a new private revision; plain JSON privacy is disclosed. No new shared Sanity content or provider request is required.
+- Keep broad W01–W10 release gates open while splitting already-verified foundation slices into visible checklist items. Do not represent a single profile as completed fabric-stash/progress/cleanup or a qualified fit input.
+
 ## October 1, 2026 — Preserve semantics instead of guessing measurement or notch equivalence
 
 - Similar notch names do not imply verified partners. Independently measure the proposed correspondence, preserve disagreement, and exclude it from readiness. A locally authored pending prerequisite graph may validate study relationships without impersonating reviewed Sanity making instructions.

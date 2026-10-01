@@ -2,6 +2,8 @@ import { createHash, randomUUID } from "node:crypto";
 import { mkdirSync } from "node:fs";
 import path from "node:path";
 import { DatabaseSync } from "node:sqlite";
+import { copyMakerProfileSchema, importMakerProfileSchema, profileValuesSchema, saveMakerProfileSchema, profileCopyPreview,
+  type MakerProfile, type SaveMakerProfileInput, type CopyMakerProfileInput } from "../../domain/maker-profile";
 import {
   createGuestProjectSchema,
   emptyProjectPlan,
@@ -61,6 +63,13 @@ export class GuestStore {
     if (databasePath !== ":memory:") this.db.exec("PRAGMA journal_mode=WAL");
     this.db.exec(`
       PRAGMA foreign_keys=ON;
+      CREATE TABLE IF NOT EXISTS maker_profiles (
+        owner_id TEXT PRIMARY KEY, data_json TEXT NOT NULL
+      ) STRICT;
+      CREATE TABLE IF NOT EXISTS maker_profile_revisions (
+        owner_id TEXT NOT NULL, sequence INTEGER NOT NULL, snapshot_json TEXT NOT NULL,
+        PRIMARY KEY (owner_id, sequence), FOREIGN KEY (owner_id) REFERENCES maker_profiles(owner_id)
+      ) STRICT;
       CREATE TABLE IF NOT EXISTS projects (
         owner_id TEXT NOT NULL,
         id TEXT NOT NULL,
@@ -116,14 +125,78 @@ export class GuestStore {
     }
   }
 
-  private receipt(ownerId: string, key: string, operation: string, requestHash: string, targetId?: string): GuestProject | null {
+  private receipt<T = GuestProject>(ownerId: string, key: string, operation: string, requestHash: string, targetId?: string): T | null {
     const row = this.db.prepare("SELECT operation, target_id, request_hash, result_json FROM mutation_receipts WHERE owner_id = ? AND idempotency_key = ?")
       .get(ownerId, key) as ReceiptRow | undefined;
     if (!row) return null;
     if (row.operation !== operation || row.request_hash !== requestHash || (targetId && row.target_id !== targetId)) {
       throw new GuestStoreError("idempotency_conflict", "This request key was already used for a different change.");
     }
-    return JSON.parse(row.result_json) as GuestProject;
+    return JSON.parse(row.result_json) as T;
+  }
+
+  getProfile(ownerId: string): MakerProfile | null {
+    const row = this.db.prepare("SELECT data_json FROM maker_profiles WHERE owner_id = ?").get(ownerId) as StoredRow | undefined;
+    return row ? JSON.parse(row.data_json) as MakerProfile : null;
+  }
+
+  listProfileRevisions(ownerId: string): MakerProfile[] {
+    const rows = this.db.prepare("SELECT snapshot_json AS data_json FROM maker_profile_revisions WHERE owner_id = ? ORDER BY sequence")
+      .all(ownerId) as unknown as StoredRow[];
+    return rows.map((row) => JSON.parse(row.data_json) as MakerProfile);
+  }
+
+  saveProfile(ownerId: string, rawInput: SaveMakerProfileInput, operation = "profile-save"): MakerProfile {
+    const input = saveMakerProfileSchema.parse(rawInput);
+    const requestHash = hash(input);
+    return this.transaction(() => {
+      const duplicate = this.receipt<MakerProfile>(ownerId, input.idempotencyKey, operation, requestHash);
+      if (duplicate) return duplicate;
+      const current = this.getProfile(ownerId);
+      if ((current?.sequence ?? 0) !== input.expectedSequence || (current?.basisHash ?? null) !== input.expectedBasisHash)
+        throw new GuestStoreError("stale", "The maker profile changed. Reload it and review your draft before saving.");
+      const now = new Date().toISOString();
+      const values = profileValuesSchema.parse(input.profile);
+      const profile: MakerProfile = { ...values, id: current?.id ?? randomUUID(), sequence: (current?.sequence ?? 0) + 1,
+        basisHash: hash(values), createdAt: current?.createdAt ?? now, updatedAt: now };
+      const json = JSON.stringify(profile);
+      this.db.prepare("INSERT INTO maker_profiles (owner_id, data_json) VALUES (?, ?) ON CONFLICT(owner_id) DO UPDATE SET data_json = excluded.data_json")
+        .run(ownerId, json);
+      this.db.prepare("INSERT INTO maker_profile_revisions (owner_id, sequence, snapshot_json) VALUES (?, ?, ?)").run(ownerId, profile.sequence, json);
+      this.db.prepare("INSERT INTO mutation_receipts (owner_id, idempotency_key, operation, target_id, request_hash, result_json) VALUES (?, ?, ?, ?, ?, ?)")
+        .run(ownerId, input.idempotencyKey, operation, profile.id, requestHash, json);
+      return profile;
+    });
+  }
+
+  importProfile(ownerId: string, rawInput: unknown): MakerProfile {
+    const { backup, ...basis } = importMakerProfileSchema.parse(rawInput);
+    return this.saveProfile(ownerId, { ...basis, profile: backup.profile }, "profile-import");
+  }
+
+  copyProfile(ownerId: string, projectId: string, rawInput: CopyMakerProfileInput): GuestProject {
+    const input = copyMakerProfileSchema.parse(rawInput);
+    const requestHash = hash({ projectId, input });
+    return this.transaction(() => {
+      const duplicate = this.receipt(ownerId, input.idempotencyKey, "profile-copy", requestHash, projectId);
+      if (duplicate) return duplicate;
+      const current = this.getProject(ownerId, projectId), profile = this.getProfile(ownerId);
+      if (!current || !profile || profile.id !== input.profileId) throw new GuestStoreError("not_found", "Project or maker profile not found.");
+      if (current.sequence !== input.expectedSequence || current.basisHash !== input.expectedBasisHash)
+        throw new GuestStoreError("stale", "The project changed. Reload and review before copying the profile.");
+      if (profile.sequence !== input.expectedProfileSequence || profile.basisHash !== input.expectedProfileBasisHash)
+        throw new GuestStoreError("stale", "The maker profile changed. Reload and review before copying it.");
+      const base = { ...current, plan: profileCopyPreview(current.plan, profile).plan, sequence: current.sequence + 1, updatedAt: new Date().toISOString() };
+      const project: GuestProject = { ...base, basisHash: projectBasisHash(base) };
+      const json = JSON.stringify(project);
+      this.db.prepare("UPDATE projects SET sequence = ?, data_json = ?, updated_at = ? WHERE owner_id = ? AND id = ?")
+        .run(project.sequence, json, project.updatedAt, ownerId, projectId);
+      this.db.prepare("INSERT INTO project_revisions (owner_id, project_id, sequence, basis_hash, snapshot_json) VALUES (?, ?, ?, ?, ?)")
+        .run(ownerId, projectId, project.sequence, project.basisHash, json);
+      this.db.prepare("INSERT INTO mutation_receipts (owner_id, idempotency_key, operation, target_id, request_hash, result_json) VALUES (?, ?, ?, ?, ?, ?)")
+        .run(ownerId, input.idempotencyKey, "profile-copy", projectId, requestHash, json);
+      return project;
+    });
   }
 
   listProjects(ownerId: string): GuestProject[] {
@@ -181,6 +254,7 @@ export class GuestStore {
 
   createProject(ownerId: string, rawInput: CreateGuestProjectInput, trustedKnowledgeFingerprint: string | null = null): GuestProject {
     const input = createGuestProjectSchema.parse(rawInput);
+    if (input.plan?.profileBasis) throw new GuestStoreError("invalid", "Copy a saved profile through the reviewed profile action; do not supply copy provenance.");
     if (input.source.kind === "own_idea" && trustedKnowledgeFingerprint !== null)
       throw new GuestStoreError("invalid", "A personal idea cannot claim a catalog knowledge binding.");
     if (trustedKnowledgeFingerprint !== null && !/^[a-f0-9]{64}$/.test(trustedKnowledgeFingerprint)) throw new GuestStoreError("invalid", "Invalid knowledge fingerprint.");
@@ -257,6 +331,8 @@ export class GuestStore {
         throw new GuestStoreError("stale", "The project changed since this view loaded. Reload and review before saving.");
       }
       const plan = input.plan === undefined ? current.plan : projectPlanSchema.parse(input.plan);
+      if (canonicalJson(plan.profileBasis) !== canonicalJson(current.plan.profileBasis))
+        throw new GuestStoreError("invalid", "Profile copy provenance cannot be changed by editing the plan. Use the reviewed copy action.");
       const base = {
         ...current,
         title: input.title ?? current.title,

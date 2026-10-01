@@ -1,6 +1,6 @@
 {
   "kind": "production-nextjs-ui",
-  "checkedAt": "2026-10-01T17:29:52.159Z",
+  "checkedAt": "2026-10-01T18:44:41.905Z",
   "base": "http://127.0.0.1:3100",
   "observations": [
     {
@@ -62,6 +62,8 @@
     "project-source-stale-1440.png",
     "project-source-recovered-1440.png",
     "project-390.png",
+    "maker-profile-copy-1440.png",
+    "maker-profile-copy-390.png",
     "project-measurements-tina-1440.png",
     "project-measurements-tina-390.png"
   ],
@@ -106,5 +108,78 @@
         "sourceFields": 14
       }
     ]
+  },
+  "makerProfile": {
+    "savedViaForm": true,
+    "keyboardSummaryOpened": true,
+    "explicitCopy": true,
+    "conflictsAndZeroPreserved": true,
+    "unsavedCopyRefused": true,
+    "projectIndependent": true,
+    "plainPrivateBackup": true,
+    "importReviewedBeforeSaving": true,
+    "resumed": true,
+    "layouts": [
+      {
+        "width": 1440,
+        "expandedAndCollapsedNoOverflow": true
+      },
+      {
+        "width": 1024,
+        "expandedAndCollapsedNoOverflow": true
+      },
+      {
+        "width": 768,
+        "expandedAndCollapsedNoOverflow": true
+      },
+      {
+        "width": 390,
+        "expandedAndCollapsedNoOverflow": true
+      },
+      {
+        "width": 320,
+        "expandedAndCollapsedNoOverflow": true
+      }
+    ],
+    "contrastPreference": "dark",
+    "textContrast": [
+      {
+        "selector": ".profile-copy h3",
+        "ratio": 11.876004821892709
+      },
+      {
+        "selector": ".profile-copy-preview h4",
+        "ratio": 10.86402400766899
+      },
+      {
+        "selector": ".profile-copy-preview h4",
+        "ratio": 10.86402400766899
+      },
+      {
+        "selector": ".profile-copy-preview p",
+        "ratio": 10.86402400766899
+      },
+      {
+        "selector": ".profile-copy-preview li",
+        "ratio": 10.86402400766899
+      },
+      {
+        "selector": ".profile-copy-preview li",
+        "ratio": 10.86402400766899
+      },
+      {
+        "selector": ".profile-actions label",
+        "ratio": 11.876004821892709
+      },
+      {
+        "selector": ".profile-body summary",
+        "ratio": 11.876004821892709
+      },
+      {
+        "selector": ".profile-copy .companion-kicker",
+        "ratio": 5.955189677526207
+      }
+    ],
+    "concurrentDraftPreserved": true
   }
 }

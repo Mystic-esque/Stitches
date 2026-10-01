@@ -1,0 +1,24 @@
+{
+  "kind": "real-local-production-api",
+  "checkedAt": "2026-10-01T18:43:22.481Z",
+  "base": "http://127.0.0.1:3100",
+  "syntheticOnly": true,
+  "ownerIsolation": true,
+  "noStore": true,
+  "crossOriginDenied": true,
+  "malformedUnitsRefused": true,
+  "profileSaveReplayConflictAndStale": true,
+  "projectCopyReplayAndIsolation": true,
+  "zeroAndConflictsPreserved": true,
+  "profileChangeLeavesProjectUnchanged": true,
+  "staleProfileCopyRefused": true,
+  "reviewedBackupImportAndReplay": true,
+  "immutableProfileRevisions": 3,
+  "forgedCopyProvenanceRefused": true,
+  "notVerified": [
+    "physical fit",
+    "cutting",
+    "production multi-instance durability",
+    "profile deletion"
+  ]
+}
