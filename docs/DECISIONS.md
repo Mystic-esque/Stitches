@@ -1,5 +1,10 @@
 # Implementation decisions
 
+## October 1, 2026 — Preserve semantics instead of guessing measurement or notch equivalence
+
+- Similar notch names do not imply verified partners. Independently measure the proposed correspondence, preserve disagreement, and exclude it from readiness. A locally authored pending prerequisite graph may validate study relationships without impersonating reviewed Sanity making instructions.
+- A private brief edit must preserve measurements not visible in its current source form. Match exact source-listed labels to typed length/angle notes; leave unknown labels unmapped and legacy keys intact. Hip/bust are not silently renamed to hips/chest. Degree notes are optional without defaults so unchanged historical snapshots/basis hashes retain their shape. Storage bounds are not an approved drafting or fitting envelope.
+
 ## October 1, 2026 — Isolate engine evidence and preserve source-version conflicts
 
 - Keep the experimental engine workspace out of production app dependencies until its exact design mapping qualifies. Pin direct dependencies and retain npm integrity locks; disable install scripts. Inspect actual imports when vendor metadata omits runtime dependencies rather than patching vendor code or guessing APIs.

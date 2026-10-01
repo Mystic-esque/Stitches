@@ -15,6 +15,27 @@ const create = (key = randomUUID()) => ({
 });
 
 describe("private guest projects", () => {
+  it("persists angular notes separately, binds the revision, and carries them through private backup import", () => {
+    const store = new GuestStore(":memory:");
+    try {
+      const owner = resolveGuestIdentity().ownerId;
+      const other = resolveGuestIdentity().ownerId;
+      const first = store.createProject(owner, create());
+      const plan = { ...first.plan, measurementsMm: { waist: 720, hips: 960, waistToFloor: 1000, waistToHips: 200 },
+        measurementsDegrees: { shoulderSlope: 14 } };
+      const request = { expectedSequence: 1, expectedBasisHash: first.basisHash, idempotencyKey: randomUUID(), plan };
+      const next = store.updateProject(owner, first.id, request);
+      expect(next.basisHash).not.toBe(first.basisHash);
+      expect(store.updateProject(owner, first.id, request)).toEqual(next);
+      expect(store.listRevisions(owner, first.id)[0].plan).not.toHaveProperty("measurementsDegrees");
+      const backup = projectBackupSchema.parse({ format: "stitches-project-backup", version: 2, title: next.title,
+        brief: next.brief, source: next.source, plan: next.plan, notes: [] });
+      const restored = store.importBackup(owner, { backup, idempotencyKey: randomUUID() });
+      expect(restored.plan).toEqual(plan);
+      expect(store.getProject(other, restored.id)).toBeNull();
+      expect(restored.capability).toBe("plan_only");
+    } finally { store.close(); }
+  });
   it("isolates two guest identities and never grants access by knowing a project ID", () => {
     const store = new GuestStore(":memory:");
     try {

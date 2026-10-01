@@ -1,0 +1,77 @@
+{
+  "checkedAt": "2026-10-01T17:19:27.004Z",
+  "provenance": "real-engine-plus-local-authored-unreviewed-map",
+  "mappingFiles": [
+    "evidence/pattern-engine/mapping-f184f41e57b03dee.json",
+    "evidence/pattern-engine/mapping-c82792cd8de46958.json",
+    "evidence/pattern-engine/mapping-e955f4a3be08e338.json"
+  ],
+  "exactPackageSourceHashes": {
+    "skirt.mjs": "8f786e3b79c8b877e32389ac292bf64cdfcf436f795fef237e63b7c26e9fc209",
+    "straight-waistband.mjs": "a9f689e433b9dd0b6fc019724b45207e616ae31a2752fb060478ef64ca77c459"
+  },
+  "allStitchSegmentsNamedExactlyOnce": true,
+  "stableEdgesAndMarksAtTwoInputs": true,
+  "tamperedGeometryAndFoldAndNotchRejected": true,
+  "invalidDagAndProgressRejected": true,
+  "curveConflictExcluded": true,
+  "notchComparisons": [
+    {
+      "kind": "unapproved-midpoint-candidate",
+      "skirtFoldMarkId": "sandy.skirt/gridAnchor-notch",
+      "bandMarkId": "sandy.waistband/centerNotch-notch",
+      "unfoldedSkirtMidpointMm": 360.0007860782222,
+      "waistbandCenterMarkMm": 349.2,
+      "differenceMm": 10.800786078222188,
+      "status": "unresolved-notch-correspondence",
+      "approvedPair": false,
+      "note": "Name similarity is not evidence of a mating role. No notch pair or recut adjustment is authorized."
+    },
+    {
+      "kind": "unapproved-midpoint-candidate",
+      "skirtFoldMarkId": "sandy.skirt/gridAnchor-notch",
+      "bandMarkId": "sandy.waistband/centerNotch-notch",
+      "unfoldedSkirtMidpointMm": 440.0009607622715,
+      "waistbandCenterMarkMm": 426.8,
+      "differenceMm": 13.200960762271507,
+      "status": "unresolved-notch-correspondence",
+      "approvedPair": false,
+      "note": "Name similarity is not evidence of a mating role. No notch pair or recut adjustment is authorized."
+    }
+  ],
+  "lengthOnlyImpact": {
+    "beforeArtifactHash": "1f051bed5ecb6eeae1877bd80a69c4cdebbd73981c47015d641ac422cd4b2986",
+    "afterArtifactHash": "953cdc00577e67d6c35fe80c06869f1696f1ba15c7b338a2674b5a34aa6c4f08",
+    "changedEdgeIds": [
+      "sandy.skirt/hem",
+      "sandy.skirt/opening",
+      "sandy.skirt/fold"
+    ],
+    "edgeLengthChanges": [
+      {
+        "id": "sandy.skirt/hem",
+        "beforeMm": 1161.108661999394,
+        "afterMm": 1318.1886376702118
+      },
+      {
+        "id": "sandy.skirt/opening",
+        "beforeMm": 509.99999999999994,
+        "afterMm": 610
+      },
+      {
+        "id": "sandy.skirt/fold",
+        "beforeMm": 510,
+        "afterMm": 610
+      }
+    ],
+    "affectedStudyStepIds": [
+      "prepare-skirt",
+      "prepare-opening",
+      "hem"
+    ],
+    "claim": "measured-coordinate-change-only-not-approved-alteration"
+  },
+  "liveSanityStepGraph": false,
+  "physicalActionsEnabled": false,
+  "fullQualificationPassed": false
+}

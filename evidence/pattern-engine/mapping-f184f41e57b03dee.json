@@ -1,0 +1,500 @@
+{
+  "format": "stitches-sandy-mapping-study-v1",
+  "artifactHash": "1f051bed5ecb6eeae1877bd80a69c4cdebbd73981c47015d641ac422cd4b2986",
+  "source": {
+    "planningSourceId": "companion-source-sandy-20261001",
+    "instructionsUrl": "https://freesewing.eu/docs/designs/sandy/instructions/",
+    "package": "@freesewing/sandy",
+    "version": "4.10.2",
+    "gitHead": "3d290d25d0b6a65852dd31aec125c97bc8ca6e2c",
+    "reviewStatus": "pending",
+    "graphOrigin": "local-authored-study-not-published-to-Sanity"
+  },
+  "applicability": {
+    "waistbandShape": "straight",
+    "panels": 1,
+    "gathering": 0,
+    "seamlessFullCircle": false,
+    "lining": false,
+    "pockets": false,
+    "closureTechnique": "unresolved"
+  },
+  "edges": [
+    {
+      "id": "sandy.skirt/hem",
+      "pieceId": "sandy.skirt",
+      "sourcePointIds": [
+        "ex2Flipped",
+        [
+          "ex2cFlipped",
+          "ex1cFlipped",
+          "ex1"
+        ],
+        [
+          "ex1c",
+          "ex2c",
+          "ex2"
+        ]
+      ],
+      "operations": [
+        {
+          "type": "move",
+          "to": {
+            "x": -162.0569369082791,
+            "y": 672.0569369082791
+          }
+        },
+        {
+          "type": "curve",
+          "cp1": {
+            "x": 33.98661501020908,
+            "y": 672.056936908279
+          },
+          "cp2": {
+            "x": 222.0007334356791,
+            "y": 594.1789391388281
+          },
+          "to": {
+            "x": 360.6244584051393,
+            "y": 455.55521416936807
+          }
+        },
+        {
+          "type": "curve",
+          "cp1": {
+            "x": 499.2481833745991,
+            "y": 316.93148919990824
+          },
+          "cp2": {
+            "x": 577.1261811440502,
+            "y": 128.91737077443767
+          },
+          "to": {
+            "x": 577.1261811440502,
+            "y": -67.12618114405038
+          }
+        }
+      ],
+      "lengthMm": 1161.108661999394,
+      "stitchOutlineSegment": true
+    },
+    {
+      "id": "sandy.skirt/opening",
+      "pieceId": "sandy.skirt",
+      "sourcePointIds": [
+        "ex2",
+        "in2"
+      ],
+      "operations": [
+        {
+          "type": "move",
+          "to": {
+            "x": 577.1261811440502,
+            "y": -67.12618114405038
+          }
+        },
+        {
+          "type": "line",
+          "to": {
+            "x": 67.12618114405024,
+            "y": -67.12618114405015
+          }
+        }
+      ],
+      "lengthMm": 509.99999999999994,
+      "stitchOutlineSegment": true
+    },
+    {
+      "id": "sandy.skirt/waist",
+      "pieceId": "sandy.skirt",
+      "sourcePointIds": [
+        "in2",
+        [
+          "in2c",
+          "in1c",
+          "in1"
+        ],
+        [
+          "in1cFlipped",
+          "in2cFlipped",
+          "in2Flipped"
+        ]
+      ],
+      "operations": [
+        {
+          "type": "move",
+          "to": {
+            "x": 67.12618114405024,
+            "y": -67.12618114405015
+          }
+        },
+        {
+          "type": "curve",
+          "cp1": {
+            "x": 67.12618114405015,
+            "y": -6.343039043729561
+          },
+          "cp2": {
+            "x": 42.98017196096225,
+            "y": 51.95058380326674
+          },
+          "to": {
+            "x": 2.842170943040401e-14,
+            "y": 94.93075576422893
+          }
+        },
+        {
+          "type": "curve",
+          "cp1": {
+            "x": -42.98017196096224,
+            "y": 137.91092772519113
+          },
+          "cp2": {
+            "x": -101.27379480795847,
+            "y": 162.05693690827908
+          },
+          "to": {
+            "x": -162.05693690827908,
+            "y": 162.0569369082791
+          }
+        }
+      ],
+      "lengthMm": 360.0007860782222,
+      "stitchOutlineSegment": true
+    },
+    {
+      "id": "sandy.skirt/fold",
+      "pieceId": "sandy.skirt",
+      "sourcePointIds": [
+        "in2Flipped",
+        "ex2Flipped"
+      ],
+      "operations": [
+        {
+          "type": "move",
+          "to": {
+            "x": -162.05693690827908,
+            "y": 162.0569369082791
+          }
+        },
+        {
+          "type": "line",
+          "to": {
+            "x": -162.0569369082791,
+            "y": 672.0569369082791
+          }
+        }
+      ],
+      "lengthMm": 510,
+      "stitchOutlineSegment": true
+    },
+    {
+      "id": "sandy.waistband/left-end",
+      "pieceId": "sandy.waistband",
+      "sourcePointIds": [
+        "topLeft",
+        "bottomLeft"
+      ],
+      "operations": [
+        {
+          "type": "move",
+          "to": {
+            "x": -360,
+            "y": -40
+          }
+        },
+        {
+          "type": "line",
+          "to": {
+            "x": -360,
+            "y": 40
+          }
+        }
+      ],
+      "lengthMm": 80,
+      "stitchOutlineSegment": true
+    },
+    {
+      "id": "sandy.waistband/attachment",
+      "pieceId": "sandy.waistband",
+      "sourcePointIds": [
+        "bottomLeft",
+        "bottomRight"
+      ],
+      "operations": [
+        {
+          "type": "move",
+          "to": {
+            "x": -360,
+            "y": 40
+          }
+        },
+        {
+          "type": "line",
+          "to": {
+            "x": 381.6,
+            "y": 40
+          }
+        }
+      ],
+      "lengthMm": 741.6,
+      "stitchOutlineSegment": true
+    },
+    {
+      "id": "sandy.waistband/right-end",
+      "pieceId": "sandy.waistband",
+      "sourcePointIds": [
+        "bottomRight",
+        "topRight"
+      ],
+      "operations": [
+        {
+          "type": "move",
+          "to": {
+            "x": 381.6,
+            "y": 40
+          }
+        },
+        {
+          "type": "line",
+          "to": {
+            "x": 381.6,
+            "y": -40
+          }
+        }
+      ],
+      "lengthMm": 80,
+      "stitchOutlineSegment": true
+    },
+    {
+      "id": "sandy.waistband/finish",
+      "pieceId": "sandy.waistband",
+      "sourcePointIds": [
+        "topRight",
+        "topLeft"
+      ],
+      "operations": [
+        {
+          "type": "move",
+          "to": {
+            "x": 381.6,
+            "y": -40
+          }
+        },
+        {
+          "type": "line",
+          "to": {
+            "x": -360,
+            "y": -40
+          }
+        }
+      ],
+      "lengthMm": 741.6,
+      "stitchOutlineSegment": true
+    },
+    {
+      "id": "sandy.waistband/fold",
+      "pieceId": "sandy.waistband",
+      "sourcePointIds": [
+        "centerRight",
+        "centerLeft"
+      ],
+      "operations": [
+        {
+          "type": "move",
+          "to": {
+            "x": 381.6,
+            "y": 0
+          }
+        },
+        {
+          "type": "line",
+          "to": {
+            "x": -360,
+            "y": 0
+          }
+        }
+      ],
+      "lengthMm": 741.6,
+      "stitchOutlineSegment": false
+    }
+  ],
+  "markings": [
+    {
+      "id": "sandy.skirt/in2-notch",
+      "pieceId": "sandy.skirt",
+      "anchor": {
+        "x": 67.12618114405024,
+        "y": -67.12618114405015
+      },
+      "status": "engine-mark-only",
+      "approvedCounterpartId": null
+    },
+    {
+      "id": "sandy.skirt/gridAnchor-notch",
+      "pieceId": "sandy.skirt",
+      "anchor": {
+        "x": -162.05693690827908,
+        "y": 162.0569369082791
+      },
+      "status": "engine-mark-only",
+      "approvedCounterpartId": null
+    },
+    {
+      "id": "sandy.skirt/center",
+      "pieceId": "sandy.skirt",
+      "anchor": {
+        "x": -162.05693690827906,
+        "y": -67.12618114405018
+      },
+      "status": "engine-mark-only",
+      "approvedCounterpartId": null
+    },
+    {
+      "id": "sandy.waistband/centerNotch-notch",
+      "pieceId": "sandy.waistband",
+      "anchor": {
+        "x": -10.799999999999999,
+        "y": 40
+      },
+      "status": "engine-mark-only",
+      "approvedCounterpartId": null
+    },
+    {
+      "id": "sandy.waistband/buttonNotch-notch",
+      "pieceId": "sandy.waistband",
+      "anchor": {
+        "x": 360,
+        "y": 39.99999999999999
+      },
+      "status": "engine-mark-only",
+      "approvedCounterpartId": null
+    },
+    {
+      "id": "sandy.waistband/bottomLeft-notch",
+      "pieceId": "sandy.waistband",
+      "anchor": {
+        "x": -360,
+        "y": 40
+      },
+      "status": "engine-mark-only",
+      "approvedCounterpartId": null
+    }
+  ],
+  "notchComparison": {
+    "kind": "unapproved-midpoint-candidate",
+    "skirtFoldMarkId": "sandy.skirt/gridAnchor-notch",
+    "bandMarkId": "sandy.waistband/centerNotch-notch",
+    "unfoldedSkirtMidpointMm": 360.0007860782222,
+    "waistbandCenterMarkMm": 349.2,
+    "differenceMm": 10.800786078222188,
+    "status": "unresolved-notch-correspondence",
+    "approvedPair": false,
+    "note": "Name similarity is not evidence of a mating role. No notch pair or recut adjustment is authorized."
+  },
+  "steps": [
+    {
+      "id": "prepare-skirt",
+      "title": "Prepare the skirt seam",
+      "requires": [],
+      "section": "Step 1",
+      "edges": [
+        "sandy.skirt/opening"
+      ],
+      "explanation": "The opening position needs confirmation before joining the seam.",
+      "sourceUrl": "https://freesewing.eu/docs/designs/sandy/instructions/",
+      "reviewStatus": "pending",
+      "executionEnabled": false
+    },
+    {
+      "id": "prepare-opening",
+      "title": "Resolve the opening method",
+      "requires": [
+        "prepare-skirt"
+      ],
+      "section": "Step 2",
+      "edges": [
+        "sandy.skirt/opening"
+      ],
+      "explanation": "Choose an applicable opening method; its detailed technique is not mapped here.",
+      "sourceUrl": "https://freesewing.eu/docs/designs/sandy/instructions/",
+      "reviewStatus": "pending",
+      "executionEnabled": false
+    },
+    {
+      "id": "prepare-band",
+      "title": "Prepare the straight waistband",
+      "requires": [],
+      "section": "Step 4: Closures",
+      "edges": [
+        "sandy.waistband/finish",
+        "sandy.waistband/fold"
+      ],
+      "explanation": "Identify the interfaced half and the opposite edge before attachment.",
+      "sourceUrl": "https://freesewing.eu/docs/designs/sandy/instructions/",
+      "reviewStatus": "pending",
+      "executionEnabled": false
+    },
+    {
+      "id": "attach-band",
+      "title": "Study the waist join",
+      "requires": [
+        "prepare-opening",
+        "prepare-band"
+      ],
+      "section": "Step 4: Closures",
+      "edges": [
+        "sandy.skirt/waist",
+        "sandy.waistband/attachment"
+      ],
+      "explanation": "Compare the skirt waist with the band attachment span, excluding the overlap.",
+      "sourceUrl": "https://freesewing.eu/docs/designs/sandy/instructions/",
+      "reviewStatus": "pending",
+      "executionEnabled": false
+    },
+    {
+      "id": "finish-band",
+      "title": "Study the waistband fold and ends",
+      "requires": [
+        "attach-band"
+      ],
+      "section": "Step 4: Other closures",
+      "edges": [
+        "sandy.waistband/fold",
+        "sandy.waistband/left-end",
+        "sandy.waistband/right-end",
+        "sandy.waistband/finish"
+      ],
+      "explanation": "The closure choice determines how the ends and inside edge are finished.",
+      "sourceUrl": "https://freesewing.eu/docs/designs/sandy/instructions/",
+      "reviewStatus": "pending",
+      "executionEnabled": false
+    },
+    {
+      "id": "hem",
+      "title": "Choose the hem method",
+      "requires": [
+        "finish-band"
+      ],
+      "section": "Step 5",
+      "edges": [
+        "sandy.skirt/hem"
+      ],
+      "explanation": "Select a compatible hem finish; the engine allowance alone does not choose it.",
+      "sourceUrl": "https://freesewing.eu/docs/designs/sandy/instructions/",
+      "reviewStatus": "pending",
+      "executionEnabled": false
+    }
+  ],
+  "fullMakingGraphQualified": false,
+  "cutReady": false,
+  "missingBindings": [
+    "opening-position-and-closure-method",
+    "interfacing-template",
+    "notch-counterparts",
+    "method-and-equipment-compatibility",
+    "allowance-and-hem-method-validation",
+    "Sanity-authored-step-graph",
+    "physical-maker-review"
+  ]
+}

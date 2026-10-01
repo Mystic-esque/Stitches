@@ -5,6 +5,7 @@ This is an isolated local research workspace, **not a production app integration
 ```
 npm ci --ignore-scripts --no-audit --no-fund --maxsockets=1
 node verify.mjs
+node verify-mapping.mjs
 node preview.mjs
 node check-preview.mjs
 ```
@@ -28,6 +29,10 @@ Core, Sandy and Tina are pinned at 4.10.2. Source inspection found omitted runti
 The curved-waistband engine returns a main-fabric count of **1**, while current published Sandy instructions and the pending Stitches planning record specify **2**. The spike reports that source/version conflict; it does not rewrite either source to pass. Only the straight-waistband scalar comparison is qualified by the experiment.
 
 Complete mating edge/notch counterpart semantics and step DAG, independent allowance validation, fabric layout, physical print calibration and maker review remain open. `qualification_spike_only` cannot become `pattern_mapped` or `cut_checked` just because the preview renders. Personal inputs and public API integration are not enabled here.
+
+The subsequent exact-edge study names all stitch-outline segments plus the band fold, validates named marking anchors, and binds them to a six-step **local, pending-review educational DAG**. It is not a published Sanity step graph and enables no physical actions. A length-only redraft changes the hem/opening/fold while preserving the waist edges; impact follows actual geometry, not painted highlights. Invalid prerequisites and tampered point/fold/notch data are rejected. The first comparison failed on object key ordering (fixed with structural equality); a 100.00000000000006 mm delta required a floating-point precision assertion, not a changed target.
+
+A second actual issue remains: the band center mark is 10.800786/13.200961 mm from the proposed unfolded skirt midpoint at the two inputs. There is no source-approved counterpart assignment or tolerance. These marks are **not** declared a mating pair and no automatic recut/shift is suggested. The source documentation also leaves opening/closure techniques and variants to the maker; those must be authored/reviewed before an executable guide is qualified. See mapping-verification.json.
 
 ## Rights evidence and notices
 

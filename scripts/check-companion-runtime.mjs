@@ -142,6 +142,9 @@ try {
   if (!recoveredFromFailure) throw new Error('Source transport recovery did not restore the current piece study');
   const projectShot = await call('Page.captureScreenshot', { format: 'png', captureBeyondViewport: true, fromSurface: true });
   await writeFile(join(output, 'project-1440.png'), Buffer.from(projectShot.data, 'base64'));
+  if (await evaluate("document.querySelectorAll('.measurement-grid input').length") !== 4) throw new Error('Sandy did not expose its four exact source-listed measurements');
+  for (const [key, value] of Object.entries({ waist: '72', hips: '96', waistToFloor: '100', waistToHips: '20' }))
+    await evaluate(`(()=>{const field=document.querySelector('[name="measure-${key}"]');Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value').set.call(field,${JSON.stringify(value)});field.dispatchEvent(new Event('input',{bubbles:true}));return true})()`);
   await evaluate("document.querySelector('.save-row button').click()");
   let saved = false;
   for (let i = 0; i < 240; i++) {
@@ -179,6 +182,7 @@ try {
   await evaluate("(()=>{const previous=URL.createObjectURL;URL.createObjectURL=function(blob){window.__stitchesBackupBlob=blob;return previous.call(URL,blob)};document.querySelector('.project-topline button:last-child').click();return true})()");
   const backup = await evaluate("(async()=>JSON.parse(await window.__stitchesBackupBlob.text()))()");
   if (backup.version !== 2 || backup.notes?.length !== 1 || !backup.knowledgeFingerprint) throw new Error('Downloaded backup omitted the journal or source binding');
+  if (!Object.entries({ waist: 720, hips: 960, waistToFloor: 1000, waistToHips: 200 }).every(([key, value]) => backup.plan.measurementsMm[key] === value)) throw new Error('Source-listed body notes did not survive save/reload/export with mm units');
   backup.knowledgeFingerprint = '0'.repeat(64); // Disposable import rehearsal of a prior Sanity source revision.
   await evaluate("document.querySelector('.project-topline button:first-child').click()");
   for (let i = 0; i < 80; i++) {
@@ -215,8 +219,46 @@ try {
   if (mobileProject.scrollWidth > 390) throw new Error(`Project mobile overflow: ${JSON.stringify(mobileProject)}`);
   const mobileShot = await call('Page.captureScreenshot', { format: 'png', captureBeyondViewport: true, fromSurface: true });
   await writeFile(join(output, 'project-390.png'), Buffer.from(mobileShot.data, 'base64'));
+  const tinaId = await evaluate("(async()=>{const response=await fetch('/api/projects',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({title:'Disposable angular notes rehearsal',brief:'Synthetic measurements only.',source:{kind:'candidate',designId:'tina'},plan:{features:[],openQuestions:[],measurementsMm:{bust:900,hip:1000,specialistLength:100.3},measurementsDegrees:{shoulderSlope:14},fabric:{description:'',widthMm:null,lengthMm:null,structure:'unknown'},equipment:[]},idempotencyKey:crypto.randomUUID()})});const data=await response.json();if(!response.ok)throw new Error(data.message);return data.project.id})()");
+  await call('Page.navigate', { url: `${base}/?project=${tinaId}` });
+  let measurementsReady = false;
+  for (let i = 0; i < 240; i++) {
+    measurementsReady = await evaluate("document.querySelectorAll('.measurement-grid input').length===14 && document.querySelector('[name=measure-shoulderSlope]')?.value==='14'");
+    if (measurementsReady) break;
+    await pause(250);
+  }
+  if (!measurementsReady) throw new Error('Tina did not show all fourteen source-specific fields and the saved degree value');
+  await evaluate("(()=>{const field=document.querySelector('[name=measure-shoulderSlope]');Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value').set.call(field,'15.25');field.dispatchEvent(new Event('input',{bubbles:true}));return true})()");
+  await evaluate("document.querySelector('.save-row button').click()");
+  let angularSaved = false;
+  for (let i = 0; i < 240; i++) {
+    angularSaved = await evaluate("document.querySelector('.project-topline')?.textContent.includes('revision 2')");
+    if (angularSaved) break;
+    await pause(250);
+  }
+  if (!angularSaved) throw new Error('Angular measurement revision did not save');
+  const measuredPlan = await evaluate(`(async()=>{const response=await fetch('/api/projects/${tinaId}');return (await response.json()).project.plan})()`);
+  if (measuredPlan.measurementsDegrees?.shoulderSlope !== 15.25 || measuredPlan.measurementsMm.shoulderSlope !== undefined ||
+      measuredPlan.measurementsMm.specialistLength !== 100.3 || measuredPlan.measurementsMm.bust !== 900 || measuredPlan.measurementsMm.hip !== 1000)
+    throw new Error('Degree units or unexposed legacy/private measurement preservation failed');
+  const measurementLayouts = [];
+  for (const width of [1440, 1024, 768, 390, 320]) {
+    await call('Emulation.setDeviceMetricsOverride', { width, height: 900, deviceScaleFactor: 1, mobile: width < 500 });
+    const layout = await evaluate("({width:innerWidth,scrollWidth:document.documentElement.scrollWidth,fields:document.querySelectorAll('.measurement-grid input').length})");
+    if (layout.scrollWidth > width || layout.fields !== 14) throw new Error('Measurement layout failed: ' + JSON.stringify(layout));
+    if (width === 1440 || width === 390) {
+      await evaluate(width === 1440 ? "document.querySelector('.measurement-plan').scrollIntoView()" : "document.querySelector('[name=measure-shoulderSlope]').scrollIntoView({block:'center'})");
+      const screenshot = await call('Page.captureScreenshot', { format: 'png', fromSurface: true });
+      await writeFile(join(output, `project-measurements-tina-${width}.png`), Buffer.from(screenshot.data, 'base64'));
+    }
+    measurementLayouts.push({ width, noOverflow: true, sourceFields: 14 });
+  }
+  const measurementJourney = { sourceSpecificSandyFields: 4, savedLengthsInMm: true, reloadAndBackupPreservedLengths: true,
+    sourceSpecificTinaFields: 14, angularUnitsPreserved: angularSaved, unexposedLegacyNotesPreserved: true, layouts: measurementLayouts };
   if (errors.length) throw new Error(`Browser runtime errors: ${JSON.stringify(errors)}`);
   const report = { kind: 'production-nextjs-ui', checkedAt: new Date().toISOString(), base, observations, sanityCatalog: { exactContentLakeCards: 2, projectSourceShown: sourceReady, educationalPieceStudy: pieceStudyReady, conditionalPiecesSwitched: switchedPieces, sharedPendingDiagnostic: diagnosticReady, conditionalScrapRemedy: conditionalRemedy, unresolvedPathStops: uncertainStops, simulatedTransportFailurePausedAdvice: pausedOnFailure, simulatedTransportRecovery: recoveredFromFailure, staleBindingObserved: staleBinding, sourceRebased: refreshed, contextKbRebuild: false }, projectJourney: { created, saved, noted, resumed, backupVersion: 2, imported, mobileNoOverflow: true }, runtimeErrors: errors, screenshots: ['home-1440.png', 'home-390.png', 'project-1440.png', 'project-piece-study-1440.png', 'project-journal-1440.png', 'project-source-stale-1440.png', 'project-source-recovered-1440.png', 'project-390.png'], notVerified: ['cut-ready geometry', 'maker review', 'agent', 'Sanity Context revalidation', 'keyboard and screen-reader audit'] };
+  report.measurementJourney = measurementJourney;
+  report.screenshots.push('project-measurements-tina-1440.png', 'project-measurements-tina-390.png');
   await writeFile(join(root, 'evidence', 'companion-runtime-verification.json'), JSON.stringify(report, null, 2) + '\n');
   console.log(JSON.stringify(report, null, 2));
 } finally { socket?.close(); chrome.kill(); }

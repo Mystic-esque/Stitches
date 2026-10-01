@@ -31,6 +31,7 @@ This replaces the September 29 Studio 1.0 W01–W12 target. Existing proof is pr
 Exit: two distinct source-qualified candidates and one fully mapped vertical journey, or explicit blocked cut-ready evidence with independent work continuing.
 
 ## W02 — Private project foundation
+- Verified measurement slice: source-specific body-note fields, separate degree storage and preservation of unexposed legacy/specialist notes. Focused tests 13/13; full suite 68 passed / one opt-in live skipped; typecheck/build/API and actual five-width Sandy/Tina browser persistence/import checks passed. Actual desktop/phone screenshots inspected. No reusable profile, fit or cutting promotion.
 - Local verified partial slice: guest owner isolation, transactional project/revision/journal store, basis-bound notes, stale/idempotent writes, restart restore, and v1/v2 latest-state backup/import. This does not yet satisfy the full W02 exit because profile, step-specific progress, cleanup and deployable durability are open.
 - [ ] Add isolated guest sessions, durable local transactional project/profile/progress store, backup/import and versioned snapshots.
 - [ ] Bind source, measurements, fabric, equipment, operation, step, diagnostic observations and evidence to a semantic basis.

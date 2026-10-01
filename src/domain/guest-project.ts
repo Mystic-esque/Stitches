@@ -11,7 +11,10 @@ export const projectSourceSchema = z.discriminatedUnion("kind", [
 export const projectPlanSchema = z.object({
   features: labels,
   openQuestions: labels,
-  measurementsMm: z.record(z.string().regex(/^[a-z][a-zA-Z0-9]{0,63}$/), z.number().finite().positive().max(3000)),
+  measurementsMm: z.record(z.string().regex(/^[a-z][a-zA-Z0-9]{0,63}$/), z.number().finite().positive().max(3000))
+    .refine((values) => !("shoulderSlope" in values), "Shoulder slope is an angle, not a millimetre length."),
+  // Optional, without a default: old project/backup basis hashes retain their exact shape.
+  measurementsDegrees: z.object({ shoulderSlope: z.number().finite().min(0).max(90).optional() }).strict().optional(),
   fabric: z.object({
     description: z.string().trim().max(180),
     widthMm: z.number().int().min(100).max(5000).nullable(),

@@ -39,6 +39,15 @@ assert.equal(own.data.revisions.length, 1);
 assert.deepEqual(own.data.notes, []);
 const other = await call(`/api/projects/${project.id}`);
 assert.equal(other.status, 404);
+for (const plan of [
+  { ...project.plan, measurementsDegrees: { shoulderSlope: 91 } },
+  { ...project.plan, measurementsMm: { shoulderSlope: 140 } },
+]) {
+  const invalid = await call(`/api/projects/${project.id}`, { method: 'PATCH', cookie: created.cookie,
+    body: { expectedSequence: 1, expectedBasisHash: project.basisHash, idempotencyKey: randomUUID(), plan } });
+  assert.equal(invalid.status, 400);
+}
+assert.equal((await call(`/api/projects/${project.id}`, { cookie: created.cookie })).data.project.sequence, 1);
 const noteBody = { kind: 'question', stage: 'prepare', text: 'Will this width fit the planned pieces?', expectedProjectSequence: project.sequence, expectedBasisHash: project.basisHash, idempotencyKey: randomUUID() };
 const noted = await call(`/api/projects/${project.id}/notes`, { method: 'POST', cookie: created.cookie, body: noteBody });
 assert.equal(noted.status, 201);
@@ -48,7 +57,8 @@ assert.equal(replayedNote.status, 201);
 assert.equal(replayedNote.data.note.id, noted.data.note.id);
 const strangerNotes = await call(`/api/projects/${project.id}/notes`);
 assert.equal(strangerNotes.status, 404);
-const change = { expectedSequence: project.sequence, expectedBasisHash: project.basisHash, idempotencyKey: randomUUID(), title: 'Rehearsal revision 2' };
+const change = { expectedSequence: project.sequence, expectedBasisHash: project.basisHash, idempotencyKey: randomUUID(), title: 'Rehearsal revision 2',
+  plan: { ...project.plan, measurementsMm: { waist: 720, specialistLength: 100.3 }, measurementsDegrees: { shoulderSlope: 14 } } };
 const updated = await call(`/api/projects/${project.id}`, { method: 'PATCH', cookie: created.cookie, body: change });
 assert.equal(updated.status, 200);
 assert.equal(updated.data.project.sequence, 2);
@@ -73,6 +83,8 @@ assert.equal(imported.status, 201);
 assert.notEqual(imported.data.project.id, project.id);
 assert.equal(imported.data.notes.length, 1);
 assert.equal(imported.data.notes[0].importedFromSequence, 1);
+assert.deepEqual(imported.data.project.plan.measurementsDegrees, { shoulderSlope: 14 });
+assert.equal(imported.data.project.plan.measurementsMm.specialistLength, 100.3);
 const replayedImport = await call('/api/projects/import', { method: 'POST', cookie: created.cookie, body: importBody });
 assert.equal(replayedImport.status, 201);
 assert.equal(replayedImport.data.project.id, imported.data.project.id);
@@ -98,5 +110,7 @@ assert.equal(staleRebase.status, 409);
 const otherRebase = await call(`/api/projects/${oldProject.id}/knowledge`, { method: 'POST', body: { ...rebaseBody, idempotencyKey: randomUUID() } });
 assert.equal(otherRebase.status, 404);
 const report = { kind: 'local-production-api', checkedAt: new Date().toISOString(), results: { exactSanityDevelopmentCatalog: 200, sourceLinkedPlanOnlyCards: 2, directCreate: 201, ownerRead: 200, crossGuestRead: 404, journalCreate: 201, journalReplay: 201, crossGuestNotes: 404, update: 200, duplicateReplay: 200, staleUpdate: 409, staleNote: 409, importWithJournal: 201, importReplay: 201, crossGuestImportedRead: 404, candidateCreateBound: 201, staleImport: 201, sourceRebase: 200, rebaseReplay: 200, staleRebase: 409, crossGuestRebase: 404, revisionCount: 2, noteCount: 1, importedNoteCount: 1 }, storage: 'ignored local .data SQLite; disposable synthetic projects retained', noSecretsLogged: true, contextKbNotRebuilt: true };
+report.measurementChecks = { invalidAngleRejected: 400, angleInLengthRejected: 400,
+  rejectedWritesKeptSequence: 1, validAngularNotesInBackupImport: true, specialistLengthPreserved: true };
 await writeFile(join(root, 'evidence', 'guest-api-verification.json'), JSON.stringify(report, null, 2) + '\n');
 console.log(JSON.stringify(report, null, 2));

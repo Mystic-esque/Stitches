@@ -1,6 +1,6 @@
 {
   "kind": "production-nextjs-ui",
-  "checkedAt": "2026-10-01T08:30:19.943Z",
+  "checkedAt": "2026-10-01T17:29:52.159Z",
   "base": "http://127.0.0.1:3100",
   "observations": [
     {
@@ -61,7 +61,9 @@
     "project-journal-1440.png",
     "project-source-stale-1440.png",
     "project-source-recovered-1440.png",
-    "project-390.png"
+    "project-390.png",
+    "project-measurements-tina-1440.png",
+    "project-measurements-tina-390.png"
   ],
   "notVerified": [
     "cut-ready geometry",
@@ -69,5 +71,40 @@
     "agent",
     "Sanity Context revalidation",
     "keyboard and screen-reader audit"
-  ]
+  ],
+  "measurementJourney": {
+    "sourceSpecificSandyFields": 4,
+    "savedLengthsInMm": true,
+    "reloadAndBackupPreservedLengths": true,
+    "sourceSpecificTinaFields": 14,
+    "angularUnitsPreserved": true,
+    "unexposedLegacyNotesPreserved": true,
+    "layouts": [
+      {
+        "width": 1440,
+        "noOverflow": true,
+        "sourceFields": 14
+      },
+      {
+        "width": 1024,
+        "noOverflow": true,
+        "sourceFields": 14
+      },
+      {
+        "width": 768,
+        "noOverflow": true,
+        "sourceFields": 14
+      },
+      {
+        "width": 390,
+        "noOverflow": true,
+        "sourceFields": 14
+      },
+      {
+        "width": 320,
+        "noOverflow": true,
+        "sourceFields": 14
+      }
+    ]
+  }
 }

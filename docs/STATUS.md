@@ -2,6 +2,23 @@
 
 Updated: October 1, 2026.
 
+## Active W02/W05 source-specific private measurement slice
+
+- Basis: C01/C03/C06/C09; current exact Sanity candidate measurement lists and the existing private project/backup/revision store. Found and fixed a real UI data-loss path: `planFor` previously reconstructed only waist/bust/hip and discarded other saved measurements on any save.
+- Work: `measurement-plan.ts`, `MeasurementPlan.tsx`, project-plan schema, workbench integration and browser regressions. Sandy exposes its four source-listed fields; Tina exposes fourteen, including a degrees-only shoulder-slope field. Unknown source labels are not guessed. Unexposed/legacy notes remain unchanged and are not silently aliased (hip→hips or bust→chest). Personal values remain in the private guest store, not Sanity.
+- Acceptance: preserve hidden measurements; canonical length/angle separation; save/reload/backup with immutable prior basis; reject invalid input; all-five-width source-specific form screenshots. This is body-note planning, not fit/ease/cutting qualification or a reusable profile implementation.
+- Verification complete for this slice: focused tests **13/13**, full deterministic suite **68 passed / one opt-in live test skipped**, `npm run typecheck` and Webpack production build exit 0. Real production API rehearsal at 17:28:31Z passed ownership/stale/replay/import plus two unit-boundary rejections (400 without advancing the revision). Actual isolated Chrome run at 17:29:52Z passed both source forms at 1440/1024/768/390/320, save/reload/backup preservation, 15.25-degree storage, unexposed legacy/specialist preservation and zero runtime errors. Fresh desktop/phone measurement screenshots were visually inspected. Four helper syntax checks and tracked whitespace checks pass. No destructive state migration or public provider write occurred.
+- Credential presence check prints booleans only: all four required read/write/Context/Gemini keys exist and project/dataset match Stitches/development. No setup request is needed. Local production preview is running on `http://127.0.0.1:3100`; root application dependency files are unchanged. This slice made no Gemini call, new Sanity write, deployment, physical test or keyboard/screen-reader certification.
+
+**Next executable task:** implement a reusable private maker profile (named body notes, experience and equipment), explicitly copied into a new project or reviewed revision rather than silently updating kept projects. Verify owner isolation, stale/idempotent save, backup/restore and profile-change independence. Step-specific progress/agent work follows; complete exact engine/cutting qualification remains separately open below.
+
+## W01 exact edge study — verified local research, no capability promotion
+
+- `verify-mapping.mjs` passes exact operation membership and complete stitch-outline segment coverage (nine semantic edge/fold IDs), six named marking anchors, two-input stable IDs, pending local prerequisite DAG, invalid DAG/progress and point/fold/notch tamper refusals. Length-only redraft affects hem/opening/fold and their local study steps, preserving waist edges. Final receipt at 17:19:27Z: `evidence/pattern-engine/mapping-verification.json`.
+- The first operation comparison failed on object key ordering; structural equality fixed that adapter defect. A strict float equality failed on 100.00000000000006 rather than 100 mm; now the same analytical target is checked to 1e-8 mm floating-point precision. Neither target nor source was rewritten.
+- Real unresolved correspondence: the waistband's named center mark differs by 10.800786/13.200961 mm from a candidate unfolded-skirt midpoint. There is no approved mating assignment/tolerance, so no pair or corrective cut is suggested. The curved band cut-count conflict also remains.
+- The six source-linked step paraphrases are a **local pending-review study**, not live Sanity-authored instructions. Opening/closure position and detailed technique, interfacing template, equipment compatibility, full notches/allowances/layout, print and maker receipts still block an exact making/cutting claim. Independent private planning work continues.
+
 ## Active W01 exact engine spike — resumed October 1, 2026
 
 - Input basis: Companion 2.0 C02/C03/C05/C06 and PATTERN-ENGINE-DECISION; existing plan-only Sandy/Tina catalog stays unchanged. Official registry access now succeeds and reports core/Sandy 4.10.2 with MIT metadata. Installed licenses and generated-output rights still require inspection.
