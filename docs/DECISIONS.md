@@ -1,5 +1,11 @@
 # Implementation decisions
 
+## October 1, 2026 — Separate Sanity planning candidates from qualified patterns
+
+- `planningCandidate` is a dedicated shared editorial type with `reviewStatus: pending`, official-source reference, measurement names and a conditional cutting caveat. It grants only `plan_only` and cannot stand in for `patternVersion`, generated geometry, print or maker review.
+- The main companion reads these four known records through a fixed server-side Content Lake query, never a model-supplied GROQ string. Missing/rejected/inconsistent records produce an explicit unavailable state. Private guest plans and journal remain local and do not enter Sanity.
+- The development write used `createIfNotExists` after a zero-collision dry run and read-back; no existing record was replaced. Sanity Context KB remains separately maintained and was not rebuilt by this Content Lake operation.
+
 ## October 1, 2026 — Maker journal and portable guest backup (active)
 
 - A private note is a maker-authored observation or question, not generated advice. It records the saved project sequence and basis hash; unsaved plan edits must be kept before a note can be added. Earlier-basis notes remain visible but cannot silently become current evidence.

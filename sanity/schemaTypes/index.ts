@@ -132,6 +132,21 @@ const fabricRequirement = defineType({
   ],
 });
 
+// Research-only catalog material. A planning candidate is deliberately separate
+// from a qualified patternVersion and cannot grant drafting/cutting capability.
+const planningCandidate = defineType({
+  name: "planningCandidate", title: "Planning candidate", type: "document",
+  fields: [
+    defineField({ name: "designKey", type: "string", options: { list: ["sandy", "tina"] }, validation: required }),
+    defineField({ name: "title", type: "string", validation: required }),
+    defineField({ name: "materialStructure", type: "string", options: { list: ["woven", "knit"] }, validation: required }),
+    defineField({ name: "requiredMeasurements", type: "array", of: [defineArrayMember({ type: "string" })] }),
+    defineField({ name: "cuttingCaveat", type: "text", validation: required }),
+    defineField({ name: "source", type: "reference", to: [{ type: "sourceDocument" }], validation: required }),
+    reviewField(),
+  ],
+});
+
 // These are shared, source-reviewed teaching records. Personal project observations
 // and uploaded photographs belong in guest storage, never in Content Lake.
 const garmentComponent = defineType({
@@ -237,7 +252,7 @@ const remedy = defineType({
 
 export const schemaTypes = [
   sourceDocument, pattern, patternVersion, patternPiece, seamConnection,
-  adjustmentRule, instructionStep, fabricRequirement, garmentComponent,
+  adjustmentRule, instructionStep, fabricRequirement, planningCandidate, garmentComponent,
   sewingTechnique, equipmentClass, fabricClass, constructionProcedure,
   issuePattern, diagnosticTest, remedy,
 ];

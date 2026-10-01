@@ -2,6 +2,16 @@
 
 Updated: October 1, 2026.
 
+## Active W03 source-linked planning catalog — October 1, 2026
+
+- Rechecked the official Sandy and Tina design pages, including required measurements and cutting/fabric differences. A bounded `npm view @freesewing/sandy` retry again produced no registry response and was cancelled after roughly 50 seconds; this does **not** qualify a drafting engine or output rights.
+- Added a distinct `planningCandidate` Sanity schema type so research candidates cannot be confused with a qualified `patternVersion`. A guarded seeder dry-ran four exact IDs, found zero collisions, then created two source records and two candidate records in **Stitches `l4eeamth/development` only**. Published Content Lake read-back verified all four with `reviewStatus: pending`. `evidence/companion-candidates-sanity.json` contains IDs/revisions, no credentials. Existing 13 illustrative records were not overwritten; no production dataset write or KB rebuild occurred.
+- Added a fixed, parameterized Content Lake catalog reader and `/api/catalog`. It validates both source/candidate pairs, rejects missing, duplicated, dangling or rejected documents, and returns plan-only metadata/fingerprints. The main companion now shows current source-linked planning caveats and an explicit unavailable state, while private project entry remains possible. It does not treat editorial photos as pattern evidence or pretend this exact read is a Context KB response.
+- The source catalog is read fresh and is **not yet pinned to a guest project's saved knowledge fingerprint**. Changes to these source records therefore must not be interpreted as automatically rebasing earlier journal evidence or approving new advice.
+- Focused catalog tests passed 3/3; full deterministic suite passed **57/57** with one opt-in live test skipped; `tsc --noEmit` exited 0 after a source-union narrowing fix. Final Webpack production build exited 0 with `/api/catalog`. The built API returned 200 and exactly two pending, plan-only cards from the development Content Lake; guest API outcomes still passed. The isolated Chrome run passed 1440/1024/768/390/320px, live source display, guest create/save/journal/reload/backup/import, no overflow/broken images/runtime errors. Refreshed desktop gallery and phone home/project screenshots were visually inspected. Reports: `evidence/guest-api-verification.json` and `evidence/companion-runtime-verification.json`.
+
+**Next executable task:** pin the Sanity candidate fingerprint to the saved guest project and invalidate source-dependent advice on change; then implement a sourced, reviewed shared method/diagnostic graph and separately verify Context KB maintenance. Plan-only records do not satisfy W03 exit.
+
 ## Active W02 journal and portable backup slice — October 1, 2026
 
 - Added private maker observations/questions with stage labels, immutable saved-revision basis, stale-write rejection, idempotent replay and cross-guest denial. The project UI distinguishes current from earlier notes and requires unsaved plan edits to be saved before a new note can be attached. These are user-authored records, **not** a verified diagnostic assistant or sewing advice.

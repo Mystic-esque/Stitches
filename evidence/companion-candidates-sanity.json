@@ -1,0 +1,30 @@
+{
+  "checkedAt": "2026-10-01T05:50:45.727Z",
+  "target": "l4eeamth/development",
+  "status": "published-content-lake-only",
+  "records": [
+    {
+      "id": "companion-candidate-sandy-20261001",
+      "type": "planningCandidate",
+      "revision": "oSPMR3vnpKAveddaHYSqPo"
+    },
+    {
+      "id": "companion-candidate-tina-20261001",
+      "type": "planningCandidate",
+      "revision": "99jR2muJ8yszKRYvaN7LHc"
+    },
+    {
+      "id": "companion-source-sandy-20261001",
+      "type": "sourceDocument",
+      "revision": "9aIbic2FIRsxr4O0psL5B0"
+    },
+    {
+      "id": "companion-source-tina-20261001",
+      "type": "sourceDocument",
+      "revision": "9lONXfgXtWsXXqs6x0rjYZ"
+    }
+  ],
+  "pendingReview": true,
+  "noPatternOrCuttingQualification": true,
+  "kbRebuildNotClaimed": true
+}

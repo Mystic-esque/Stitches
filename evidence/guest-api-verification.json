@@ -1,7 +1,9 @@
 {
   "kind": "local-production-api",
-  "checkedAt": "2026-10-01T05:40:00.139Z",
+  "checkedAt": "2026-10-01T06:06:08.769Z",
   "results": {
+    "exactSanityDevelopmentCatalog": 200,
+    "sourceLinkedPlanOnlyCards": 2,
     "directCreate": 201,
     "ownerRead": 200,
     "crossGuestRead": 404,
@@ -20,5 +22,6 @@
     "importedNoteCount": 1
   },
   "storage": "ignored local .data SQLite; disposable synthetic projects retained",
-  "noSecretsLogged": true
+  "noSecretsLogged": true,
+  "contextKbNotRebuilt": true
 }

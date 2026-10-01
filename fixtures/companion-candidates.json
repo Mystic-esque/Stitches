@@ -1,0 +1,47 @@
+{
+  "fixtureStatus": "source-linked-planning-only",
+  "documents": [
+    {
+      "_id": "companion-source-sandy-20261001",
+      "_type": "sourceDocument",
+      "title": "FreeSewing Sandy Circle Skirt documentation",
+      "url": "https://freesewing.eu/docs/designs/sandy/",
+      "author": "Erica Alcusa Sáez",
+      "locator": "Required Measurements; Cutting Instructions; Fabric Options",
+      "licenseNotes": "Source link and original Stitches paraphrase only. Exact design package/output redistribution rights remain unqualified.",
+      "reviewStatus": "pending"
+    },
+    {
+      "_id": "companion-source-tina-20261001",
+      "_type": "sourceDocument",
+      "title": "FreeSewing Tina top documentation",
+      "url": "https://freesewing.eu/docs/designs/tina/",
+      "author": "Jonathan Haas",
+      "locator": "Required Measurements; Fabric Options; Cutting Instructions",
+      "licenseNotes": "Source link and original Stitches paraphrase only. Exact design package/output redistribution rights remain unqualified.",
+      "reviewStatus": "pending"
+    },
+    {
+      "_id": "companion-candidate-sandy-20261001",
+      "_type": "planningCandidate",
+      "designKey": "sandy",
+      "title": "Sandy circle skirt",
+      "materialStructure": "woven",
+      "requiredMeasurements": ["Waist circumference", "Waist to floor", "Waist to hips", "Hips circumference"],
+      "cuttingCaveat": "The documented default and seamless variants use different folds, and the waistband option changes the cut list. A generated, checked layout is still required before cutting.",
+      "source": { "_type": "reference", "_ref": "companion-source-sandy-20261001" },
+      "reviewStatus": "pending"
+    },
+    {
+      "_id": "companion-candidate-tina-20261001",
+      "_type": "planningCandidate",
+      "designKey": "tina",
+      "title": "Tina faux-wrap top",
+      "materialStructure": "knit",
+      "requiredMeasurements": ["Head circumference", "Biceps circumference", "Chest circumference", "HPS to waist back", "Neck circumference", "Shoulder to shoulder", "Shoulder slope", "Waist to armpit", "Waist to seat", "Seat circumference", "Waist circumference", "Shoulder to wrist", "Waist to underbust", "Wrist circumference"],
+      "cuttingCaveat": "The documented cut list has mirrored fronts, a back on fold, and optional sleeve and front-bottom parts. A generated, checked pattern is still required before cutting.",
+      "source": { "_type": "reference", "_ref": "companion-source-tina-20261001" },
+      "reviewStatus": "pending"
+    }
+  ]
+}

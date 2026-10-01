@@ -14,6 +14,12 @@ async function call(path, { method = 'GET', cookie, body } = {}) {
   return { status: response.status, cookie: response.headers.get('set-cookie')?.split(';')[0], data: await response.json() };
 }
 
+const catalog = await call('/api/catalog');
+assert.equal(catalog.status, 200);
+assert.equal(catalog.data.provenance, 'sanity-development-content-lake');
+assert.deepEqual(catalog.data.cards.map((item) => item.designKey), ['sandy', 'tina']);
+assert.ok(catalog.data.cards.every((item) => item.capability === 'plan_only' && item.reviewStatus === 'pending'));
+
 const key = randomUUID();
 const createBody = { title: 'Disposable local API rehearsal', brief: 'No personal information.', source: { kind: 'own_idea' }, idempotencyKey: key };
 const created = await call('/api/projects', { method: 'POST', body: createBody });
@@ -66,6 +72,6 @@ assert.equal(replayedImport.status, 201);
 assert.equal(replayedImport.data.project.id, imported.data.project.id);
 const otherImport = await call(`/api/projects/${imported.data.project.id}`);
 assert.equal(otherImport.status, 404);
-const report = { kind: 'local-production-api', checkedAt: new Date().toISOString(), results: { directCreate: 201, ownerRead: 200, crossGuestRead: 404, journalCreate: 201, journalReplay: 201, crossGuestNotes: 404, update: 200, duplicateReplay: 200, staleUpdate: 409, staleNote: 409, importWithJournal: 201, importReplay: 201, crossGuestImportedRead: 404, revisionCount: 2, noteCount: 1, importedNoteCount: 1 }, storage: 'ignored local .data SQLite; disposable synthetic projects retained', noSecretsLogged: true };
+const report = { kind: 'local-production-api', checkedAt: new Date().toISOString(), results: { exactSanityDevelopmentCatalog: 200, sourceLinkedPlanOnlyCards: 2, directCreate: 201, ownerRead: 200, crossGuestRead: 404, journalCreate: 201, journalReplay: 201, crossGuestNotes: 404, update: 200, duplicateReplay: 200, staleUpdate: 409, staleNote: 409, importWithJournal: 201, importReplay: 201, crossGuestImportedRead: 404, revisionCount: 2, noteCount: 1, importedNoteCount: 1 }, storage: 'ignored local .data SQLite; disposable synthetic projects retained', noSecretsLogged: true, contextKbNotRebuilt: true };
 await writeFile(join(root, 'evidence', 'guest-api-verification.json'), JSON.stringify(report, null, 2) + '\n');
 console.log(JSON.stringify(report, null, 2));

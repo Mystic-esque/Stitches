@@ -37,6 +37,7 @@ Exit: two distinct source-qualified candidates and one fully mapped vertical jou
 Exit: two sessions cannot cross-read; actual project resumes after restart; stale/duplicate transitions deterministic.
 
 ## W03 — Sanity intelligence graph
+- Verified partial: four source-linked, pending-review planning records in `l4eeamth/development` are read by the companion through an exact Content Lake catalog API. This is not a reviewed procedure/diagnostic graph or a served Context KB update.
 - [ ] Extend existing schema with components, technique, equipment/fabric classes, procedures, issue patterns, diagnostic tests and remedies; preserve current pattern/step refs.
 - [ ] Seed only qualified shared facts into project l4eeamth/development after dry-run exact IDs, backups, revision guards and complete graph validation.
 - [ ] Maintain separate fixed exact Content Lake reads and actual KB-only Context; no private maker data in Sanity.

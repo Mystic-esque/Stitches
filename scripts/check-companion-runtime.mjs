@@ -55,7 +55,7 @@ try {
     await call('Page.navigate', { url: `${base}/` });
     let ready = false;
     for (let i = 0; i < 240; i++) {
-      ready = await evaluate("document.readyState === 'complete' && !!document.querySelector('.companion-hero')");
+      ready = await evaluate("document.readyState === 'complete' && !!document.querySelector('.companion-hero') && document.querySelectorAll('.catalog-evidence-grid article').length === 2");
       if (ready) break;
       await pause(250);
     }
@@ -96,6 +96,13 @@ try {
   if (!created) throw new Error('Project create did not reach the workspace');
   const projectName = await evaluate("document.querySelector('.project-head h1')?.textContent");
   if (projectName !== 'The circle skirt') throw new Error(`Unexpected project title: ${projectName}`);
+  let sourceReady = false;
+  for (let i = 0; i < 120; i++) {
+    sourceReady = await evaluate("document.querySelector('.project-source-strip')?.textContent.includes('Sandy circle skirt')");
+    if (sourceReady) break;
+    await pause(250);
+  }
+  if (!sourceReady) throw new Error('Project did not show the current Sanity planning source');
   const projectShot = await call('Page.captureScreenshot', { format: 'png', captureBeyondViewport: true, fromSurface: true });
   await writeFile(join(output, 'project-1440.png'), Buffer.from(projectShot.data, 'base64'));
   await evaluate("document.querySelector('.save-row button').click()");
@@ -155,7 +162,7 @@ try {
   const mobileShot = await call('Page.captureScreenshot', { format: 'png', captureBeyondViewport: true, fromSurface: true });
   await writeFile(join(output, 'project-390.png'), Buffer.from(mobileShot.data, 'base64'));
   if (errors.length) throw new Error(`Browser runtime errors: ${JSON.stringify(errors)}`);
-  const report = { kind: 'production-nextjs-ui', checkedAt: new Date().toISOString(), base, observations, projectJourney: { created, saved, noted, resumed, backupVersion: 2, imported, mobileNoOverflow: true }, runtimeErrors: errors, screenshots: ['home-1440.png', 'home-390.png', 'project-1440.png', 'project-journal-1440.png', 'project-390.png'], notVerified: ['cut-ready geometry', 'maker review', 'agent', 'Sanity revalidation', 'keyboard and screen-reader audit'] };
+  const report = { kind: 'production-nextjs-ui', checkedAt: new Date().toISOString(), base, observations, sanityCatalog: { exactContentLakeCards: 2, projectSourceShown: sourceReady, contextKbRebuild: false }, projectJourney: { created, saved, noted, resumed, backupVersion: 2, imported, mobileNoOverflow: true }, runtimeErrors: errors, screenshots: ['home-1440.png', 'home-390.png', 'project-1440.png', 'project-journal-1440.png', 'project-390.png'], notVerified: ['cut-ready geometry', 'maker review', 'agent', 'Sanity Context revalidation', 'keyboard and screen-reader audit'] };
   await writeFile(join(root, 'evidence', 'companion-runtime-verification.json'), JSON.stringify(report, null, 2) + '\n');
   console.log(JSON.stringify(report, null, 2));
 } finally { socket?.close(); chrome.kill(); }

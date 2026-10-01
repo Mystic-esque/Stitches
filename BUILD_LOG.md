@@ -1,5 +1,11 @@
 # Build log
 
+## October 1, 2026 — W03 pending-review Sanity planning-source slice
+
+- Source: official FreeSewing Sandy and Tina documentation rechecked; only paraphrased source-linked planning facts were authored. The `npm view` retry was stopped after about 50 seconds without a response. No engine/version/rights or physical gate was upgraded.
+- Added `planningCandidate` schema; guard-checked four exact document IDs. Seeder dry-run against `l4eeamth/development` found zero existing collisions; `--apply` created two `sourceDocument` and two `planningCandidate` records in that dataset, all pending review. Published read-back verified four records and saved ID/revision evidence in `evidence/companion-candidates-sanity.json`. The 13 prior illustrative records and production dataset were untouched. No Context KB build/refresh or Gemini call.
+- Added fixed-query catalog resolver, failure state and main-app source evidence panel. Focused Vitest 3/3 and full Vitest 57/57 passed, one opt-in live test skipped. `tsc --noEmit` passed after fixing TypeScript narrowing in the client. Final Webpack production build exited 0. Built `/api/catalog` returned 200 with two pending, plan-only Content Lake cards; guest API rehearsal passed. Isolated Chrome passed five widths and displayed the live Sandy source on the project, while preserving the guest journey and backup import, with zero overflow/broken images/runtime exceptions. Refreshed desktop gallery and phone screenshots were inspected. Evidence JSON and captures are under `evidence/`.
+
 ## October 1, 2026 — W02 private journal and backup/import slice
 
 - Scope: add user-authored observation/question records bound to an immutable saved project basis; make their data portable without claiming sewing diagnosis. Files: domain schemas, guest SQLite store, `/api/projects/[id]/notes`, `/api/projects/import`, project workspace, API/browser checks. Rollback: revert this coherent slice; the prior committed project-first baseline is `93fe96c`.
