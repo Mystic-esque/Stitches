@@ -35,7 +35,7 @@ export function guestErrorResponse(error: unknown): NextResponse {
     return NextResponse.json({ error: "invalid_input", message: "Review the project fields and try again." }, { status: 400 });
   }
   if (error instanceof GuestStoreError) {
-    const status = error.code === "not_found" ? 404 : 409;
+    const status = error.code === "not_found" ? 404 : error.code === "invalid" ? 400 : 409;
     return NextResponse.json({ error: error.code, message: error.message }, { status });
   }
   console.error("Guest project request failed", error);

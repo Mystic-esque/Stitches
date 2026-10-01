@@ -141,7 +141,8 @@ try {
   await writeFile(join(output, 'project-journal-1440.png'), Buffer.from(journalShot.data, 'base64'));
   await evaluate("(()=>{const previous=URL.createObjectURL;URL.createObjectURL=function(blob){window.__stitchesBackupBlob=blob;return previous.call(URL,blob)};document.querySelector('.project-topline button:last-child').click();return true})()");
   const backup = await evaluate("(async()=>JSON.parse(await window.__stitchesBackupBlob.text()))()");
-  if (backup.version !== 2 || backup.notes?.length !== 1) throw new Error('Downloaded backup omitted the journal');
+  if (backup.version !== 2 || backup.notes?.length !== 1 || !backup.knowledgeFingerprint) throw new Error('Downloaded backup omitted the journal or source binding');
+  backup.knowledgeFingerprint = '0'.repeat(64); // Disposable import rehearsal of a prior Sanity source revision.
   await evaluate("document.querySelector('.project-topline button:first-child').click()");
   for (let i = 0; i < 80; i++) {
     if (await evaluate("!!document.querySelector('.import-backup input')")) break;
@@ -156,13 +157,27 @@ try {
     await pause(250);
   }
   if (!imported) throw new Error('Backup import did not restore the journal and provenance');
+  const staleBinding = await evaluate("document.querySelector('.source-binding.stale')?.textContent.includes('Source changed')");
+  if (!staleBinding) throw new Error('Outdated source binding was not shown as stale');
+  const staleShot = await call('Page.captureScreenshot', { format: 'png', captureBeyondViewport: true, fromSurface: true });
+  await writeFile(join(output, 'project-source-stale-1440.png'), Buffer.from(staleShot.data, 'base64'));
+  await evaluate("document.querySelector('.source-binding button').click()");
+  let refreshed = false;
+  for (let i = 0; i < 240; i++) {
+    refreshed = await evaluate("document.querySelector('.source-binding.current')?.textContent.includes('bound to the current') && document.querySelector('.project-topline')?.textContent.includes('revision 2')");
+    if (refreshed) break;
+    await pause(250);
+  }
+  if (!refreshed) throw new Error('Source rebase did not restore the current binding');
+  const recoveredShot = await call('Page.captureScreenshot', { format: 'png', captureBeyondViewport: true, fromSurface: true });
+  await writeFile(join(output, 'project-source-recovered-1440.png'), Buffer.from(recoveredShot.data, 'base64'));
   await call('Emulation.setDeviceMetricsOverride', { width: 390, height: 900, deviceScaleFactor: 1, mobile: true });
   const mobileProject = await evaluate("({width:innerWidth,scrollWidth:document.documentElement.scrollWidth,overflow:[...document.querySelectorAll('*')].filter(el=>el.getBoundingClientRect().right>document.documentElement.clientWidth+1).slice(0,12).map(el=>({tag:el.tagName,className:typeof el.className==='string'?el.className:'',right:Math.round(el.getBoundingClientRect().right)}))})");
   if (mobileProject.scrollWidth > 390) throw new Error(`Project mobile overflow: ${JSON.stringify(mobileProject)}`);
   const mobileShot = await call('Page.captureScreenshot', { format: 'png', captureBeyondViewport: true, fromSurface: true });
   await writeFile(join(output, 'project-390.png'), Buffer.from(mobileShot.data, 'base64'));
   if (errors.length) throw new Error(`Browser runtime errors: ${JSON.stringify(errors)}`);
-  const report = { kind: 'production-nextjs-ui', checkedAt: new Date().toISOString(), base, observations, sanityCatalog: { exactContentLakeCards: 2, projectSourceShown: sourceReady, contextKbRebuild: false }, projectJourney: { created, saved, noted, resumed, backupVersion: 2, imported, mobileNoOverflow: true }, runtimeErrors: errors, screenshots: ['home-1440.png', 'home-390.png', 'project-1440.png', 'project-journal-1440.png', 'project-390.png'], notVerified: ['cut-ready geometry', 'maker review', 'agent', 'Sanity Context revalidation', 'keyboard and screen-reader audit'] };
+  const report = { kind: 'production-nextjs-ui', checkedAt: new Date().toISOString(), base, observations, sanityCatalog: { exactContentLakeCards: 2, projectSourceShown: sourceReady, staleBindingObserved: staleBinding, sourceRebased: refreshed, contextKbRebuild: false }, projectJourney: { created, saved, noted, resumed, backupVersion: 2, imported, mobileNoOverflow: true }, runtimeErrors: errors, screenshots: ['home-1440.png', 'home-390.png', 'project-1440.png', 'project-journal-1440.png', 'project-source-stale-1440.png', 'project-source-recovered-1440.png', 'project-390.png'], notVerified: ['cut-ready geometry', 'maker review', 'agent', 'Sanity Context revalidation', 'keyboard and screen-reader audit'] };
   await writeFile(join(root, 'evidence', 'companion-runtime-verification.json'), JSON.stringify(report, null, 2) + '\n');
   console.log(JSON.stringify(report, null, 2));
 } finally { socket?.close(); chrome.kill(); }

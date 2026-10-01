@@ -1,6 +1,6 @@
 {
   "kind": "production-nextjs-ui",
-  "checkedAt": "2026-10-01T06:07:08.650Z",
+  "checkedAt": "2026-10-01T06:34:10.382Z",
   "base": "http://127.0.0.1:3100",
   "observations": [
     {
@@ -32,6 +32,8 @@
   "sanityCatalog": {
     "exactContentLakeCards": 2,
     "projectSourceShown": true,
+    "staleBindingObserved": true,
+    "sourceRebased": true,
     "contextKbRebuild": false
   },
   "projectJourney": {
@@ -49,6 +51,8 @@
     "home-390.png",
     "project-1440.png",
     "project-journal-1440.png",
+    "project-source-stale-1440.png",
+    "project-source-recovered-1440.png",
     "project-390.png"
   ],
   "notVerified": [

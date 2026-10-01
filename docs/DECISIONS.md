@@ -2,6 +2,8 @@
 
 ## October 1, 2026 — Separate Sanity planning candidates from qualified patterns
 
+- A guest project may pin the exact candidate Content Lake fingerprint at creation or through an explicit source-rebase mutation. New source facts never silently rewrite an old project basis or journal note. If the source changes, the UI marks the binding stale; rebase requires the saved sequence/hash and creates a new revision. Sanity outage permits an unbound private plan, not source-backed advice.
+
 - `planningCandidate` is a dedicated shared editorial type with `reviewStatus: pending`, official-source reference, measurement names and a conditional cutting caveat. It grants only `plan_only` and cannot stand in for `patternVersion`, generated geometry, print or maker review.
 - The main companion reads these four known records through a fixed server-side Content Lake query, never a model-supplied GROQ string. Missing/rejected/inconsistent records produce an explicit unavailable state. Private guest plans and journal remain local and do not enter Sanity.
 - The development write used `createIfNotExists` after a zero-collision dry run and read-back; no existing record was replaced. Sanity Context KB remains separately maintained and was not rebuilt by this Content Lake operation.

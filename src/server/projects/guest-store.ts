@@ -8,16 +8,18 @@ import {
   importGuestProjectSchema,
   projectPlanSchema,
   recordProjectNoteSchema,
+  rebaseGuestKnowledgeSchema,
   updateGuestProjectSchema,
   type CreateGuestProjectInput,
   type GuestProject,
   type ImportGuestProjectInput,
   type ProjectNote,
   type RecordProjectNoteInput,
+  type RebaseGuestKnowledgeInput,
   type UpdateGuestProjectInput,
 } from "../../domain/guest-project";
 
-export type GuestStoreErrorCode = "not_found" | "stale" | "idempotency_conflict";
+export type GuestStoreErrorCode = "not_found" | "stale" | "idempotency_conflict" | "invalid";
 
 export class GuestStoreError extends Error {
   constructor(public readonly code: GuestStoreErrorCode, message: string) { super(message); }
@@ -177,8 +179,11 @@ export class GuestStore {
     });
   }
 
-  createProject(ownerId: string, rawInput: CreateGuestProjectInput): GuestProject {
+  createProject(ownerId: string, rawInput: CreateGuestProjectInput, trustedKnowledgeFingerprint: string | null = null): GuestProject {
     const input = createGuestProjectSchema.parse(rawInput);
+    if (input.source.kind === "own_idea" && trustedKnowledgeFingerprint !== null)
+      throw new GuestStoreError("invalid", "A personal idea cannot claim a catalog knowledge binding.");
+    if (trustedKnowledgeFingerprint !== null && !/^[a-f0-9]{64}$/.test(trustedKnowledgeFingerprint)) throw new GuestStoreError("invalid", "Invalid knowledge fingerprint.");
     const requestHash = hash(input);
     return this.transaction(() => {
       const duplicate = this.receipt(ownerId, input.idempotencyKey, "create", requestHash);
@@ -187,7 +192,7 @@ export class GuestStore {
       const base = {
         id: randomUUID(), title: input.title, brief: input.brief, source: input.source,
         plan: input.plan ?? emptyProjectPlan(), capability: "plan_only" as const, sequence: 1,
-        knowledgeFingerprint: null, createdAt: now, updatedAt: now,
+        knowledgeFingerprint: trustedKnowledgeFingerprint, createdAt: now, updatedAt: now,
       };
       const project: GuestProject = { ...base, basisHash: projectBasisHash(base) };
       const json = JSON.stringify(project);
@@ -203,6 +208,8 @@ export class GuestStore {
 
   importBackup(ownerId: string, rawInput: ImportGuestProjectInput): GuestProject {
     const input = importGuestProjectSchema.parse(rawInput);
+    if (input.backup.source.kind === "own_idea" && input.backup.version === 2 && input.backup.knowledgeFingerprint)
+      throw new GuestStoreError("invalid", "A personal idea cannot claim a catalog knowledge binding.");
     const requestHash = hash(input);
     return this.transaction(() => {
       const duplicate = this.receipt(ownerId, input.idempotencyKey, "import", requestHash);
@@ -211,7 +218,8 @@ export class GuestStore {
       const base = {
         id: randomUUID(), title: input.backup.title, brief: input.backup.brief, source: input.backup.source,
         plan: input.backup.plan, capability: "plan_only" as const, sequence: 1,
-        knowledgeFingerprint: null, createdAt: now, updatedAt: now,
+        knowledgeFingerprint: input.backup.version === 2 ? input.backup.knowledgeFingerprint ?? null : null,
+        createdAt: now, updatedAt: now,
       };
       const project: GuestProject = { ...base, basisHash: projectBasisHash(base) };
       const json = JSON.stringify(project);
@@ -266,6 +274,36 @@ export class GuestStore {
       this.db.prepare("INSERT INTO mutation_receipts (owner_id, idempotency_key, operation, target_id, request_hash, result_json) VALUES (?, ?, ?, ?, ?, ?)")
         .run(ownerId, input.idempotencyKey, "update", id, requestHash, json);
       return next;
+    });
+  }
+
+  rebaseKnowledge(ownerId: string, id: string, rawInput: RebaseGuestKnowledgeInput, trustedFingerprint: string): GuestProject {
+    const input = rebaseGuestKnowledgeSchema.parse(rawInput);
+    if (!/^[a-f0-9]{64}$/.test(trustedFingerprint)) throw new GuestStoreError("invalid", "Invalid knowledge fingerprint.");
+    const requestHash = hash({ id, input });
+    return this.transaction(() => {
+      const duplicate = this.receipt(ownerId, input.idempotencyKey, "knowledge-rebase", requestHash, id);
+      if (duplicate) return duplicate;
+      const current = this.getProject(ownerId, id);
+      if (!current) throw new GuestStoreError("not_found", "Project not found.");
+      if (current.source.kind !== "candidate") throw new GuestStoreError("invalid", "This project has no linked candidate source.");
+      if (current.sequence !== input.expectedSequence || current.basisHash !== input.expectedBasisHash)
+        throw new GuestStoreError("stale", "The project changed. Reload and review before refreshing its source.");
+      const next = current.knowledgeFingerprint === trustedFingerprint ? current : {
+        ...current, sequence: current.sequence + 1, knowledgeFingerprint: trustedFingerprint,
+        updatedAt: new Date().toISOString(),
+      };
+      const project: GuestProject = next === current ? current : { ...next, basisHash: projectBasisHash(next) };
+      const json = JSON.stringify(project);
+      if (project !== current) {
+        this.db.prepare("UPDATE projects SET sequence = ?, data_json = ?, updated_at = ? WHERE owner_id = ? AND id = ?")
+          .run(project.sequence, json, project.updatedAt, ownerId, id);
+        this.db.prepare("INSERT INTO project_revisions (owner_id, project_id, sequence, basis_hash, snapshot_json) VALUES (?, ?, ?, ?, ?)")
+          .run(ownerId, id, project.sequence, project.basisHash, json);
+      }
+      this.db.prepare("INSERT INTO mutation_receipts (owner_id, idempotency_key, operation, target_id, request_hash, result_json) VALUES (?, ?, ?, ?, ?, ?)")
+        .run(ownerId, input.idempotencyKey, "knowledge-rebase", id, requestHash, json);
+      return project;
     });
   }
 }

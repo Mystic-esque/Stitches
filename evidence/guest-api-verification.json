@@ -1,6 +1,6 @@
 {
   "kind": "local-production-api",
-  "checkedAt": "2026-10-01T06:06:08.769Z",
+  "checkedAt": "2026-10-01T06:29:37.419Z",
   "results": {
     "exactSanityDevelopmentCatalog": 200,
     "sourceLinkedPlanOnlyCards": 2,
@@ -17,6 +17,12 @@
     "importWithJournal": 201,
     "importReplay": 201,
     "crossGuestImportedRead": 404,
+    "candidateCreateBound": 201,
+    "staleImport": 201,
+    "sourceRebase": 200,
+    "rebaseReplay": 200,
+    "staleRebase": 409,
+    "crossGuestRebase": 404,
     "revisionCount": 2,
     "noteCount": 1,
     "importedNoteCount": 1

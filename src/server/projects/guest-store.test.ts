@@ -123,7 +123,7 @@ describe("private guest projects", () => {
     try {
       const owner = resolveGuestIdentity().ownerId;
       const stranger = resolveGuestIdentity().ownerId;
-      const original = store.createProject(owner, create());
+      const original = store.createProject(owner, { ...create(), source: { kind: "candidate", designId: "tina" } }, "a".repeat(64));
       const early = store.recordNote(owner, original.id, { kind: "journal", stage: "prepare", text: "Sample seam finished.",
         expectedProjectSequence: 1, expectedBasisHash: original.basisHash, idempotencyKey: randomUUID() });
       const revised = store.updateProject(owner, original.id, { title: "My revised idea", expectedSequence: 1,
@@ -132,6 +132,7 @@ describe("private guest projects", () => {
         expectedProjectSequence: 2, expectedBasisHash: revised.basisHash, idempotencyKey: randomUUID() });
       const backup = projectBackupSchema.parse({ format: "stitches-project-backup", version: 2,
         title: revised.title, brief: revised.brief, source: revised.source, plan: revised.plan,
+        knowledgeFingerprint: revised.knowledgeFingerprint,
         notes: [early, current].map(({ kind, stage, text, basisSequence, basisHash, createdAt }) => ({ kind, stage, text, basisSequence, basisHash, createdAt })) });
       if (backup.version !== 2) throw new Error("Expected a v2 backup.");
       const request = { backup, idempotencyKey: randomUUID() };
@@ -139,6 +140,7 @@ describe("private guest projects", () => {
       expect(store.importBackup(owner, request)).toEqual(imported);
       expect(imported.id).not.toBe(original.id);
       expect(imported.sequence).toBe(1);
+      expect(imported.knowledgeFingerprint).toBe(revised.knowledgeFingerprint);
       const notes = store.listNotes(owner, imported.id);
       expect(notes.map((note) => note.importedFromSequence)).toEqual([1, 2]);
       expect(notes[0].basisHash).not.toBe(imported.basisHash);
@@ -175,6 +177,36 @@ describe("private guest projects", () => {
         .toThrowError(/changed/);
       expect(() => store.recordNote(owner, project.id, { ...request, text: " ", idempotencyKey: randomUUID(),
         expectedProjectSequence: changed.sequence, expectedBasisHash: changed.basisHash })).toThrow();
+    } finally { store.close(); }
+  });
+
+  it("pins source knowledge, rebases only with the saved basis, and leaves old observations stale", () => {
+    const store = new GuestStore(":memory:");
+    try {
+      const owner = resolveGuestIdentity().ownerId;
+      const other = resolveGuestIdentity().ownerId;
+      const firstFingerprint = "a".repeat(64);
+      const nextFingerprint = "b".repeat(64);
+      const createInput = { ...create(), source: { kind: "candidate" as const, designId: "sandy" as const } };
+      const first = store.createProject(owner, createInput, firstFingerprint);
+      expect(store.createProject(owner, createInput, "c".repeat(64))).toEqual(first);
+      expect(first.knowledgeFingerprint).toBe(firstFingerprint);
+      const note = store.recordNote(owner, first.id, { kind: "question", stage: "plan", text: "Which version is this?",
+        expectedProjectSequence: 1, expectedBasisHash: first.basisHash, idempotencyKey: randomUUID() });
+      const request = { expectedSequence: first.sequence, expectedBasisHash: first.basisHash, idempotencyKey: randomUUID() };
+      const second = store.rebaseKnowledge(owner, first.id, request, nextFingerprint);
+      expect(second.sequence).toBe(2);
+      expect(second.knowledgeFingerprint).toBe(nextFingerprint);
+      expect(second.basisHash).not.toBe(first.basisHash);
+      expect(store.listNotes(owner, first.id)[0]).toEqual(note);
+      expect(note.basisHash).not.toBe(second.basisHash);
+      expect(store.rebaseKnowledge(owner, first.id, request, nextFingerprint)).toEqual(second);
+      expect(store.rebaseKnowledge(owner, first.id, request, "c".repeat(64))).toEqual(second);
+      expect(() => store.rebaseKnowledge(owner, first.id, { ...request, idempotencyKey: randomUUID() }, firstFingerprint))
+        .toThrowError(/changed/);
+      expect(() => store.rebaseKnowledge(other, first.id, { ...request, idempotencyKey: randomUUID() }, nextFingerprint))
+        .toThrowError(/not found/);
+      expect(store.listRevisions(owner, first.id)).toHaveLength(2);
     } finally { store.close(); }
   });
 });

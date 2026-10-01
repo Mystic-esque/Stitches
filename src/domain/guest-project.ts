@@ -46,7 +46,8 @@ const backupNoteSchema = z.object({
 }).strict();
 export const projectBackupSchema = z.discriminatedUnion("version", [
   projectBackupBaseSchema.extend({ version: z.literal(1) }).strict(),
-  projectBackupBaseSchema.extend({ version: z.literal(2), notes: z.array(backupNoteSchema).max(2000) }).strict(),
+  projectBackupBaseSchema.extend({ version: z.literal(2), notes: z.array(backupNoteSchema).max(2000),
+    knowledgeFingerprint: z.string().regex(/^[a-f0-9]{64}$/).nullable().optional() }).strict(),
 ]);
 export const importGuestProjectSchema = z.object({
   backup: projectBackupSchema,
@@ -58,6 +59,12 @@ export const recordProjectNoteSchema = z.object({
   stage: z.enum(["plan", "prepare", "make", "check"]),
   text: z.string().trim().min(1).max(1000),
   expectedProjectSequence: z.number().int().min(1),
+  expectedBasisHash: z.string().regex(/^[a-f0-9]{64}$/),
+  idempotencyKey: z.string().uuid(),
+}).strict();
+
+export const rebaseGuestKnowledgeSchema = z.object({
+  expectedSequence: z.number().int().min(1),
   expectedBasisHash: z.string().regex(/^[a-f0-9]{64}$/),
   idempotencyKey: z.string().uuid(),
 }).strict();
@@ -78,6 +85,7 @@ export type CreateGuestProjectInput = z.infer<typeof createGuestProjectSchema>;
 export type UpdateGuestProjectInput = z.infer<typeof updateGuestProjectSchema>;
 export type RecordProjectNoteInput = z.infer<typeof recordProjectNoteSchema>;
 export type ImportGuestProjectInput = z.infer<typeof importGuestProjectSchema>;
+export type RebaseGuestKnowledgeInput = z.infer<typeof rebaseGuestKnowledgeSchema>;
 
 export interface ProjectNote {
   id: string;
@@ -100,7 +108,7 @@ export interface GuestProject {
   capability: "plan_only";
   sequence: number;
   basisHash: string;
-  knowledgeFingerprint: null;
+  knowledgeFingerprint: string | null;
   createdAt: string;
   updatedAt: string;
 }

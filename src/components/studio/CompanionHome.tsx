@@ -122,6 +122,7 @@ export function CompanionHome() {
   function downloadBackup() {
     if (!active) return;
     const backup = projectBackupSchema.parse({ format: "stitches-project-backup", version: 2, title: active.title, brief: active.brief, source: active.source, plan: active.plan,
+      knowledgeFingerprint: active.knowledgeFingerprint,
       notes: notes.map(({ kind, stage, text, basisSequence, basisHash, createdAt, importedFromSequence }) => ({
         kind, stage, text, basisSequence: importedFromSequence ?? basisSequence, basisHash, createdAt,
       })) });
@@ -160,15 +161,34 @@ export function CompanionHome() {
     finally { setBusy(false); }
   }
 
+  async function refreshSource() {
+    if (!active || active.source.kind !== "candidate" || !draft || busy || JSON.stringify(draft) !== JSON.stringify(draftFor(active))) return;
+    setBusy(true); setError(""); setNotice("");
+    try {
+      const data = await json(await fetch(`/api/projects/${active.id}/knowledge`, {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ expectedSequence: active.sequence, expectedBasisHash: active.basisHash, idempotencyKey: crypto.randomUUID() }),
+      }));
+      setActive(data.project); setDraft(draftFor(data.project));
+      if (data.project.sequence !== active.sequence) setRevisions((current) => [...current, data.project]);
+      setProjects((current) => current.map((item) => item.id === data.project.id ? data.project : item));
+      setNotice(`Source binding saved in revision ${data.project.sequence}. Earlier notes remain tied to their original basis.`);
+    } catch (cause) { setError(cause instanceof Error ? cause.message : "Could not refresh source."); }
+    finally { setBusy(false); }
+  }
+
   const unsavedChanges = !!(active && draft && JSON.stringify(draft) !== JSON.stringify(draftFor(active)));
   const sourceDesignId = active?.source.kind === "candidate" ? active.source.designId : null;
   const sourceCard = sourceDesignId ? catalog.find((item) => item.designKey === sourceDesignId) : undefined;
+  const sourceBinding = !sourceDesignId ? null : !sourceCard ? "unavailable" : !active?.knowledgeFingerprint ? "unbound" :
+    active.knowledgeFingerprint === sourceCard.fingerprint ? "current" : "stale";
   return <div className="companion-app">
     <header className="companion-nav"><a href="/" className="companion-logo" aria-label="Stitches home">stitches<span>.</span></a><nav aria-label="Main navigation"><a href="/#how-it-works">How it works</a><a href="/#collection">Explore starts</a><a href="/demo">Pattern study ↗</a></nav><button type="button" onClick={() => active ? back() : document.getElementById("collection")?.scrollIntoView({ behavior: "smooth" })} className="nav-action">{active ? "All projects" : "Start making"} ↗</button></header>
     {active && draft ? <main className="companion-project">
       <div className="project-topline"><button type="button" onClick={back}>← All projects</button><span>Private guest project · revision {active.sequence}</span><button type="button" onClick={downloadBackup}>Download latest-state backup ↓</button></div>
       <div className="project-head"><div><p className="companion-kicker">YOUR MAKING COMPANION / 01</p><h1>{active.title}</h1><p>Carry your idea, materials and decisions in one place. Every save becomes a reviewable revision.</p></div><span className="capability-chip">Planning only · no cutting yet</span></div>
-      {active.source.kind === "candidate" && <section className="project-source-strip" aria-label="Current source research">{sourceCard ? <><p className="companion-kicker">LIVE SANITY CONTENT LAKE · PLANNING SOURCE</p><strong>{sourceCard.title}</strong><p>{sourceCard.cuttingCaveat}</p><span>{sourceCard.materialStructure} · {sourceCard.requiredMeasurements.length} source-listed measurements · {sourceCard.reviewStatus} review · plan only</span><a href={sourceCard.sourceUrl} target="_blank" rel="noreferrer">Read {sourceCard.sourceTitle} ↗</a></> : <p role="status">{catalogState === "loading" ? "Checking the current Sanity source record…" : "Current Sanity source details are unavailable. Your private plan is still saved, but do not use this card to cut."}</p>}</section>}
+      {active.source.kind === "candidate" && <section className="project-source-strip" aria-label="Current source research">{sourceCard ? <><p className="companion-kicker">LIVE SANITY CONTENT LAKE · PLANNING SOURCE</p><strong>{sourceCard.title}</strong><p>{sourceBinding === "stale" ? "This source record changed after your saved project basis. Review and refresh it before using the new planning facts." : sourceCard.cuttingCaveat}</p><span>{sourceCard.materialStructure} · {sourceCard.requiredMeasurements.length} source-listed measurements · {sourceCard.reviewStatus} review · plan only</span><a href={sourceCard.sourceUrl} target="_blank" rel="noreferrer">Read {sourceCard.sourceTitle} ↗</a></> : <p role="status">{catalogState === "loading" ? "Checking the current Sanity source record…" : "Current Sanity source details are unavailable. Your private plan is still saved, but do not use this card to cut."}</p>}</section>}
+      {sourceBinding && <div className={`source-binding ${sourceBinding}`} role="status"><span>{sourceBinding === "current" ? "This plan is bound to the current Sanity source revision. It is still planning-only." : sourceBinding === "stale" ? "Source changed since this project revision. Source-dependent advice is stale; earlier maker notes are preserved." : sourceBinding === "unbound" ? "This project has no saved Sanity source binding yet. Review the current source before attaching it." : "Sanity source check is unavailable. Source-dependent guidance is paused."}</span>{(sourceBinding === "stale" || sourceBinding === "unbound") && <button type="button" disabled={busy || unsavedChanges} onClick={refreshSource}>Review & bind current source ↗</button>}{unsavedChanges && sourceBinding !== "current" && <small>Save plan edits first.</small>}</div>}
       <div className="project-workspace"><aside className="project-rail" aria-label="Project stages"><p className="rail-caption">THE JOURNEY</p><ol><li className="current"><b>01</b><span>Plan your idea<small>Available now</small></span></li><li><b>02</b><span>Understand the pattern<small>Qualification in progress</small></span></li><li><b>03</b><span>Cut with confidence<small>Not yet verified</small></span></li><li><b>04</b><span>Make & troubleshoot<small>Not yet verified</small></span></li></ol><a href="/demo">Explore the pattern study ↗</a></aside>
         <form className="project-form" onSubmit={save}><div className="form-intro"><p className="companion-kicker">THE WORKING BRIEF</p><h2>Make it yours, one decision at a time.</h2><p>Describe what you want to make. Stitches keeps constraints together while drafting and making tools are verified.</p></div>
           <div className="field-row"><label>Project name<input value={draft.title} maxLength={100} required onChange={(event) => update("title", event.target.value)} /></label><label>Fabric structure<select value={draft.structure} onChange={(event) => update("structure", event.target.value)}><option value="unknown">Not sure yet</option><option value="woven">Woven</option><option value="knit">Knit / stretch</option></select></label></div>
