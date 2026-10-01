@@ -1,6 +1,6 @@
 {
   "kind": "production-nextjs-ui",
-  "checkedAt": "2026-10-01T04:43:56.443Z",
+  "checkedAt": "2026-10-01T05:40:52.742Z",
   "base": "http://127.0.0.1:3100",
   "observations": [
     {
@@ -32,7 +32,10 @@
   "projectJourney": {
     "created": true,
     "saved": true,
+    "noted": true,
     "resumed": true,
+    "backupVersion": 2,
+    "imported": true,
     "mobileNoOverflow": true
   },
   "runtimeErrors": [],
@@ -40,6 +43,7 @@
     "home-1440.png",
     "home-390.png",
     "project-1440.png",
+    "project-journal-1440.png",
     "project-390.png"
   ],
   "notVerified": [

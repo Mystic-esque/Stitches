@@ -29,13 +29,37 @@ export const createGuestProjectSchema = z.object({
   idempotencyKey: z.string().uuid(),
 }).strict();
 
-export const projectBackupSchema = z.object({
+const projectBackupBaseSchema = z.object({
   format: z.literal("stitches-project-backup"),
-  version: z.literal(1),
   title: label(100),
   brief: z.string().trim().max(1500),
   source: projectSourceSchema,
   plan: projectPlanSchema,
+});
+const backupNoteSchema = z.object({
+  kind: z.enum(["journal", "question"]),
+  stage: z.enum(["plan", "prepare", "make", "check"]),
+  text: z.string().trim().min(1).max(1000),
+  basisSequence: z.number().int().min(1),
+  basisHash: z.string().regex(/^[a-f0-9]{64}$/),
+  createdAt: z.iso.datetime(),
+}).strict();
+export const projectBackupSchema = z.discriminatedUnion("version", [
+  projectBackupBaseSchema.extend({ version: z.literal(1) }).strict(),
+  projectBackupBaseSchema.extend({ version: z.literal(2), notes: z.array(backupNoteSchema).max(2000) }).strict(),
+]);
+export const importGuestProjectSchema = z.object({
+  backup: projectBackupSchema,
+  idempotencyKey: z.string().uuid(),
+}).strict();
+
+export const recordProjectNoteSchema = z.object({
+  kind: z.enum(["journal", "question"]),
+  stage: z.enum(["plan", "prepare", "make", "check"]),
+  text: z.string().trim().min(1).max(1000),
+  expectedProjectSequence: z.number().int().min(1),
+  expectedBasisHash: z.string().regex(/^[a-f0-9]{64}$/),
+  idempotencyKey: z.string().uuid(),
 }).strict();
 
 export const updateGuestProjectSchema = z.object({
@@ -52,6 +76,20 @@ export type ProjectSource = z.infer<typeof projectSourceSchema>;
 export type ProjectPlan = z.infer<typeof projectPlanSchema>;
 export type CreateGuestProjectInput = z.infer<typeof createGuestProjectSchema>;
 export type UpdateGuestProjectInput = z.infer<typeof updateGuestProjectSchema>;
+export type RecordProjectNoteInput = z.infer<typeof recordProjectNoteSchema>;
+export type ImportGuestProjectInput = z.infer<typeof importGuestProjectSchema>;
+
+export interface ProjectNote {
+  id: string;
+  projectId: string;
+  kind: "journal" | "question";
+  stage: "plan" | "prepare" | "make" | "check";
+  text: string;
+  basisSequence: number;
+  basisHash: string;
+  createdAt: string;
+  importedFromSequence?: number;
+}
 
 export interface GuestProject {
   id: string;

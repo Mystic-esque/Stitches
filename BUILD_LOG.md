@@ -1,5 +1,11 @@
 # Build log
 
+## October 1, 2026 — W02 private journal and backup/import slice
+
+- Scope: add user-authored observation/question records bound to an immutable saved project basis; make their data portable without claiming sewing diagnosis. Files: domain schemas, guest SQLite store, `/api/projects/[id]/notes`, `/api/projects/import`, project workspace, API/browser checks. Rollback: revert this coherent slice; the prior committed project-first baseline is `93fe96c`.
+- Focused `vitest` passed 7/7; full `vitest run --testTimeout 15000 --maxWorkers 1` passed 54/54, one opt-in live test skipped. `tsc --noEmit` exited 0 after an intermediate union-narrowing error in a new test was corrected. The initial journal-only production build passed, and its local API rehearsal proved 201 note create/replay, 404 cross-guest read, 409 stale note. Isolated Chrome saved/reloaded a note and passed 1440/1024/768/390/320px with no overflow, broken image or runtime exception; the actual desktop and phone journal screenshots were inspected. These checks preceded the v2 backup extension.
+- V2 backup includes latest plan and journal; legacy v1 remains accepted. Import is atomic, idempotent and creates new owner-scoped records with original source-revision labels; old revision snapshots are **not** restored. Final `next build --webpack` exited 0 (compile, TypeScript, static pages, traces). Built API rehearsal passed 201 create/journal/import, 200 owner/replay, 404 cross-guest, 409 stale; report `evidence/guest-api-verification.json`. Isolated Chrome passed five widths and actual create → save → journal → reload → backup → import journey, no overflow/broken images/runtime errors; five captures and `evidence/companion-runtime-verification.json`. Refreshed desktop journal and imported phone captures were visually inspected. No external write, Gemini call, Sanity write, deployment or submission.
+
 ## October 1, 2026 — W01 investigation and W02/W04 implementation in progress
 
 - Read the current Stitches handoff, product/architecture/design, Devpost checklist and applicable skill. The official Devpost build-project stepper's required state and `docs/hackathon-build/` directory were absent; no state or approval was fabricated. Executed the approved Stitches checklist directly, as the owner explicitly allowed.

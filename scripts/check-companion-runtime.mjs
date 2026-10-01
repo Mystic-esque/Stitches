@@ -106,21 +106,56 @@ try {
     await pause(250);
   }
   if (!saved) throw new Error('Project revision save did not complete');
+  await evaluate("(()=>{const field=document.querySelector('.maker-journal textarea');const setter=Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype,'value').set;setter.call(field,'I tested a sample seam and need to check the edge finish.');field.dispatchEvent(new Event('input',{bubbles:true}));return true})()");
+  let noteReady = false;
+  for (let i = 0; i < 80; i++) {
+    noteReady = await evaluate("!!document.querySelector('.journal-add:not(:disabled)')");
+    if (noteReady) break;
+    await pause(250);
+  }
+  if (!noteReady) throw new Error('Journal entry did not become ready');
+  await evaluate("document.querySelector('.journal-add').click()");
+  let noted = false;
+  for (let i = 0; i < 240; i++) {
+    noted = await evaluate("document.querySelector('.journal-list')?.textContent.includes('I tested a sample seam')");
+    if (noted) break;
+    await pause(250);
+  }
+  if (!noted) throw new Error('Journal note was not saved');
   await call('Page.reload');
   let resumed = false;
   for (let i = 0; i < 240; i++) {
-    resumed = await evaluate("document.querySelector('.project-topline')?.textContent.includes('revision 2')");
+    resumed = await evaluate("document.querySelector('.project-topline')?.textContent.includes('revision 2') && document.querySelector('.journal-list')?.textContent.includes('I tested a sample seam')");
     if (resumed) break;
     await pause(250);
   }
-  if (!resumed) throw new Error('Saved project did not resume after reload');
+  if (!resumed) throw new Error('Saved project and note did not resume after reload');
+  const journalShot = await call('Page.captureScreenshot', { format: 'png', captureBeyondViewport: true, fromSurface: true });
+  await writeFile(join(output, 'project-journal-1440.png'), Buffer.from(journalShot.data, 'base64'));
+  await evaluate("(()=>{const previous=URL.createObjectURL;URL.createObjectURL=function(blob){window.__stitchesBackupBlob=blob;return previous.call(URL,blob)};document.querySelector('.project-topline button:last-child').click();return true})()");
+  const backup = await evaluate("(async()=>JSON.parse(await window.__stitchesBackupBlob.text()))()");
+  if (backup.version !== 2 || backup.notes?.length !== 1) throw new Error('Downloaded backup omitted the journal');
+  await evaluate("document.querySelector('.project-topline button:first-child').click()");
+  for (let i = 0; i < 80; i++) {
+    if (await evaluate("!!document.querySelector('.import-backup input')")) break;
+    await pause(250);
+  }
+  const backupLiteral = JSON.stringify(JSON.stringify(backup));
+  await evaluate(`(()=>{const input=document.querySelector('.import-backup input');const transfer=new DataTransfer();transfer.items.add(new File([${backupLiteral}],'stitches-backup.json',{type:'application/json'}));input.files=transfer.files;input.dispatchEvent(new Event('change',{bubbles:true}));return true})()`);
+  let imported = false;
+  for (let i = 0; i < 240; i++) {
+    imported = await evaluate("document.querySelector('.project-notice')?.textContent.includes('including its journal') && document.querySelector('.journal-list')?.textContent.includes('Imported source revision')");
+    if (imported) break;
+    await pause(250);
+  }
+  if (!imported) throw new Error('Backup import did not restore the journal and provenance');
   await call('Emulation.setDeviceMetricsOverride', { width: 390, height: 900, deviceScaleFactor: 1, mobile: true });
   const mobileProject = await evaluate("({width:innerWidth,scrollWidth:document.documentElement.scrollWidth,overflow:[...document.querySelectorAll('*')].filter(el=>el.getBoundingClientRect().right>document.documentElement.clientWidth+1).slice(0,12).map(el=>({tag:el.tagName,className:typeof el.className==='string'?el.className:'',right:Math.round(el.getBoundingClientRect().right)}))})");
   if (mobileProject.scrollWidth > 390) throw new Error(`Project mobile overflow: ${JSON.stringify(mobileProject)}`);
   const mobileShot = await call('Page.captureScreenshot', { format: 'png', captureBeyondViewport: true, fromSurface: true });
   await writeFile(join(output, 'project-390.png'), Buffer.from(mobileShot.data, 'base64'));
   if (errors.length) throw new Error(`Browser runtime errors: ${JSON.stringify(errors)}`);
-  const report = { kind: 'production-nextjs-ui', checkedAt: new Date().toISOString(), base, observations, projectJourney: { created, saved, resumed, mobileNoOverflow: true }, runtimeErrors: errors, screenshots: ['home-1440.png', 'home-390.png', 'project-1440.png', 'project-390.png'], notVerified: ['cut-ready geometry', 'maker review', 'agent', 'Sanity revalidation', 'keyboard and screen-reader audit'] };
+  const report = { kind: 'production-nextjs-ui', checkedAt: new Date().toISOString(), base, observations, projectJourney: { created, saved, noted, resumed, backupVersion: 2, imported, mobileNoOverflow: true }, runtimeErrors: errors, screenshots: ['home-1440.png', 'home-390.png', 'project-1440.png', 'project-journal-1440.png', 'project-390.png'], notVerified: ['cut-ready geometry', 'maker review', 'agent', 'Sanity revalidation', 'keyboard and screen-reader audit'] };
   await writeFile(join(root, 'evidence', 'companion-runtime-verification.json'), JSON.stringify(report, null, 2) + '\n');
   console.log(JSON.stringify(report, null, 2));
 } finally { socket?.close(); chrome.kill(); }

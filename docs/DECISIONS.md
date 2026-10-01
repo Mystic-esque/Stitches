@@ -1,5 +1,11 @@
 # Implementation decisions
 
+## October 1, 2026 — Maker journal and portable guest backup (active)
+
+- A private note is a maker-authored observation or question, not generated advice. It records the saved project sequence and basis hash; unsaved plan edits must be kept before a note can be added. Earlier-basis notes remain visible but cannot silently become current evidence.
+- Backup v2 contains the latest project state and journal only. The v1 latest-state format still imports. Import is a new transactional project, never an overwrite. Imported notes expose original source-revision provenance; a matching content hash may be associated with the new current revision, but the old revision history is not invented. No private note is written to Sanity.
+- The local single-server SQLite store remains a rehearsal adapter. Before deployment, replace it or provide verified durable placement, operational backup/restore and guest-recovery/cleanup behavior.
+
 ## October 1, 2026 — Local guest-project implementation (active)
 
 - The first private project adapter uses Node 22's experimental `node:sqlite` under ignored `.data/` for local, single-server development only. Transactions, owner isolation, immutable revisions, idempotency receipts and optimistic basis checks are enforced server-side. A deployment target needs a portable durable database and backup/restore runbook before production claims.

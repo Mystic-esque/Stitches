@@ -5,10 +5,15 @@ import { DatabaseSync } from "node:sqlite";
 import {
   createGuestProjectSchema,
   emptyProjectPlan,
+  importGuestProjectSchema,
   projectPlanSchema,
+  recordProjectNoteSchema,
   updateGuestProjectSchema,
   type CreateGuestProjectInput,
   type GuestProject,
+  type ImportGuestProjectInput,
+  type ProjectNote,
+  type RecordProjectNoteInput,
   type UpdateGuestProjectInput,
 } from "../../domain/guest-project";
 
@@ -44,6 +49,7 @@ export function projectBasisHash(project: Pick<GuestProject, "title" | "brief" |
 
 interface StoredRow { data_json: string }
 interface ReceiptRow { operation: string; target_id: string; request_hash: string; result_json: string }
+interface NoteRow { data_json: string; request_hash: string; project_id: string }
 
 export class GuestStore {
   private readonly db: DatabaseSync;
@@ -78,6 +84,18 @@ export class GuestStore {
         request_hash TEXT NOT NULL,
         result_json TEXT NOT NULL,
         PRIMARY KEY (owner_id, idempotency_key)
+      ) STRICT;
+      CREATE TABLE IF NOT EXISTS project_notes (
+        owner_id TEXT NOT NULL,
+        project_id TEXT NOT NULL,
+        id TEXT NOT NULL,
+        idempotency_key TEXT NOT NULL,
+        request_hash TEXT NOT NULL,
+        data_json TEXT NOT NULL,
+        created_at TEXT NOT NULL,
+        PRIMARY KEY (owner_id, id),
+        UNIQUE (owner_id, idempotency_key),
+        FOREIGN KEY (owner_id, project_id) REFERENCES projects(owner_id, id) ON DELETE CASCADE
       ) STRICT;
     `);
   }
@@ -125,6 +143,40 @@ export class GuestStore {
     return rows.map((row) => JSON.parse(row.data_json) as GuestProject);
   }
 
+  listNotes(ownerId: string, projectId: string): ProjectNote[] {
+    if (!this.getProject(ownerId, projectId)) throw new GuestStoreError("not_found", "Project not found.");
+    const rows = this.db.prepare("SELECT data_json FROM project_notes WHERE owner_id = ? AND project_id = ? ORDER BY created_at ASC, id ASC")
+      .all(ownerId, projectId) as unknown as StoredRow[];
+    return rows.map((row) => JSON.parse(row.data_json) as ProjectNote);
+  }
+
+  recordNote(ownerId: string, projectId: string, rawInput: RecordProjectNoteInput): ProjectNote {
+    const input = recordProjectNoteSchema.parse(rawInput);
+    const requestHash = hash({ projectId, input });
+    return this.transaction(() => {
+      const prior = this.db.prepare("SELECT data_json, request_hash, project_id FROM project_notes WHERE owner_id = ? AND idempotency_key = ?")
+        .get(ownerId, input.idempotencyKey) as NoteRow | undefined;
+      if (prior) {
+        if (prior.project_id !== projectId || prior.request_hash !== requestHash) {
+          throw new GuestStoreError("idempotency_conflict", "This request key was already used for a different note.");
+        }
+        return JSON.parse(prior.data_json) as ProjectNote;
+      }
+      const project = this.getProject(ownerId, projectId);
+      if (!project) throw new GuestStoreError("not_found", "Project not found.");
+      if (project.sequence !== input.expectedProjectSequence || project.basisHash !== input.expectedBasisHash) {
+        throw new GuestStoreError("stale", "The project changed. Reload and review before recording this note.");
+      }
+      const note: ProjectNote = {
+        id: randomUUID(), projectId, kind: input.kind, stage: input.stage, text: input.text,
+        basisSequence: project.sequence, basisHash: project.basisHash, createdAt: new Date().toISOString(),
+      };
+      this.db.prepare("INSERT INTO project_notes (owner_id, project_id, id, idempotency_key, request_hash, data_json, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)")
+        .run(ownerId, projectId, note.id, input.idempotencyKey, requestHash, JSON.stringify(note), note.createdAt);
+      return note;
+    });
+  }
+
   createProject(ownerId: string, rawInput: CreateGuestProjectInput): GuestProject {
     const input = createGuestProjectSchema.parse(rawInput);
     const requestHash = hash(input);
@@ -145,6 +197,42 @@ export class GuestStore {
         .run(ownerId, project.id, project.sequence, project.basisHash, json);
       this.db.prepare("INSERT INTO mutation_receipts (owner_id, idempotency_key, operation, target_id, request_hash, result_json) VALUES (?, ?, ?, ?, ?, ?)")
         .run(ownerId, input.idempotencyKey, "create", project.id, requestHash, json);
+      return project;
+    });
+  }
+
+  importBackup(ownerId: string, rawInput: ImportGuestProjectInput): GuestProject {
+    const input = importGuestProjectSchema.parse(rawInput);
+    const requestHash = hash(input);
+    return this.transaction(() => {
+      const duplicate = this.receipt(ownerId, input.idempotencyKey, "import", requestHash);
+      if (duplicate) return duplicate;
+      const now = new Date().toISOString();
+      const base = {
+        id: randomUUID(), title: input.backup.title, brief: input.backup.brief, source: input.backup.source,
+        plan: input.backup.plan, capability: "plan_only" as const, sequence: 1,
+        knowledgeFingerprint: null, createdAt: now, updatedAt: now,
+      };
+      const project: GuestProject = { ...base, basisHash: projectBasisHash(base) };
+      const json = JSON.stringify(project);
+      this.db.prepare("INSERT INTO projects (owner_id, id, sequence, data_json, updated_at) VALUES (?, ?, ?, ?, ?)")
+        .run(ownerId, project.id, project.sequence, json, now);
+      this.db.prepare("INSERT INTO project_revisions (owner_id, project_id, sequence, basis_hash, snapshot_json) VALUES (?, ?, ?, ?, ?)")
+        .run(ownerId, project.id, project.sequence, project.basisHash, json);
+      if (input.backup.version === 2) {
+        for (const original of input.backup.notes) {
+          const note: ProjectNote = {
+            id: randomUUID(), projectId: project.id, kind: original.kind, stage: original.stage,
+            text: original.text, basisSequence: original.basisHash === project.basisHash ? 1 : original.basisSequence,
+            basisHash: original.basisHash, createdAt: original.createdAt, importedFromSequence: original.basisSequence,
+          };
+          const key = randomUUID();
+          this.db.prepare("INSERT INTO project_notes (owner_id, project_id, id, idempotency_key, request_hash, data_json, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)")
+            .run(ownerId, project.id, note.id, key, hash({ importKey: input.idempotencyKey, noteId: note.id }), JSON.stringify(note), note.createdAt);
+        }
+      }
+      this.db.prepare("INSERT INTO mutation_receipts (owner_id, idempotency_key, operation, target_id, request_hash, result_json) VALUES (?, ?, ?, ?, ?, ?)")
+        .run(ownerId, input.idempotencyKey, "import", project.id, requestHash, json);
       return project;
     });
   }

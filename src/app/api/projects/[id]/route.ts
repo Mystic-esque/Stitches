@@ -13,7 +13,11 @@ export async function GET(request: NextRequest, context: RouteContext) {
     const { id } = await context.params;
     const project = getLocalGuestStore().getProject(identity.ownerId, id);
     if (!project) throw new GuestHttpError(404, "not_found", "Project not found.");
-    return guestResponse(request, identity, { project, revisions: getLocalGuestStore().listRevisions(identity.ownerId, id) });
+    return guestResponse(request, identity, {
+      project,
+      revisions: getLocalGuestStore().listRevisions(identity.ownerId, id),
+      notes: getLocalGuestStore().listNotes(identity.ownerId, id),
+    });
   } catch (error) {
     return guestErrorResponse(error);
   }

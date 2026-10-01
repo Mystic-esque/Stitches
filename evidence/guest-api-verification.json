@@ -1,15 +1,24 @@
 {
   "kind": "local-production-api",
-  "checkedAt": "2026-10-01T04:44:40.074Z",
+  "checkedAt": "2026-10-01T05:40:00.139Z",
   "results": {
     "directCreate": 201,
     "ownerRead": 200,
     "crossGuestRead": 404,
+    "journalCreate": 201,
+    "journalReplay": 201,
+    "crossGuestNotes": 404,
     "update": 200,
     "duplicateReplay": 200,
     "staleUpdate": 409,
-    "revisionCount": 2
+    "staleNote": 409,
+    "importWithJournal": 201,
+    "importReplay": 201,
+    "crossGuestImportedRead": 404,
+    "revisionCount": 2,
+    "noteCount": 1,
+    "importedNoteCount": 1
   },
-  "storage": "ignored local .data SQLite; disposable synthetic project retained",
+  "storage": "ignored local .data SQLite; disposable synthetic projects retained",
   "noSecretsLogged": true
 }

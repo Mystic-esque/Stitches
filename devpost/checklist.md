@@ -30,6 +30,7 @@ This replaces the September 29 Studio 1.0 W01–W12 target. Existing proof is pr
 Exit: two distinct source-qualified candidates and one fully mapped vertical journey, or explicit blocked cut-ready evidence with independent work continuing.
 
 ## W02 — Private project foundation
+- Local verified partial slice: guest owner isolation, transactional project/revision/journal store, basis-bound notes, stale/idempotent writes, restart restore, and v1/v2 latest-state backup/import. This does not yet satisfy the full W02 exit because profile, step-specific progress, cleanup and deployable durability are open.
 - [ ] Add isolated guest sessions, durable local transactional project/profile/progress store, backup/import and versioned snapshots.
 - [ ] Bind source, measurements, fabric, equipment, operation, step, diagnostic observations and evidence to a semantic basis.
 - [ ] Implement stale-tab, idempotent keep, cross-guest denial, restart restore and safe cleanup.

@@ -2,6 +2,16 @@
 
 Updated: October 1, 2026.
 
+## Active W02 journal and portable backup slice — October 1, 2026
+
+- Added private maker observations/questions with stage labels, immutable saved-revision basis, stale-write rejection, idempotent replay and cross-guest denial. The project UI distinguishes current from earlier notes and requires unsaved plan edits to be saved before a new note can be attached. These are user-authored records, **not** a verified diagnostic assistant or sewing advice.
+- Extended the strict backup format from v1 (latest plan only) to v2 (latest plan plus journal). v1 remains importable. Import creates a fresh guest-owned project and note records in one SQLite transaction, preserves original source-revision labels, and does not fabricate old project revision snapshots. The guest cookie is still the only access key; there is no account recovery or multi-instance database.
+- Focused journal-store tests passed 7/7, the full deterministic suite passed **54/54** with one opt-in live test skipped, and `tsc --noEmit` exited 0. An intermediate TypeScript check caught an un-narrowed v2 test union; it was fixed and rerun successfully. The final Webpack production build exited 0 with both journal and import API routes. The built-app API rehearsal passed create/owner/journal/import/replay and cross-guest/stale outcomes (201/200/404/409), recorded without secrets in `evidence/guest-api-verification.json`.
+- The final isolated Chrome run passed 1440/1024/768/390/320px with no horizontal overflow, broken images or runtime exceptions. It created a project, saved revision 2, journaled, reloaded, downloaded v2 backup, imported it as a new project and verified the note's source-revision label. `evidence/companion-runtime-verification.json` and five real `evidence/screenshots/companion-runtime/` captures record the run; the refreshed desktop journal and imported phone screenshots were visually inspected. These are local production Next.js checks, not maker, model or new Sanity proof.
+- W02 remains partial: no qualified step/diagnostic state, profile, safe cleanup or portable deployment database. W03 exact Sanity graph and agent-backed maker recovery are still not implemented in the new project-first runtime. The historical illustrative `/demo` proof below remains separate.
+
+**Next executable task:** connect the project basis to a sourced Sanity graph and verify exact Content Lake + served Context behavior without promoting plan-only candidates to cut-ready status. W02 profile/progress/cleanup remains open.
+
 ## Active implementation — W02 guest-project slice and W04 shell in progress
 
 - Began implementation from `SOL_HANDOFF.md` and the autonomous W01–W10 checklist. The installed Devpost `build-project` skill expects `.devpost-hackathon-state.json` and `docs/hackathon-build/`, neither of which exists in this established Stitches repository. Its formal stepper/state flow was not fabricated; the existing approved `devpost/` checklist governs execution.
