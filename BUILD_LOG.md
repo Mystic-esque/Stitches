@@ -1,5 +1,10 @@
 # Build log
 
+## October 1, 2026 — Planning instruction also affects material constraints
+
+- Owner reported Sanity's instruction conflict check flagged three entries, including Fabric & Material Constraints. A bounded read-only actual Context MCP request for `fabric_constraints` exited 0 and confirmed mismatched attributions: Sandy's woven declaration cites [2] (the appended list labels Tina), while Tina's knit declaration cites [3] (the list labels Sandy documentation). This is an attribution issue, not a request to change the authored material declarations.
+- Expanded the targeted rewrite guidance from two entries to these three; leave the already verified diagnostic and the rest of the KB unchanged. The owner's three rewrites and actual served-result verification remain pending. No source write, inference, rebuild, deployment or new application test was performed in this check.
+
 ## October 1, 2026 — Actual Context review, failed gate and source-bound recovery
 
 - Read current Stitches instructions/status/handoff and current official Sanity KB maintenance/source/issue/CLI documentation. Browser control timed out on initial inventory, direct KB opening, the owner's new window and a longer connection attempt; native computer-use initialization also timed out. The default local runner was unresponsive; the authorized elevated runner worked. The default patch tool stalled without creating a file, and the Windows batch patch wrapper rejected multiline input; the installed patch executable applied the same patches successfully.
