@@ -1,6 +1,25 @@
 # Implementation decisions
 
-## September 29, 2026 — Studio 1.0 product-lead upgrade (current)
+## October 1, 2026 — Parametric pattern authority clarification (current)
+
+- Accepted the owner's attached core architecture: versioned semantic pattern definition + confirmed private inputs + bounded registered operation → deterministic draft artifact → independent validation → SVG/React technical view. SVG remains valuable for selection, teaching and print but is not editable pattern authority. See `PATTERN-ENGINE-DECISION.md`.
+- FreeSewing is the first isolated engine spike, subject to exact design/version/license/output rights, two-input drafting, semantic piece/edge/notch binding and deterministic checks. It is not yet adopted or integrated. A failed spike must be reported; it does not authorize static-SVG substitution.
+- Agent operations are sewing-semantic and bounded. The attachment's sample `adjustPoint(-10mm)` is too low-level as a public agent capability unless a separately reviewed CAD operation preserves every coupled seam/marking invariant. No model-generated SVG/path/coordinate edits.
+- SeamScape's documented preview/apply/save MCP flow informs our command boundary, but its full API access is advertised under Enterprise; the owner's $0 paid-provider budget rules out using it as the Stitches runtime dependency without later authorization. Seamly2D/PatternSoft remain research references.
+- This is a contract/design decision only; no draft engine, new Sanity content, production UI or cut-ready pattern has been produced by this follow-up.
+
+## October 1, 2026 — Companion 2.0 direction (current)
+
+- Adopt the research's project-aware sewing companion as the primary product object and `Inspire → Plan → Prepare → Make → Check → Resolve → Continue` as its loop. Preserve the earlier pattern workbench's technical teaching requirements, but do not require its exact three-column layout.
+- Reject the September 29 six-card/colorway collection and simple part-highlighting as release proof. Require two genuinely different source-qualified project examples plus a useful planning-only personal-idea path. Variants belong within an example.
+- Make source-qualified flat technical pattern information prominent: cut count, fold, grain, markings, stitch/cut/allowance, mating edges and actual before/after geometry. The new sample diagrams are not qualified patterns.
+- Make “I'm stuck” a step-aware, source-backed diagnostic workflow with maker-observable tests, uncertainty and recorded unsuccessful fixes. Optional photo supplies confirmed observations, not an automatic diagnosis. Fitting remains structured self-check/hypothesis until physical evidence supports stronger claims.
+- Extend shared Sanity exact graph with components, techniques, fabric/equipment classes, procedures, issue hypotheses, diagnostic tests and remedies. Context KB remains separately verified explanation; personal photos/measurements/history never enter shared Sanity. A correction must affect two distinct projects, not two recolors.
+- Keep capability/provenance states separate: plan_only, guided_making, pattern_mapped, cut_checked, maker_reviewed. No attractive render, model prose or generic image analysis advances a gate.
+- Three.js is optional educational enhancement after correct 2D and Make/recovery; no forced 3D milestone or drape/fit claim. No arbitrary professional CAD in the first release.
+- This is a product/contract and schema-source change. No development dataset migration, model call, production app upgrade, external deployment or submission is implied. The September 29 decision block below is historical where it conflicts.
+
+## September 29, 2026 — Studio 1.0 product-lead upgrade (superseded where conflicting)
 
 - The owner requested Astra's complete product/design/technical handoff for Sol, not full production implementation in this pass. The design reference is an inspectable static artifact; it is not application proof.
 - Preserve the garment-first ambition and broaden the release to six meaningful presets across two qualified families. Earlier one-blouse-only scope below describes the proof phase and is superseded for the final release, not permission to show unsupported gallery cards.

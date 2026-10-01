@@ -1,0 +1,128 @@
+{
+  "kind": "design-reference-only",
+  "checkedAt": "2026-10-01T01:45:30.518Z",
+  "states": [
+    {
+      "screen": "home",
+      "width": 1440,
+      "noOverflow": true
+    },
+    {
+      "screen": "project",
+      "width": 1440,
+      "noOverflow": true
+    },
+    {
+      "screen": "pattern",
+      "width": 1440,
+      "noOverflow": true
+    },
+    {
+      "screen": "make",
+      "width": 1440,
+      "noOverflow": true
+    },
+    {
+      "screen": "home",
+      "width": 1024,
+      "noOverflow": true
+    },
+    {
+      "screen": "project",
+      "width": 1024,
+      "noOverflow": true
+    },
+    {
+      "screen": "pattern",
+      "width": 1024,
+      "noOverflow": true
+    },
+    {
+      "screen": "make",
+      "width": 1024,
+      "noOverflow": true
+    },
+    {
+      "screen": "home",
+      "width": 768,
+      "noOverflow": true
+    },
+    {
+      "screen": "project",
+      "width": 768,
+      "noOverflow": true
+    },
+    {
+      "screen": "pattern",
+      "width": 768,
+      "noOverflow": true
+    },
+    {
+      "screen": "make",
+      "width": 768,
+      "noOverflow": true
+    },
+    {
+      "screen": "home",
+      "width": 390,
+      "noOverflow": true
+    },
+    {
+      "screen": "project",
+      "width": 390,
+      "noOverflow": true
+    },
+    {
+      "screen": "pattern",
+      "width": 390,
+      "noOverflow": true
+    },
+    {
+      "screen": "make",
+      "width": 390,
+      "noOverflow": true
+    },
+    {
+      "screen": "home",
+      "width": 320,
+      "noOverflow": true
+    },
+    {
+      "screen": "project",
+      "width": 320,
+      "noOverflow": true
+    },
+    {
+      "screen": "pattern",
+      "width": 320,
+      "noOverflow": true
+    },
+    {
+      "screen": "make",
+      "width": 320,
+      "noOverflow": true
+    }
+  ],
+  "interactions": {
+    "selection": {
+      "selected": true,
+      "hidden": true,
+      "restored": true
+    },
+    "diagnostic": {
+      "open": true,
+      "answer": true
+    },
+    "reducedMotion": true
+  },
+  "runtimeErrors": [],
+  "externalRequests": [],
+  "screenshots": "8 actual isolated Chrome captures",
+  "notVerified": [
+    "production Next.js UI",
+    "qualified garment geometry",
+    "real agent/Sanity call",
+    "physical sewing",
+    "full keyboard/screen-reader audit"
+  ]
+}

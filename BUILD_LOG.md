@@ -1,5 +1,20 @@
 # Build log
 
+## October 1, 2026 — SVG/parametric-pattern architecture follow-up
+
+- Read the owner's attached proposal as design research, independently checked the FreeSewing Pattern/render/editor documentation, SeamScape MCP/Pattern API/pricing, Seamly wiki and PatternSoft project. Its central distinction is adopted: SVG is a semantic, measured artifact's view, not pattern authority. FreeSewing remains a candidate, not a selected engine or qualified garment. SeamScape's full API is advertised as Enterprise, so no paid dependency was added under the $0 budget.
+- Added `docs/PATTERN-ENGINE-DECISION.md` and updated architecture, content, spec, checklist, product, design, build plan, Sol handoff, instructions, decisions and source ledger. The next executable W01 task now includes an exact-design two-input FreeSewing spike with rights, semantic-ID and determinism checks. No package install, runtime code, provider call, Sanity write, deployment or submission in this follow-up.
+- Verification: `git -c core.autocrlf=false diff --check` exited 0. After the final small mobile pattern zoom edit, `node scripts/check-companion-reference.mjs` exited 0: 20 screen/viewport states, piece/original/change/diagnostic/reduced-motion interactions, zero runtime errors or external requests; eight actual reference screenshots refreshed. `pattern-390.png` was visually inspected. These are static-reference results, not production UI, engine, Sanity or Gemini proof. The earlier 44-test and TypeScript passes were not rerun for this documentation-only clarification.
+
+## October 1, 2026 — Companion 2.0 direction and design-contract revision
+
+- Read owner-supplied project-aware companion research twice and compared it with the September Studio proposal, prior pattern screenshot, existing application evidence and Sanity schema. Recorded decisions in `docs/DIRECTION-REVIEW.md`.
+- Revised `docs/PRODUCT.md`, architecture, content model, design, experience contracts, build plan, handoff, AGENTS/KICKOFF/README and Devpost scope/PRD/spec/checklist. Current checklist is W01–W10; earlier Studio W01–W12 is historical in Git/status.
+- Extended local Sanity schema source with eight proposed shared instructional/diagnostic types and optional step binding. No dataset or Knowledge Base write. Added a labeled static Companion reference and checker; existing September reference is retained for comparison.
+- Generated two original fashion-editorial concept photos after browsing real wrap-skirt/overshirt art direction; saved `design/hero-wrap-skirt.png` and `design/card-utility-overshirt.png`. They are explicitly illustrative, not photographed builds; provenance in `design/ASSETS.md`. No retailer/Pinterest image was copied.
+- Actual verification: `node --check scripts/check-companion-reference.mjs` exited 0. Initial non-escalated `tsc --noEmit` failed TS5033/EPERM on incremental cache (sandbox, not a TypeScript finding); authorized rerun exited 0. `vitest run` passed 44/44, one opt-in test skipped. Isolated Chrome reference check first failed EPERM creating output, then browser startup bound and one overly specific checker assertion; final authorized run passed 20 screen/viewport states, piece/change/diagnostic interactions, reduced motion, zero overflow, zero broken images/runtime errors/external requests. Eight actual design-reference screenshots saved under `design/screenshots/companion/`, desktop/mobile inspected. In-app browser attach timed out separately. This is not production UI validation.
+- Next: Sol executes W01 source/rights/content qualification and a mapped making-problem journey. No Gemini/Sanity calls, external deployment or submission in this direction pass.
+
 All checks below ran against the Stitches folder on the local Windows machine. This log distinguishes illustrative work from live provider or pattern proof.
 
 ## September 29, 2026 — Studio 1.0 product-lead package

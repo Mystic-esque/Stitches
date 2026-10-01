@@ -1,5 +1,18 @@
 # Official sources
 
+## Pattern-engine boundary check — October 1, 2026
+
+The owner's attached SVG/parametric-pattern prose had unresolved `chatgpt-content-reference` markers. These direct sources support the engineering decision in `PATTERN-ENGINE-DECISION.md`; they do **not** establish any Stitches engine integration or garment rights.
+
+- [FreeSewing developer portal](https://freesewing.dev/): JavaScript parametric pattern library and code-based designs.
+- [FreeSewing Pattern API](https://freesewing.dev/reference/api/pattern/) and [render method](https://freesewing.dev/reference/api/pattern/render/): a `Pattern` is the parametric blueprint; after drafting it can render SVG. This does not promise our required IDs/markings for an arbitrary design.
+- [FreeSewing editor rendering](https://freesewing.eu/docs/editor/menus/preferences/renderer/): its own interactive editor uses React by default; SVG is used mainly for export/printing. Stitches may still use semantic interactive SVG, but should not assume FreeSewing's exported markup already provides our UX bindings.
+- [FreeSewing archived monorepo](https://github.com/freesewing/freesewing) and [current core package](https://www.npmjs.com/package/@freesewing/core): historical MIT repository moved to Codeberg; inspect current exact design/package and generated-output terms before adoption.
+- [SeamScape MCP](https://seamscape.com/docs/api/mcp) and [Pattern API](https://seamscape.com/docs/api/v1/pattern): structured inspect/preview/confirmed apply/save and parameterized JSON/DXF. [Pricing](https://seamscape.com/pricing) places full API access under Enterprise; it is a reference, not an authorized paid dependency.
+- [Seamly project wiki](https://wiki.seamly.io/wiki/Main_Page/en) and [PatternSoft project](https://patternsoft.drytrix.com/): patternmaking terminology and a separate FreeSewing-plus-editor example. No software or design was imported from either.
+
+October 1 Companion 2.0 note: this is a historical research ledger. The supplied project-aware companion text is assessed separately in DIRECTION-REVIEW.md and is not a reviewed sewing source. Before seeding diagnostic rules, choosing pattern rights, or depending on current provider behavior, verify task-specific primary documentation and physical sewing expertise. The former Three.js and six-preset architecture are no longer required release decisions.
+
 ## Studio 1.0 architectural research — September 29, 2026
 
 These primary sources informed the upgraded specification. They do not prove our implementation, qualify pattern rights, or replace maker testing. No new model call or cloud operation occurred during this design pass.

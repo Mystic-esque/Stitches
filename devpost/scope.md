@@ -1,43 +1,31 @@
 ---
 doc: scope
-status: revised-for-full-application
-revision: studio-1.0
+status: approved-direction; implementation-evidence-pending
+revision: companion-2.0
 ---
+# Stitches — project-aware sewing companion
 
-# Stitches — scope
+## One-line scope
+Stitches helps a maker carry a garment from idea or pattern through preparation, cutting where qualified, sewing, checking and recovery. It understands how pieces become clothing through Sanity-authored relationships and bounded deterministic tools.
 
-## Primary Goal
+## Audience and task
+Primary: home sewists with basic machine operation who need pattern literacy and step-specific help. Secondary: beginners exploring an example and designers planning construction. A successful maker can start or resume a project, identify what they know and do not know, understand relevant flat pieces and cutting marks, choose an applicable next action, and recover from a real making problem.
 
-Deliver the complete garment studio in ../docs/PRODUCT.md, with Sanity as a core dependency and a useful Gemini assistant. Sanity is the primary entry; Devpost is a second presentation of the same work. The owner explicitly requested a premium application and a detailed design and Sol implementation handoff. Routine product and technical decisions are delegated.
+## Core product
+- Project-first home: two genuinely different, source-qualified example projects plus "my idea/pattern." Variants are not counted as new garments.
+- A private guest project remembers references, confirmed features, measurements, fabric, equipment, pattern/version, decisions, current step, checkpoints and attempted fixes. No account required.
+- The pattern-connected workbench ties finished appearance to technical flat pieces, joining edges, fold/grain/cut-count/markings, change overlays, consequence trail and the active construction step. Exact cutting detail appears only for qualified versions.
+- Preparation checks source, measurements, material, tools, layout assumptions and unresolved risks.
+- Make mode teaches a single operation with orientation, parts, authored measurements, checkpoint and context-specific help.
+- "I'm stuck" narrows symptoms with authored diagnostic tests, explains possible causes and offers a checked next step. Optional close-up image supplies observations, never a definitive diagnosis.
+- A bounded Gemini tool loop reads exact Sanity graph records and actual Stitches Context KB guidance, performs deterministic validations, asks for missing facts and proposes reviewable changes. It never silently keeps a change.
+- An editor correction in development changes applicable guidance for two different projects, with exact and served-KB evidence recorded separately.
 
-## The Unique Kernel
+## Capability boundary
+Planning projects can use photos or a user's externally authored pattern to organize work; a garment image is not an exact pattern. Exact pattern/cutting/export operations need licensed complete source/engine, piece/edge mapping, numerical checks and physical maker review for the claimed scope. No universal CAD, automatic photo-to-pattern, drape prediction or fit guarantee. Educational diagrams are clearly labeled.
 
-A maker changes one design and sees the connected consequences across the preview, pieces, seams, cloth, cutting, and sewing. The assistant executes supported tools to carry a multi-part brief through that process and recover from a failed constraint. Construction rules and evidence are maintained in Sanity; exact relationships and actual Context Knowledge Base retrieval both affect the result.
+## Release gate
+Two distinct project journeys, useful context-aware troubleshooting, project persistence, qualified 2D teaching/pattern details, real Sanity maintenance, real bounded model calls, meaningful benchmarks, recoverable failures, responsive accessible UI and actual maker/print evidence. If a physical/source gate fails, preserve the planning and education workflow but do not call the affected output cut-ready.
 
-## Target User
-
-A home sewist with basic machine skills and limited pattern-alteration confidence. Beginners can explore construction; experienced makers can inspect values and sources. Do not infer gender, body shape, or skill from a photo.
-
-## Full First Release
-
-Landing page; six supported looks across two qualified families; garment detail; photo analysis and template matching; guest projects; 3D construction and linked flat pieces; design options and measurements; an assistant using actual Sanity knowledge and deterministic tools; immutable revisions; feasible fabric placement; cutting preparation; scale-correct PDF/SVG and making package; focused sewing and saved progress; editorial correction evidence; recovery; polished desktop/mobile UI.
-
-The two-family/six-look target is a release gate. Build the whole journey for the lead top first, then qualify the skirt and every preset. One family is a milestone, not the completed release. The former shoulder-only POC boundary is superseded.
-
-## Kept Out of This Release
-
-No signup/accounts, collaboration, marketplace, body scanning, arbitrary photo/PDF-to-pattern conversion, or physical cloth simulation. No public deployment or submission is authorized. Guest isolation and backup are required. Shared Sanity content never stores personal measurements or reference photos.
-
-## Working Means
-
-A maker begins at a collection or photo, selects a supported look, inspects construction, supplies required measurements, makes meaningful changes, resolves a fabric or technique constraint with the assistant, retains a version, exports its cutting/making package, and follows its exact sewing steps.
-
-Evidence establishes determinism, actual seam/layout validation, source bindings, stale refusal, live Gemini and Context, recovery, accessibility, and print scale. At least one documented physical make qualifies the lead family before a ready-to-cut claim; the second family cannot borrow that review. Real-world review may remain an explicit open gate but cannot be fabricated.
-
-## Constraints and Collaboration
-
-Next.js/React/TypeScript, Sanity, Gemini, and the atelier identity remain. Paid-provider budget is $0. Use the allowlisted gemini-3.5-flash-lite within confirmed free quotas, with bounded calls and no paid fallback. Content writes stay in l4eeamth/development. Sol implements without recurring milestone approval requests. Verification and local commits are required. Physical making and external release are separately evidenced.
-
-## Planning and Event Records
-
-Existing proof remains in Git and ../BUILD_LOG.md. Revised documents describe a larger target, not completed features. Legacy devpost/ paths remain canonical; the newer plugin's alternate state/directory layout is not silently initialized. Event requirements must be checked through the official workflow when submission preparation becomes active.
+## Constraints
+Sanity challenge is primary; Devpost is secondary. $0 paid providers, free available quota, Stitches development dataset only, no production changes, no public deployment or submission without separate authority. Existing illustrative proof and September 29 visual reference are historical, not completion evidence.

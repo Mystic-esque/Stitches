@@ -1,53 +1,42 @@
-# Architecture — Stitches Studio 1.0
+# Architecture — Stitches Companion 2.0
 
-This is the current target architecture, not a claim about implemented code. The normative contracts are devpost/spec.md C01–C10. Current verified behavior remains in STATUS.md.
+Target architecture. See ../devpost/spec.md C01–C10 for enforceable contracts and STATUS.md for actual implementation/evidence.
 
-## One project, connected representations
-
-A shared immutable design basis connects the garment preview, flat pieces, seam checks, cutting layout, making steps and export. A feature cannot be accepted just because one representation looks right.
+## Project is the durable unit
+A guest-owned project—not an assistant conversation or a gallery card—binds idea/source, confirmed garment features, private measurement/material/tool profile, supported choices, active making step, checks, issue history, kept revisions and evidence. Both example and own-idea projects use this state model. Planning-only projects can be useful without pretending to own an exact pattern.
 
 ```text
-Sanity Content Lake ── exact graph + versioned rules ─┐
-Sanity Context KB ─── maintained explanatory sources ├─ Server application services
-Guest measurements/options/fabric ─────────────────┘       │
-                         registered deterministic tools ← Gemini bounded planner
-                                      │
-                       proposal + checks + consequence report
-                                      │ explicit user keep
-                    immutable guest revision + artifact manifest
-                       │             │              │
-                2D / 3D views   cutting layout   steps / export
+Sanity exact graph (components → patterns/pieces/seams → methods/steps → issues/tests/remedies)
+        │ fixed scoped reads and semantic fingerprints
+Context KB (maintained explanations) ─── separate served verification
+        │
+Guest project snapshot + private profile + active step + observations
+        │
+Server resolver/registered deterministic tools ← bounded Gemini planner
+        │
+checked plan / proposal / step / diagnostic test / consequence report
+        │ explicit maker confirmation
+immutable revision + progress + issue history + artifact manifest
+        │
+2D pattern-connected board · prepare · make · recovery · qualified export
 ```
 
-The model chooses supported tools and explains their results; it never determines numerical validity or performs unchecked operations. Three.js displays educational construction, not physical drape.
+## Trust boundaries
+Browser presents/collects and may hold provisional UI state. Server owns guest scope, fixed Sanity queries, Context retrieval, source/provenance checks, pattern geometry/layout, diagnostic selection, run checkpoints and transitions. Durable local transaction store isolates guest projects/profiles; temporary validated images have expiry and explicit deletion. Sanity development holds shared public knowledge only, not private maker data. Gemini may choose registered tools and explain checked outcomes, never execute arbitrary shell/GROQ, keep a revision, certify fit or override a validator.
 
-## Trust and storage boundaries
+## Pattern authority, not SVG authority
+`PATTERN-ENGINE-DECISION.md` is the binding design for the technical workbench. Sanity owns reviewed semantic relationships, operation applicability and sources; private project state owns confirmed inputs and revisions; a deterministic drafting adapter owns exact geometry. It emits an immutable, versioned `PatternArtifact` with physical units and stable piece/edge/notch IDs. SVG/React renderers consume that artifact and expose semantic selection back to steps and knowledge; they do not store, infer or mutate the pattern. A proposed alteration is a registered bounded *sewing operation* followed by a full redraft and independent validation, not a model-generated SVG path or arbitrary point move. FreeSewing is the first engine to spike, subject to the decision document's source, rights and binding gates; SeamScape is a command-boundary reference only under the $0 budget.
 
-- Browser: UI state, camera, selected piece, provisional interaction. No Sanity/Gemini secrets.
-- Server: guest isolation, fixed queries, schema validation, source bindings, geometry and layout authority, bounded execution, atomic acceptance and private artifacts.
-- Local transactional SQLite: hashed opaque guest sessions, projects/revisions/proposals, measurement/fabric input, progress, run checkpoints, manifests. Do not reuse the global demo JSON store for actual guests.
-- Sanity development: shared garment/pattern/method/instruction/source records only. No private measurements or reference photos.
-- Context KB-only MCP endpoint: maintained guidance. Exact Content Lake reads use a separate fixed-query adapter. Different retrieval roles must remain observable.
-- Private temporary upload storage: validated photo bytes with expiry; no Sanity upload or implicit long-term retention.
-- Pattern/preview adapters: pinned, licensed, complete artifacts with stable piece and edge IDs and honest review status.
+## Source and capability ladder
+The existing shoulder fragment and old blouse artwork remain illustrative. Exact pattern workbench layers require licensed complete source data and stable piece/edge IDs; cutting/printing also require deterministic numerical and physical review receipts. A photo or 3D mesh is not that data. `plan_only`, `guided_making`, `pattern_mapped`, `cut_checked`, `maker_reviewed` are explicit capability claims with scope and evidence.
 
-## Existing code: preserve the useful foundation
+A project basis is a canonical semantic hash of source/version, measurements, material/equipment, options, method and content fingerprints. A content correction marks affected future advice/proposals for review but does not silently rewrite completed physical work. Kept versions and diagnostic attempts remain auditable.
 
-The exact resolver, Content Lake and Context adapters, assembly conflict checks, Gemini signed-message handling, and stale/immutable test ideas are reusable. The shoulder-fragment module and garment SVG are illustrative; new engine qualification is required. Existing fixture/live modes remain distinct during migration.
+## Recovery loop
+The active instructionStep supplies piece/edge/method context. An issuePattern supplies scoped hypotheses; diagnosticTest chooses a safe discriminating observation; remedy becomes eligible only after relevant outcomes. The maker confirms photo observations and remedy results. Missing/conflicting evidence yields a safe unresolved state. The bounded agent orchestrates this loop; deterministic server code owns applicability.
 
-## Change propagation
+## Existing code and migration
+Preserve exact Content Lake and actual Context adapters, Gemini signed tool proof, immutable state ideas and 44 historical regression tests. Replace shared demo state with guest-owned transactional state while keeping a stable illustrative demo route until parity. Build first 2D educational workbench and step-specific recovery; Three.js may consume the same versioned IDs later but is not the product's core or a drape claim.
 
-Relevant source, measurements, option, fabric or equipment change → compute semantic basis → invalidate dependent receipts → regenerate/check → show consequences → deliberate keep. Keep previous accepted artifacts immutable. Content changes may update discoverable guidance but never silently rewrite what a person has already cut or sewn.
-
-Editorial impact detection is a pure local service first, with a prepared Sanity Function wrapper. Until separate deployment approval, compare fingerprints on requests and rehearse events locally. A Function deployment is not needed to claim local correctness.
-
-## Guest-first, no authentication product
-
-No signup, identity provider, billing or cloud account workflow. An opaque HttpOnly guest cookie isolates local workspace state. Provide explicit backup/import and honest device/browser persistence copy. Test cross-guest access and stale multi-tab mutations. A public release needs a compatible persistent server/database and retention policy; do not deploy SQLite to an ephemeral host by accident.
-
-## Target module boundaries
-
-UI routes and components / pure domain geometry-layout-instructions / application services / provider adapters / guest repository / artifact generation / editorial impact. See spec File structure for paths and SOL_HANDOFF for current-file migration.
-
-Do not add a vector database, arbitrary model shell, hosted orchestration framework or alternate paid model to compensate for missing domain tools.
+No external deployment, paid model, production Sanity dataset write or deployed Function is authorized. Prepare adapters and local tests only. Do not confuse a reference screenshot with working production UI.
 

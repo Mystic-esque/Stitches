@@ -3,6 +3,7 @@ import { defineArrayMember, defineField, defineType } from "sanity";
 const required = <R extends { required: () => R }>(rule: R): R => rule.required();
 const sourceArray = () => defineField({ name: "sources", title: "Sources", type: "array", of: [defineArrayMember({ type: "reference", to: [{ type: "sourceDocument" }] })] });
 const versionField = () => defineField({ name: "patternVersion", title: "Pattern version", type: "reference", to: [{ type: "patternVersion" }], validation: required });
+const reviewField = () => defineField({ name: "reviewStatus", type: "string", options: { list: ["illustrative", "pending", "reviewed", "rejected"] }, validation: required });
 
 const sourceDocument = defineType({
   name: "sourceDocument", title: "Source document", type: "document",
@@ -110,6 +111,11 @@ const instructionStep = defineType({
     defineField({ name: "prerequisites", type: "array", of: [defineArrayMember({ type: "reference", to: [{ type: "instructionStep" }] })] }),
     defineField({ name: "pieces", type: "array", of: [defineArrayMember({ type: "reference", to: [{ type: "patternPiece" }] })] }),
     defineField({ name: "affectedBy", type: "array", of: [defineArrayMember({ type: "reference", to: [{ type: "adjustmentRule" }] })] }),
+    defineField({ name: "procedure", type: "reference", to: [{ type: "constructionProcedure" }] }),
+    defineField({ name: "edgeIds", type: "array", of: [defineArrayMember({ type: "string" })] }),
+    defineField({ name: "orientationNotes", type: "text" }),
+    defineField({ name: "checkpoint", type: "text" }),
+    sourceArray(),
   ],
 });
 
@@ -126,4 +132,112 @@ const fabricRequirement = defineType({
   ],
 });
 
-export const schemaTypes = [sourceDocument, pattern, patternVersion, patternPiece, seamConnection, adjustmentRule, instructionStep, fabricRequirement];
+// These are shared, source-reviewed teaching records. Personal project observations
+// and uploaded photographs belong in guest storage, never in Content Lake.
+const garmentComponent = defineType({
+  name: "garmentComponent", title: "Garment component", type: "document",
+  fields: [
+    defineField({ name: "componentKey", type: "string", validation: required }),
+    defineField({ name: "title", type: "string", validation: required }),
+    defineField({ name: "explanation", type: "text" }),
+    defineField({ name: "patternRoles", type: "array", of: [defineArrayMember({ type: "string" })] }),
+    reviewField(), sourceArray(),
+  ],
+});
+
+const sewingTechnique = defineType({
+  name: "sewingTechnique", title: "Sewing technique", type: "document",
+  fields: [
+    defineField({ name: "techniqueKey", type: "string", validation: required }),
+    defineField({ name: "title", type: "string", validation: required }),
+    defineField({ name: "purpose", type: "text" }),
+    defineField({ name: "prerequisites", type: "array", of: [defineArrayMember({ type: "reference", to: [{ type: "sewingTechnique" }] })] }),
+    defineField({ name: "compatibleEquipment", type: "array", of: [defineArrayMember({ type: "reference", to: [{ type: "equipmentClass" }] })] }),
+    reviewField(), sourceArray(),
+  ],
+});
+
+const equipmentClass = defineType({
+  name: "equipmentClass", title: "Equipment class", type: "document",
+  fields: [
+    defineField({ name: "equipmentKey", type: "string", validation: required }),
+    defineField({ name: "title", type: "string", validation: required }),
+    defineField({ name: "capabilities", type: "array", of: [defineArrayMember({ type: "string" })] }),
+    reviewField(), sourceArray(),
+  ],
+});
+
+const fabricClass = defineType({
+  name: "fabricClass", title: "Fabric class", type: "document",
+  fields: [
+    defineField({ name: "fabricKey", type: "string", validation: required }),
+    defineField({ name: "title", type: "string", validation: required }),
+    defineField({ name: "behaviorNotes", type: "text" }),
+    defineField({ name: "grainAndNapNotes", type: "text" }),
+    reviewField(), sourceArray(),
+  ],
+});
+
+const constructionProcedure = defineType({
+  name: "constructionProcedure", title: "Construction procedure", type: "document",
+  fields: [
+    defineField({ name: "procedureKey", type: "string", validation: required }),
+    defineField({ name: "title", type: "string", validation: required }),
+    defineField({ name: "purpose", type: "text" }),
+    defineField({ name: "components", type: "array", of: [defineArrayMember({ type: "reference", to: [{ type: "garmentComponent" }] })] }),
+    defineField({ name: "techniques", type: "array", of: [defineArrayMember({ type: "reference", to: [{ type: "sewingTechnique" }] })] }),
+    defineField({ name: "applicableSteps", type: "array", of: [defineArrayMember({ type: "reference", to: [{ type: "instructionStep" }] })] }),
+    defineField({ name: "compatibleFabrics", type: "array", of: [defineArrayMember({ type: "reference", to: [{ type: "fabricClass" }] })] }),
+    defineField({ name: "compatibleEquipment", type: "array", of: [defineArrayMember({ type: "reference", to: [{ type: "equipmentClass" }] })] }),
+    reviewField(), sourceArray(),
+  ],
+});
+
+const issuePattern = defineType({
+  name: "issuePattern", title: "Possible making issue", type: "document",
+  fields: [
+    defineField({ name: "issueKey", type: "string", validation: required }),
+    defineField({ name: "title", type: "string", validation: required }),
+    defineField({ name: "observableSymptoms", type: "array", of: [defineArrayMember({ type: "string" })] }),
+    defineField({ name: "procedures", type: "array", of: [defineArrayMember({ type: "reference", to: [{ type: "constructionProcedure" }] })] }),
+    defineField({ name: "steps", type: "array", of: [defineArrayMember({ type: "reference", to: [{ type: "instructionStep" }] })] }),
+    defineField({ name: "riskNotes", type: "text" }),
+    reviewField(), sourceArray(),
+  ],
+});
+
+const diagnosticTest = defineType({
+  name: "diagnosticTest", title: "Diagnostic check", type: "document",
+  fields: [
+    defineField({ name: "testKey", type: "string", validation: required }),
+    defineField({ name: "title", type: "string", validation: required }),
+    defineField({ name: "makerQuestion", type: "text", validation: required }),
+    defineField({ name: "howToCheck", type: "text" }),
+    defineField({ name: "possibleOutcomes", type: "array", of: [defineArrayMember({ type: "string" })] }),
+    defineField({ name: "distinguishes", type: "array", of: [defineArrayMember({ type: "reference", to: [{ type: "issuePattern" }] })] }),
+    defineField({ name: "riskNotes", type: "text" }),
+    reviewField(), sourceArray(),
+  ],
+});
+
+const remedy = defineType({
+  name: "remedy", title: "Supported remedy", type: "document",
+  fields: [
+    defineField({ name: "remedyKey", type: "string", validation: required }),
+    defineField({ name: "title", type: "string", validation: required }),
+    defineField({ name: "issues", type: "array", of: [defineArrayMember({ type: "reference", to: [{ type: "issuePattern" }] })] }),
+    defineField({ name: "requiredTests", type: "array", of: [defineArrayMember({ type: "reference", to: [{ type: "diagnosticTest" }] })] }),
+    defineField({ name: "safeAction", type: "text" }),
+    defineField({ name: "confirmationCheck", type: "text" }),
+    defineField({ name: "irreversible", type: "boolean" }),
+    defineField({ name: "riskNotes", type: "text" }),
+    reviewField(), sourceArray(),
+  ],
+});
+
+export const schemaTypes = [
+  sourceDocument, pattern, patternVersion, patternPiece, seamConnection,
+  adjustmentRule, instructionStep, fabricRequirement, garmentComponent,
+  sewingTechnique, equipmentClass, fabricClass, constructionProcedure,
+  issuePattern, diagnosticTest, remedy,
+];

@@ -1,12 +1,8 @@
-# Start the Studio 1.0 implementation
+# Start the Companion 2.0 implementation
 
-Work in C:\\Users\\USER\\Desktop\\Stitches. Read AGENTS.md, docs/STATUS.md, then docs/SOL_HANDOFF.md and its linked documents. The product/design package is ready; the new full application is not implemented yet.
+Work in C:\Users\USER\Desktop\Stitches. Read AGENTS.md and docs/STATUS.md first, then docs/SOL_HANDOFF.md, docs/PRODUCT.md, docs/DIRECTION-REVIEW.md, devpost/scope.md, devpost/prd.md, devpost/spec.md, devpost/checklist.md and docs/DESIGN.md. The October 1 product/design package replaces the September 29 Studio 1.0 target; neither package is a finished application.
 
-Build the premium garment-studio journey in devpost/prd.md using devpost/spec.md and devpost/checklist.md. Follow docs/DESIGN.md and inspect design/stitches-studio.html on desktop and phone. Preserve the current tested knowledge/provider adapters and explicit demo status; do not restart or turn the old shoulder spike into a production pattern.
+Build a project-aware sewing companion: distinct example projects and personal idea path; private project memory; technical pattern literacy with fold/grain/cut/count and changed-edge consequences; preparation; step-focused Make; contextual “I'm stuck” diagnosis; bounded Gemini tools over exact Sanity graph and actual Context KB; honest capability gates. The old pattern screen supplies useful teaching requirements but is not a mandated layout.
 
-Start W01 with full-pattern/source/license qualification and versioned capability manifests for a top and a skirt. Continue guest/UI work independently if physical expert evidence is unavailable. Implement small coherent tasks with real checks, update state/logs and local commits, and continue without routine re-approval.
-
-No signup; no paid provider spend; no production Sanity changes; no public deployment, messaging or final submission. Actual Sanity Content Lake + maintained Context KB and bounded Gemini tools remain essential. Keep review-only output honest until digital, source and physical gates qualify it.
-
-Success is a locally working two-family product with connected garment/pieces/assembly/customization/fabric/making/export, actual failure recovery and reviewable release evidence—not the static reference or a decorative gallery.
+Begin W01 with exact source/rights qualification for two different projects and map a real making-step problem/recovery loop. Continue W02 guest state and W04 shell independently if source or physical evidence takes time. Preserve the existing illustrative proof and real Sanity/Context/Gemini adapters; never call them a cut-ready pattern. Add no account, paid API, production Sanity write, public deployment or submission. Update STATUS/DECISIONS/BUILD_LOG after real milestones and commit locally.
 

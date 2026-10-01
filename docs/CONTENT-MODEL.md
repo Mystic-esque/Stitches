@@ -1,59 +1,43 @@
-# Content model — shared garment intelligence
+# Stitches shared content model — Companion 2.0
 
-Studio 1.0 target. See spec C01/C02/C08/C10. The currently seeded 13 records are illustrative; a schema document does not qualify sewing content.
+Target authoring contract, not a claim that these types or records are deployed. Existing 13 development records and the 8-entry Context KB are illustrative proofs. Schema changes require guarded development migration and live read-back.
 
-## Existing core and extensions
-
-Keep existing stable references/version checks while adding the following semantic structure. Names below are proposed app/schema contracts, not claims that these document types are already deployed.
-
-| Record | Important fields and relationships |
+## Exact graph in Sanity Content Lake
+| Record | Purpose and mandatory relationships |
 | --- | --- |
-| garmentDesign | Public title/slug, family, creator/rights, supported pattern versions, cover and view assets |
-| garmentPreset | Exact version, authored option values, distinct silhouette/components, suitable fabric classes, required techniques, readiness |
-| patternVersion | Immutable semantic version, engine adapter/version/hash, measurement definitions, pieces, joins, options, methods, review evidence |
-| patternPiece | Stable piece role/ID, named edges, cut-instance rule, fold/grain/notch semantics; numerical generated paths come from engine |
-| seamConnection | Version-bound edge endpoints, join relation, intended ease, source-backed tolerance and method |
-| measurementDefinition | Body landmark, how-to diagram/text, units, requiredness, reviewed range, relation to ease; never a user's value |
-| styleOperation | Registered tool/operation ID, typed bounds/options, affected/locked roles, prerequisites, compatibility and invalidation dependencies |
-| compatibilityRule | Declarative typed predicates over known options/material/method IDs; reason and source; no executable JS or free-form model code |
-| fabricRequirement | Qualified fabric classes/behavior, direction/nap/fold limitations, layout assumptions and source |
-| constructionMethod | Reusable technique, supported equipment/material classes, ordered micro-actions, authored numerical references, diagrams, prerequisites, sources |
-| instructionStep | Piece/edge and method refs, prerequisites, conditions, side/orientation, action/checkpoint, diagram binding and semantic version |
-| garmentView / previewBinding | View assets, named panel/edge bindings, topology hash, supported parameter mapping, authored exploded/step poses, limitations |
-| sourceReference | Author, title, locator/date, license/attribution, applicable version/method, review status and curated excerpt |
-| reviewEvidence | Reviewer consent/role, exact family/version/options/material, digital checks vs physical trial, evidence locations, limitations |
+| sourceDocument | Origin, locator, rights, review status, version, supersedes/conflicts; every actionable claim needs applicable source evidence. |
+| pattern / patternVersion | A genuinely distinct garment project and immutable qualified version, engine/rights/capability envelope. Color/length variants remain options. |
+| patternPiece / seamConnection | Stable piece/edge IDs; physical cut count, mirrored/on-fold, grain, notches, stitch/cut/allowance and joining relation where qualified. |
+| adjustmentRule / fabricRequirement | Typed, reviewed operation scope and affected graph; fabric behavior/direction/width prerequisites. |
+| instructionStep | Version-bound prerequisite DAG, pieces/edges, orientation, method, diagram and checkpoint. |
+| garmentComponent | Garment concept (bodice, sleeve, pocket, waistband), public explanation and compatible pattern roles. |
+| sewingTechnique | Reusable technique with skill demand, prerequisites, equipment/material compatibility, source/review. |
+| equipmentClass / fabricClass | Machine/tool capabilities and material properties; no brand inference or user-owned item stored here. |
+| constructionProcedure | Shared source-backed action sequence binding technique, components, pieces/edges and steps, with alternatives and conditions. |
+| issuePattern | Possible mistake/symptom scoped to procedure/step/component/material/tool and risk. A hypothesis, never diagnosis alone. |
+| diagnosticTest | Discriminating maker-observable question/check, expected outcomes, prerequisites, source and safety caveat. |
+| remedy | Applicable response to supported test results, risk level, reversible/irreversible flag, confirmation checkpoint and alternative. |
+| reviewEvidence | Exact authored scope, digital/physical reviewer status and limitations; no implicit promotion. |
 
-Do not store private measurements, guest designs or uploaded inspiration photographs in this shared graph. A public review excerpt may be authored with consent, never implicitly extracted from a guest project.
+An instructive example: a sleeve insertion issue binds the active instructionStep, sleeve and armhole piece edges and notches, method, possible mismatch hypotheses, a notch/stitch-line check, fabric behavior and qualified remedies. Stitches asks the test before recommending a risky physical change. Two different garment projects can share that method and diagnostic without duplicating prose. A correction propagates to both only where applicability matches.
 
-## Separate authorship from computation
+## Private project state is not shared content
+Guest profiles/projects hold personal measurements, materials/equipment on hand, photos, pattern ownership, decisions, step progress, symptoms/tests/fixes, revisions and consent. Never seed that into shared Content Lake or KB. A public pattern can reference a license; a user's purchased PDF stays private and is not redistributable.
 
-Sanity authors meaning, relationships and qualified operating envelopes. The deterministic adapter produces exact curves, dimensions and check results from those inputs. Store adapter identity and reproducible source definitions, not giant per-person generated paths in Content Lake. Preview assets identify the same pieces and edges; art alone cannot establish readiness.
+## Geometry ownership
+Sanity records a qualified pattern/engine version, semantic part and seam relationships, supported operation IDs, source rights and educational meaning. It is **not** the primary store for a guest's coordinate graph, SVG path data or made-to-measure draft. The versioned drafting adapter produces exact geometry from private inputs, and its immutable artifact maps stable piece/edge/notch IDs back to Sanity records. A source editor can change an instruction or operation applicability without silently modifying previously kept geometry. The adapter must reject a semantic ID that has no exact generated counterpart; a decorative SVG label cannot satisfy the pattern-mapped gate. See PATTERN-ENGINE-DECISION.md.
 
-Each capability manifest must resolve to installed engine, option and renderer adapters. Publishing unsupported IDs fails runtime validation even if Studio permits it.
+## Validation and readiness
+Schema validation helps editors, but server resolver independently enforces unique and version-matching IDs; no dangling refs; prerequisite DAG; condition and compatibility semantics; supported installed operation IDs; source applicability; rights; numeric envelopes and complete piece/edge/cut bindings. Canonically hash semantic fields; distinguish geometry, procedure and editorial changes. A beautiful asset has no readiness authority.
 
-## Validation at the server boundary
+Capability receipts: plan_only → guided_making → pattern_mapped → cut_checked → maker_reviewed. Each step requires explicit source, adapter and check evidence. Keep digital and physical review separate. No photo, KB prose, model answer or 3D view may bypass a gate.
 
-Required checks include unique IDs, version ownership, no dangling/cross-family edges, closed dependency graph, DAG acyclicity, valid conditional references, typed option constraints, compatible fabric/method combinations, source-backed bounds, asset rights and complete adapter bindings. Sanity authoring validation helps editors; it does not replace server checks.
+## KB and Context
+The dedicated Stitches Knowledge Base maintains explanations of components, techniques, sources, procedures, issue tests and resolutions. It does not replace exact graph constraints. Compile from reviewed, scoped source material; preserve step prerequisite DAG and avoid misleading sequential arrows. Exact and served KB versions are checked independently. If a new source/rule corrects a method, record source update → graph impact → KB rebuild requested → entry reviewed → served entry verified. Do not claim a deployed Function when only local event rehearsal exists.
 
-Hash canonically sorted semantic fields, not query time. Keep geometry semantics, instruction semantics, and editorial-only presentation changes identifiable so precise invalidation is possible. An accepted revision records the exact relevant snapshot rather than a mutable reference alone.
+## Development-only migration
+Target exactly project l4eeamth / development with separate read/editor tokens, dry-run IDs/types, backup, revision preconditions, graph validation and read-back. Never write Stitches production. Existing illustrative IDs/history remain until migration parity and tests pass. Adding schema types in this repository alone does not create or publish documents in Sanity.
 
-## Sanity as a core dependency
-
-A pocket is not a keyword in a paragraph. It refers to a real optional piece, placement constraints, changed cutting instances, a method, a sequence before closing its supporting seams, and applicable sources. The same method may serve several presets. Exact graph traversal determines consequences; Context provides maintained explanation.
-
-First maintenance demonstration: a source-backed correction to a shared pocket/edge method affects at least two looks, invalidates relevant pending proposals and prompts review of specific making steps. Keep previous versions available. Refresh/rebuild/review the KB and read the actual served entry before claiming the explanation has caught up.
-
-## Knowledge Base compilation guidance
-
-Include garment identity/version, piece/seam vocabulary, option constraints, material/equipment methods, prerequisites and curated sources. Keep instructions concise and source-scoped. Require generated assembly descriptions/diagrams to preserve the exact DAG; parallel steps must not be rewritten as sequential dependency claims. Do not include secrets, private project state or arbitrary visitor prompts.
-
-The endpoint remains KB-only. Fixed parameterized Content Lake queries are a separate adapter. Record statuses for source change, graph verification, KB update requested, entry reviewed and served entry verified.
-
-## Development migration safety
-
-Target only project l4eeamth / dataset development. Produce an exact dry-run ID/type list, snapshot old documents, apply revision preconditions, then validate the entire relevant graph and read it back. Use separate read/editor tokens. Preserve current fixture IDs/history until new resolved catalog parity is proven. Production stays untouched. A schema extract or dry run does not count as a successful migration.
-
-## Content required for the full application
-
-Two qualified families; six genuinely distinct presets; all mandatory measurements; complete physical pieces including allowances/notches/grain/counts; supported options and combinations; material/equipment constraints; every making prerequisite and method; all display/diagram bindings; source/license metadata; and separate numerical/physical review evidence. Missing content must surface as an authoring issue or explicit unsupported state, not be improvised by Gemini.
+## Release content floor
+Two different source-qualified project examples with rights, complete piece/edge/step graph and actual educational assets; one useful shared method/diagnostic affecting both; planning-only own-idea route; source and review status visible. No arbitrary six-look count and no fabricated technical guidance to fill an empty gallery.
 

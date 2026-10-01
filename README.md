@@ -1,14 +1,14 @@
 # Stitches
 
-## Current direction: Studio 1.0
+## Current direction: Companion 2.0
 
-**See how it’s made. Make it yours.** A garment-first creative studio with connected pieces, supported changes, fabric planning and guided making, powered by shared Sanity knowledge and bounded Gemini tools.
+**See how it’s made. Make it yours.** A project-aware sewing companion that connects an idea or pattern, technical pieces, preparation, actual making steps and contextual recovery. Sanity maintains the shared construction/diagnostic knowledge; bounded Gemini tools use it with the maker's private project context.
 
-The September 29 product-lead package is ready for implementation. Start with [Sol handoff](docs/SOL_HANDOFF.md), [product](docs/PRODUCT.md), [design](docs/DESIGN.md), [experience contracts](docs/EXPERIENCE-CONTRACTS.md), [PRD](devpost/prd.md), [technical spec](devpost/spec.md), and [checklist](devpost/checklist.md). The six-screen [interactive visual reference](design/stitches-studio.html) has its own [browser captures](design/screenshots/) and [verification report](design/verification.json).
+The October 1 direction supersedes the September 29 Studio 1.0 proposal. Start with the [comparison and research assessment](docs/DIRECTION-REVIEW.md), [Sol handoff](docs/SOL_HANDOFF.md), [product](docs/PRODUCT.md), [design](docs/DESIGN.md), [experience contracts](docs/EXPERIENCE-CONTRACTS.md), [PRD](devpost/prd.md), [technical spec](devpost/spec.md), and [checklist](devpost/checklist.md). The new [Companion visual reference](design/stitches-companion.html) is a labeled concept, not the application. The [older six-screen reference](design/stitches-studio.html) and its captures remain historical.
 
-The full Studio 1.0 app is **not built yet**. The existing runtime is a tested illustrative foundation with real Sanity/Context/Gemini integration proofs; it does not produce qualified cut-ready garments. Read [actual status](docs/STATUS.md). No public deployment/submission or new provider operation occurred in this design pass.
+The full Companion 2.0 app is **not built yet**. The existing runtime is a tested illustrative foundation with real Sanity/Context/Gemini integration proofs; it does not produce qualified cut-ready garments. Read [actual status](docs/STATUS.md). The new schemas are local proposals, not seeded/deployed Sanity content. No public deployment/submission or provider operation occurred in this design pass.
 
-Preview the reference locally: `node scripts/check-design-reference.mjs --serve`, then open http://127.0.0.1:4175. This is not the Next.js app and makes no API calls.
+Open `design/stitches-companion.html` locally to inspect the reference, or run `node scripts/check-companion-reference.mjs` for isolated browser captures and interaction checks. This is not the Next.js app and makes no API calls. The older reference can still be served with `node scripts/check-design-reference.mjs --serve`.
 
 ## Existing runtime documentation (baseline; retained)
 
@@ -51,7 +51,7 @@ You can also continue in the existing conversation by telling Codex to work in t
 | [Content model](docs/CONTENT-MODEL.md) | Documents, relationships, provenance, and versioning |
 | [Build plan](docs/BUILD-PLAN.md) | Ordered milestones with evidence of completion |
 | [Sources](docs/SOURCES.md) | Primary documentation and candidate caveats checked September 28–29, 2026 |
-| [Current interactive design reference](design/stitches-studio.html) | Six-screen Studio 1.0 concept; no accounts or API keys needed |
+| [Current interactive design reference](design/stitches-companion.html) | Companion 2.0 concept; no accounts or API keys needed |
 | [Historical desktop reference](references/stitches-desktop.png) | Earlier visual identity; current design supersedes layout |
 | [Historical mobile reference](references/stitches-mobile.png) | Earlier concept, not the current phone specification |
 | [Historical dark reference](references/stitches-dark.png) | Earlier study; dark mode needs deliberate revalidation |
@@ -66,14 +66,14 @@ You can also continue in the existing conversation by telling Codex to work in t
 - Sanity Studio and Content Lake for the reviewed, versioned pattern knowledge. Use references and parameterized GROQ queries.
 - Gemini through Google's `@google/genai` SDK for interpretation, bounded tool use, and grounded explanations. The local allowlisted candidate is `gemini-3.5-flash-lite`, with an opt-in, incomplete live rehearsal.
 - A deterministic TypeScript geometry layer with SVG rendering. Evaluate FreeSewing behind an adapter after checking the exact design's license, supported adjustments, and drafting behavior.
-- Guest-first transactional SQLite storage on the local Node server, isolated by an opaque session; no Supabase/Auth in Studio 1.0. The historical global demo store remains fixture-only.
-- Runtime validation for external data/model output, meaningful domain and browser tests, plus a lazy Three.js construction viewer with an SVG fallback. Preserve existing pins; qualify new dependencies when their task is active.
+- Guest-first transactional local storage on the Node server, isolated by an opaque session; no Supabase/Auth in Companion 2.0. The historical global demo store remains fixture-only.
+- Runtime validation for external data/model output and meaningful domain/browser tests. An educational Three.js construction view may be added after technical 2D pattern literacy and Make/recovery work; it is not a release substitute.
 
 Sanity is the knowledge layer. Gemini is the interpretation and explanation layer. The geometry engine owns numerical results. An additional vector database is not needed for the first version.
 
 ## Next working milestone
 
-Start W01 in [Sol handoff](docs/SOL_HANDOFF.md): qualify exact source/licenses and complete patterns for the top and skirt families, then continue the twelve work packages. Guest infrastructure and UI can progress independently of physical review. The old shoulder fragments and static reference do not satisfy pattern gates.
+Start W01 in [Sol handoff](docs/SOL_HANDOFF.md): qualify exact source/licenses and complete patterns for two genuinely different project candidates, and map one step-specific making/recovery loop. Then continue W02–W10. Guest infrastructure and UI can progress independently of physical review. The old shoulder fragments and static references do not satisfy pattern gates.
 
 ## Configuration
 
