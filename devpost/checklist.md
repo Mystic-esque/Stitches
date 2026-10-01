@@ -43,7 +43,7 @@ Exit: two sessions cannot cross-read; actual project resumes after restart; stal
 Exit: exact graph queries validate, served KB separately verified, content absence/contradiction visible. Schema code alone is not live content.
 
 ## W04 — Companion UI and pattern literacy
-- [ ] Implement project-first landing, distinct gallery, private project library, planning intake, premium workspace and mobile-focused navigation.
+- [x] Implement project-first landing, distinct gallery, private project library, planning intake, premium workspace and mobile-focused navigation. Local planning-only runtime passed responsive production browser rehearsal; this does not complete W04's pattern-literacy or accessibility exit gates.
 - [ ] Build 2D pattern-connected board: garment ↔ named flat pieces ↔ seams/steps, cut/fold/grain/count/marking legends, changed-edge before/after and impact trail.
 - [ ] Show explicit plan-only versus mapped/cut-checked/maker-reviewed states; illustrated geometry never masquerades as pattern.
 - [ ] Test 320/390/768/1024/1440, keyboard, focus, contrast, reduced motion and real screenshots.

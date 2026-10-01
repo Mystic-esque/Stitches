@@ -1,0 +1,52 @@
+{
+  "kind": "production-nextjs-ui",
+  "checkedAt": "2026-10-01T04:43:56.443Z",
+  "base": "http://127.0.0.1:3100",
+  "observations": [
+    {
+      "width": 1440,
+      "noOverflow": true,
+      "brokenImages": 0
+    },
+    {
+      "width": 1024,
+      "noOverflow": true,
+      "brokenImages": 0
+    },
+    {
+      "width": 768,
+      "noOverflow": true,
+      "brokenImages": 0
+    },
+    {
+      "width": 390,
+      "noOverflow": true,
+      "brokenImages": 0
+    },
+    {
+      "width": 320,
+      "noOverflow": true,
+      "brokenImages": 0
+    }
+  ],
+  "projectJourney": {
+    "created": true,
+    "saved": true,
+    "resumed": true,
+    "mobileNoOverflow": true
+  },
+  "runtimeErrors": [],
+  "screenshots": [
+    "home-1440.png",
+    "home-390.png",
+    "project-1440.png",
+    "project-390.png"
+  ],
+  "notVerified": [
+    "cut-ready geometry",
+    "maker review",
+    "agent",
+    "Sanity revalidation",
+    "keyboard and screen-reader audit"
+  ]
+}

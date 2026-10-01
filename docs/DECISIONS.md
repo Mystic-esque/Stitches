@@ -1,5 +1,12 @@
 # Implementation decisions
 
+## October 1, 2026 — Local guest-project implementation (active)
+
+- The first private project adapter uses Node 22's experimental `node:sqlite` under ignored `.data/` for local, single-server development only. Transactions, owner isolation, immutable revisions, idempotency receipts and optimistic basis checks are enforced server-side. A deployment target needs a portable durable database and backup/restore runbook before production claims.
+- A 32-byte random HttpOnly SameSite=Lax cookie is an unregistered guest bearer; the database stores its SHA-256 owner ID, not the token. Mutations require exact same-origin JSON. There is no account recovery, cross-device sync or public deployment claim.
+- Sandy and Tina are displayed as distinct **planning-only source candidates** with original editorial concept imagery. Their images cannot be treated as engine-rendered variants, pattern geometry or physical proof. The prior Sanity-backed illustrative worktable is retained at `/demo`; the new project-first home is not yet an agent or a qualified pattern workbench.
+- Portable JSON backup is a strict, versioned latest-state export/import that creates a fresh guest-owned project. Server-side revision history remains immutable but is not represented as restored history by an imported file.
+
 ## October 1, 2026 — Parametric pattern authority clarification (current)
 
 - Accepted the owner's attached core architecture: versioned semantic pattern definition + confirmed private inputs + bounded registered operation → deterministic draft artifact → independent validation → SVG/React technical view. SVG remains valuable for selection, teaching and print but is not editable pattern authority. See `PATTERN-ENGINE-DECISION.md`.
