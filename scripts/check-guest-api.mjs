@@ -19,6 +19,9 @@ assert.equal(catalog.status, 200);
 assert.equal(catalog.data.provenance, 'sanity-development-content-lake');
 assert.deepEqual(catalog.data.cards.map((item) => item.designKey), ['sandy', 'tina']);
 assert.ok(catalog.data.cards.every((item) => item.capability === 'plan_only' && item.reviewStatus === 'pending'));
+assert.deepEqual(catalog.data.cards.map((item) => item.pieceStudy.length), [5, 4]);
+assert.equal(catalog.data.cards[0].pieceStudy.find((item) => item.condition === 'seamless').fold, 'double');
+assert.equal(catalog.data.cards[1].pieceStudy.find((item) => item.pieceKey === 'back').fold, 'single');
 
 const key = randomUUID();
 const createBody = { title: 'Disposable local API rehearsal', brief: 'No personal information.', source: { kind: 'own_idea' }, idempotencyKey: key };

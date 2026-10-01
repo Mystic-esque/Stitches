@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useCallback, useEffect, useState, type ChangeEvent, type FormEvent } from "react";
 import { projectBackupSchema, type GuestProject, type ProjectNote, type ProjectPlan, type ProjectSource } from "@/domain/guest-project";
 import type { CompanionCatalogCard } from "@/server/knowledge/companion-catalog";
+import { PieceStudy } from "./PieceStudy";
 
 const starts = [
   { id: "sandy", name: "The circle skirt", kind: "Woven · skirt", image: "/images/circle-skirt.png", caption: "A full silhouette from measured curves", question: "Waistband, fabric width and fold layout" },
@@ -78,13 +79,20 @@ export function CompanionHome() {
   }, [open]);
   useEffect(() => {
     let mounted = true;
-    (async () => {
+    let request = 0;
+    const refresh = async () => {
+      const currentRequest = ++request;
       try {
         const data = await json(await fetch("/api/catalog", { cache: "no-store" }));
-        if (mounted) { setCatalog(data.cards); setCatalogState("ready"); }
-      } catch { if (mounted) setCatalogState("unavailable"); }
-    })();
-    return () => { mounted = false; };
+        if (mounted && currentRequest === request) { setCatalog(data.cards); setCatalogState("ready"); }
+      } catch { if (mounted && currentRequest === request) { setCatalog([]); setCatalogState("unavailable"); } }
+    };
+    void refresh();
+    const onVisibility = () => { if (document.visibilityState === "visible") void refresh(); };
+    window.addEventListener("focus", refresh);
+    document.addEventListener("visibilitychange", onVisibility);
+    const timer = window.setInterval(refresh, 60_000);
+    return () => { mounted = false; window.removeEventListener("focus", refresh); document.removeEventListener("visibilitychange", onVisibility); window.clearInterval(timer); };
   }, []);
 
   function begin(source: ProjectSource) {
@@ -189,6 +197,7 @@ export function CompanionHome() {
       <div className="project-head"><div><p className="companion-kicker">YOUR MAKING COMPANION / 01</p><h1>{active.title}</h1><p>Carry your idea, materials and decisions in one place. Every save becomes a reviewable revision.</p></div><span className="capability-chip">Planning only · no cutting yet</span></div>
       {active.source.kind === "candidate" && <section className="project-source-strip" aria-label="Current source research">{sourceCard ? <><p className="companion-kicker">LIVE SANITY CONTENT LAKE · PLANNING SOURCE</p><strong>{sourceCard.title}</strong><p>{sourceBinding === "stale" ? "This source record changed after your saved project basis. Review and refresh it before using the new planning facts." : sourceCard.cuttingCaveat}</p><span>{sourceCard.materialStructure} · {sourceCard.requiredMeasurements.length} source-listed measurements · {sourceCard.reviewStatus} review · plan only</span><a href={sourceCard.sourceUrl} target="_blank" rel="noreferrer">Read {sourceCard.sourceTitle} ↗</a></> : <p role="status">{catalogState === "loading" ? "Checking the current Sanity source record…" : "Current Sanity source details are unavailable. Your private plan is still saved, but do not use this card to cut."}</p>}</section>}
       {sourceBinding && <div className={`source-binding ${sourceBinding}`} role="status"><span>{sourceBinding === "current" ? "This plan is bound to the current Sanity source revision. It is still planning-only." : sourceBinding === "stale" ? "Source changed since this project revision. Source-dependent advice is stale; earlier maker notes are preserved." : sourceBinding === "unbound" ? "This project has no saved Sanity source binding yet. Review the current source before attaching it." : "Sanity source check is unavailable. Source-dependent guidance is paused."}</span>{(sourceBinding === "stale" || sourceBinding === "unbound") && <button type="button" disabled={busy || unsavedChanges} onClick={refreshSource}>Review & bind current source ↗</button>}{unsavedChanges && sourceBinding !== "current" && <small>Save plan edits first.</small>}</div>}
+      {sourceBinding === "current" && sourceCard && <PieceStudy key={sourceCard.designKey} card={sourceCard} />}
       <div className="project-workspace"><aside className="project-rail" aria-label="Project stages"><p className="rail-caption">THE JOURNEY</p><ol><li className="current"><b>01</b><span>Plan your idea<small>Available now</small></span></li><li><b>02</b><span>Understand the pattern<small>Qualification in progress</small></span></li><li><b>03</b><span>Cut with confidence<small>Not yet verified</small></span></li><li><b>04</b><span>Make & troubleshoot<small>Not yet verified</small></span></li></ol><a href="/demo">Explore the pattern study ↗</a></aside>
         <form className="project-form" onSubmit={save}><div className="form-intro"><p className="companion-kicker">THE WORKING BRIEF</p><h2>Make it yours, one decision at a time.</h2><p>Describe what you want to make. Stitches keeps constraints together while drafting and making tools are verified.</p></div>
           <div className="field-row"><label>Project name<input value={draft.title} maxLength={100} required onChange={(event) => update("title", event.target.value)} /></label><label>Fabric structure<select value={draft.structure} onChange={(event) => update("structure", event.target.value)}><option value="unknown">Not sure yet</option><option value="woven">Woven</option><option value="knit">Knit / stretch</option></select></label></div>

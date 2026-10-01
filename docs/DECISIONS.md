@@ -1,5 +1,11 @@
 # Implementation decisions
 
+## October 1, 2026 — Educational cut-list before qualified geometry
+
+- `planningPiece` records are intentionally not `patternPiece` artifacts. They represent conditional, source-linked teaching facts (cut count, fold, mirroring, material), not measured outlines, placement, grainlines, allowances or approved cutting instructions. The project UI can teach these distinctions while the engine/rights/maker gates remain open.
+- The exact planning catalog requires all nine piece records in addition to the four source/candidate records. A missing, rejected, malformed or cross-candidate reference fails closed. Piece revisions participate in each candidate's fingerprint; one candidate's correction does not stale the other's project. No model-generated GROQ or source-to-fixture fallback is permitted.
+- Source-dependent teaching must disappear on current read failure and on an old saved basis. A periodic/focus recheck reduces the window for silently stale advice; rebind is a separate immutable revision. This is still a local project-first preview, not a hosted live subscription or a demonstrated Context KB correction.
+
 ## October 1, 2026 — Separate Sanity planning candidates from qualified patterns
 
 - A guest project may pin the exact candidate Content Lake fingerprint at creation or through an explicit source-rebase mutation. New source facts never silently rewrite an old project basis or journal note. If the source changes, the UI marks the binding stale; rebase requires the saved sequence/hash and creates a new revision. Sanity outage permits an unbound private plan, not source-backed advice.

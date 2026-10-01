@@ -37,7 +37,7 @@ Exit: two distinct source-qualified candidates and one fully mapped vertical jou
 Exit: two sessions cannot cross-read; actual project resumes after restart; stale/duplicate transitions deterministic.
 
 ## W03 — Sanity intelligence graph
-- Verified partial: four source-linked, pending-review planning records in `l4eeamth/development` are read by the companion through an exact Content Lake catalog API. Candidate guest projects pin its fingerprint; an old binding is visibly stale and can be refreshed into a new revision without rewriting prior notes. This is not a reviewed procedure/diagnostic graph or a served Context KB update.
+- Verified partial: four source/candidate records plus nine conditional planning-piece records, all pending review in `l4eeamth/development`, are read through an exact Content Lake catalog API. Candidate guest projects pin the full candidate/piece fingerprint; an old binding is visibly stale and can be refreshed into a new revision without rewriting prior notes. Failed reads pause the source-linked study. This is not a reviewed procedure/diagnostic graph, cut-ready piece map or served Context KB update.
 - [ ] Extend existing schema with components, technique, equipment/fabric classes, procedures, issue patterns, diagnostic tests and remedies; preserve current pattern/step refs.
 - [ ] Seed only qualified shared facts into project l4eeamth/development after dry-run exact IDs, backups, revision guards and complete graph validation.
 - [ ] Maintain separate fixed exact Content Lake reads and actual KB-only Context; no private maker data in Sanity.
@@ -46,6 +46,7 @@ Exit: exact graph queries validate, served KB separately verified, content absen
 
 ## W04 — Companion UI and pattern literacy
 - [x] Implement project-first landing, distinct gallery, private project library, planning intake, premium workspace and mobile-focused navigation. Local planning-only runtime passed responsive production browser rehearsal; this does not complete W04's pattern-literacy or accessibility exit gates.
+- [x] Show source-derived educational cut/fold/mirroring counts for two distinct candidate garments, with conditional options, pending-review labels and source-failure/stale-basis pause. Production browser rehearsal passed five widths and actual captures. This is not a qualified pattern board or maker-verified cutting guide.
 - [ ] Build 2D pattern-connected board: garment ↔ named flat pieces ↔ seams/steps, cut/fold/grain/count/marking legends, changed-edge before/after and impact trail.
 - [ ] Show explicit plan-only versus mapped/cut-checked/maker-reviewed states; illustrated geometry never masquerades as pattern.
 - [ ] Test 320/390/768/1024/1440, keyboard, focus, contrast, reduced motion and real screenshots.

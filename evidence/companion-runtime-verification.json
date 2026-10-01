@@ -1,6 +1,6 @@
 {
   "kind": "production-nextjs-ui",
-  "checkedAt": "2026-10-01T06:34:10.382Z",
+  "checkedAt": "2026-10-01T07:22:15.759Z",
   "base": "http://127.0.0.1:3100",
   "observations": [
     {
@@ -32,6 +32,10 @@
   "sanityCatalog": {
     "exactContentLakeCards": 2,
     "projectSourceShown": true,
+    "educationalPieceStudy": true,
+    "conditionalPiecesSwitched": true,
+    "simulatedTransportFailurePausedAdvice": true,
+    "simulatedTransportRecovery": true,
     "staleBindingObserved": true,
     "sourceRebased": true,
     "contextKbRebuild": false
@@ -50,6 +54,7 @@
     "home-1440.png",
     "home-390.png",
     "project-1440.png",
+    "project-piece-study-1440.png",
     "project-journal-1440.png",
     "project-source-stale-1440.png",
     "project-source-recovered-1440.png",

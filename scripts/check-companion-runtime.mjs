@@ -103,6 +103,30 @@ try {
     await pause(250);
   }
   if (!sourceReady) throw new Error('Project did not show the current Sanity planning source');
+  const pieceStudyReady = await evaluate("document.querySelector('.piece-study')?.textContent.includes('Skirt section') && document.querySelector('.piece-study')?.textContent.includes('Place on one fabric fold')");
+  if (!pieceStudyReady) throw new Error('Current source did not show its linked educational fold study');
+  await evaluate("document.querySelectorAll('input[name=skirt-construction][type=radio]')[1]?.click()");
+  await evaluate("document.querySelectorAll('input[name=waistband-shape][type=radio]')[1]?.click()");
+  const switchedPieces = await evaluate("document.querySelector('.piece-study')?.textContent.includes('Seamless skirt section') && document.querySelector('.piece-study')?.textContent.includes('Place on a double fold') && document.querySelector('.piece-study')?.textContent.includes('Curved waistband') && !document.querySelector('.piece-study-list')?.textContent.includes('Straight waistband')");
+  if (!switchedPieces) throw new Error('Sandy option controls did not switch the source-derived cut list');
+  const studyShot = await call('Page.captureScreenshot', { format: 'png', captureBeyondViewport: true, fromSurface: true });
+  await writeFile(join(output, 'project-piece-study-1440.png'), Buffer.from(studyShot.data, 'base64'));
+  await evaluate("(()=>{window.__sourceFetch=window.fetch;window.fetch=(input,init)=>String(input).includes('/api/catalog')?Promise.reject(new Error('disposable source transport failure')):window.__sourceFetch(input,init);window.dispatchEvent(new Event('focus'));return true})()");
+  let pausedOnFailure = false;
+  for (let i = 0; i < 120; i++) {
+    pausedOnFailure = await evaluate("!!document.querySelector('.source-binding.unavailable') && !document.querySelector('.piece-study')");
+    if (pausedOnFailure) break;
+    await pause(250);
+  }
+  if (!pausedOnFailure) throw new Error('Source transport failure left cached cut-list guidance visible');
+  await evaluate("(()=>{window.fetch=window.__sourceFetch;window.dispatchEvent(new Event('focus'));return true})()");
+  let recoveredFromFailure = false;
+  for (let i = 0; i < 120; i++) {
+    recoveredFromFailure = await evaluate("!!document.querySelector('.source-binding.current') && !!document.querySelector('.piece-study')");
+    if (recoveredFromFailure) break;
+    await pause(250);
+  }
+  if (!recoveredFromFailure) throw new Error('Source transport recovery did not restore the current piece study');
   const projectShot = await call('Page.captureScreenshot', { format: 'png', captureBeyondViewport: true, fromSurface: true });
   await writeFile(join(output, 'project-1440.png'), Buffer.from(projectShot.data, 'base64'));
   await evaluate("document.querySelector('.save-row button').click()");
@@ -159,6 +183,7 @@ try {
   if (!imported) throw new Error('Backup import did not restore the journal and provenance');
   const staleBinding = await evaluate("document.querySelector('.source-binding.stale')?.textContent.includes('Source changed')");
   if (!staleBinding) throw new Error('Outdated source binding was not shown as stale');
+  if (await evaluate("!!document.querySelector('.piece-study')")) throw new Error('Stale source still exposed the educational cut list');
   const staleShot = await call('Page.captureScreenshot', { format: 'png', captureBeyondViewport: true, fromSurface: true });
   await writeFile(join(output, 'project-source-stale-1440.png'), Buffer.from(staleShot.data, 'base64'));
   await evaluate("document.querySelector('.source-binding button').click()");
@@ -169,6 +194,7 @@ try {
     await pause(250);
   }
   if (!refreshed) throw new Error('Source rebase did not restore the current binding');
+  if (!await evaluate("!!document.querySelector('.piece-study')")) throw new Error('Rebased source did not restore the linked piece study');
   const recoveredShot = await call('Page.captureScreenshot', { format: 'png', captureBeyondViewport: true, fromSurface: true });
   await writeFile(join(output, 'project-source-recovered-1440.png'), Buffer.from(recoveredShot.data, 'base64'));
   await call('Emulation.setDeviceMetricsOverride', { width: 390, height: 900, deviceScaleFactor: 1, mobile: true });
@@ -177,7 +203,7 @@ try {
   const mobileShot = await call('Page.captureScreenshot', { format: 'png', captureBeyondViewport: true, fromSurface: true });
   await writeFile(join(output, 'project-390.png'), Buffer.from(mobileShot.data, 'base64'));
   if (errors.length) throw new Error(`Browser runtime errors: ${JSON.stringify(errors)}`);
-  const report = { kind: 'production-nextjs-ui', checkedAt: new Date().toISOString(), base, observations, sanityCatalog: { exactContentLakeCards: 2, projectSourceShown: sourceReady, staleBindingObserved: staleBinding, sourceRebased: refreshed, contextKbRebuild: false }, projectJourney: { created, saved, noted, resumed, backupVersion: 2, imported, mobileNoOverflow: true }, runtimeErrors: errors, screenshots: ['home-1440.png', 'home-390.png', 'project-1440.png', 'project-journal-1440.png', 'project-source-stale-1440.png', 'project-source-recovered-1440.png', 'project-390.png'], notVerified: ['cut-ready geometry', 'maker review', 'agent', 'Sanity Context revalidation', 'keyboard and screen-reader audit'] };
+  const report = { kind: 'production-nextjs-ui', checkedAt: new Date().toISOString(), base, observations, sanityCatalog: { exactContentLakeCards: 2, projectSourceShown: sourceReady, educationalPieceStudy: pieceStudyReady, conditionalPiecesSwitched: switchedPieces, simulatedTransportFailurePausedAdvice: pausedOnFailure, simulatedTransportRecovery: recoveredFromFailure, staleBindingObserved: staleBinding, sourceRebased: refreshed, contextKbRebuild: false }, projectJourney: { created, saved, noted, resumed, backupVersion: 2, imported, mobileNoOverflow: true }, runtimeErrors: errors, screenshots: ['home-1440.png', 'home-390.png', 'project-1440.png', 'project-piece-study-1440.png', 'project-journal-1440.png', 'project-source-stale-1440.png', 'project-source-recovered-1440.png', 'project-390.png'], notVerified: ['cut-ready geometry', 'maker review', 'agent', 'Sanity Context revalidation', 'keyboard and screen-reader audit'] };
   await writeFile(join(root, 'evidence', 'companion-runtime-verification.json'), JSON.stringify(report, null, 2) + '\n');
   console.log(JSON.stringify(report, null, 2));
 } finally { socket?.close(); chrome.kill(); }

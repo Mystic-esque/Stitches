@@ -1,0 +1,55 @@
+{
+  "checkedAt": "2026-10-01T07:04:25.243Z",
+  "target": "l4eeamth/development",
+  "status": "published-content-lake-only",
+  "records": [
+    {
+      "id": "companion-piece-sandy-skirt-default-20261001",
+      "type": "planningPiece",
+      "revision": "9aIbic2FIRsxr4O0psRp5i"
+    },
+    {
+      "id": "companion-piece-sandy-skirt-seamless-20261001",
+      "type": "planningPiece",
+      "revision": "eFzdw1piZw3HvDNTQQh0Ag"
+    },
+    {
+      "id": "companion-piece-sandy-waistband-curved-20261001",
+      "type": "planningPiece",
+      "revision": "JH6ySKRUnqJAVaqfCPdKfT"
+    },
+    {
+      "id": "companion-piece-sandy-waistband-interfacing-20261001",
+      "type": "planningPiece",
+      "revision": "JH6ySKRUnqJAVaqfCPdKoV"
+    },
+    {
+      "id": "companion-piece-sandy-waistband-straight-20261001",
+      "type": "planningPiece",
+      "revision": "9aIbic2FIRsxr4O0psRp8o"
+    },
+    {
+      "id": "companion-piece-tina-back-20261001",
+      "type": "planningPiece",
+      "revision": "JH6ySKRUnqJAVaqfCPdKvH"
+    },
+    {
+      "id": "companion-piece-tina-front-20261001",
+      "type": "planningPiece",
+      "revision": "U0do4JIPBO5TTWeOyWZcq8"
+    },
+    {
+      "id": "companion-piece-tina-front-bottom-20261001",
+      "type": "planningPiece",
+      "revision": "JH6ySKRUnqJAVaqfCPdL23"
+    },
+    {
+      "id": "companion-piece-tina-sleeve-20261001",
+      "type": "planningPiece",
+      "revision": "9aIbic2FIRsxr4O0psRpI6"
+    }
+  ],
+  "pendingReview": true,
+  "noMeasuredGeometryOrCuttingQualification": true,
+  "kbRebuildNotClaimed": true
+}

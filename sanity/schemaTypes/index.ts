@@ -146,6 +146,21 @@ const planningCandidate = defineType({
     reviewField(),
   ],
 });
+const planningPiece = defineType({
+  name: "planningPiece", title: "Planning cut-list piece", type: "document",
+  fields: [
+    defineField({ name: "candidate", type: "reference", to: [{ type: "planningCandidate" }], validation: required }),
+    defineField({ name: "pieceKey", type: "string", validation: required }),
+    defineField({ name: "title", type: "string", validation: required }),
+    defineField({ name: "cutCount", type: "number", validation: (rule) => rule.required().integer().min(1) }),
+    defineField({ name: "fold", type: "string", options: { list: ["none", "single", "double"] }, validation: required }),
+    defineField({ name: "mirrored", type: "boolean", validation: required }),
+    defineField({ name: "material", type: "string", options: { list: ["main", "interfacing"] }, validation: required }),
+    defineField({ name: "condition", type: "string", options: { list: ["always", "default", "seamless", "straight", "curved", "front-bottom", "sleeves"] }, validation: required }),
+    defineField({ name: "source", type: "reference", to: [{ type: "sourceDocument" }], validation: required }),
+    reviewField(),
+  ],
+});
 
 // These are shared, source-reviewed teaching records. Personal project observations
 // and uploaded photographs belong in guest storage, never in Content Lake.
@@ -252,7 +267,7 @@ const remedy = defineType({
 
 export const schemaTypes = [
   sourceDocument, pattern, patternVersion, patternPiece, seamConnection,
-  adjustmentRule, instructionStep, fabricRequirement, planningCandidate, garmentComponent,
+  adjustmentRule, instructionStep, fabricRequirement, planningCandidate, planningPiece, garmentComponent,
   sewingTechnique, equipmentClass, fabricClass, constructionProcedure,
   issuePattern, diagnosticTest, remedy,
 ];
