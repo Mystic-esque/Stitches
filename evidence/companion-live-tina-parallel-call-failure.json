@@ -1,0 +1,61 @@
+{
+  "kind": "actual-gemini-content-lake-context",
+  "checkedAt": "2026-10-02T05:33:21.122Z",
+  "paidBudgetUsd": 0,
+  "syntheticPrivateProject": true,
+  "sharedSanityWrites": 0,
+  "model": "gemini-3.5-flash-lite",
+  "design": "tina",
+  "injectedContextInterruption": true,
+  "passed": false,
+  "elapsedMs": 5521,
+  "run": {
+    "id": "a51ca5ac-7dbc-4d2b-a9e5-c82b0fa70055",
+    "projectId": "bcf82f3a-e6df-4e7e-a77e-8a43cef2cde8",
+    "basis": {
+      "projectId": "bcf82f3a-e6df-4e7e-a77e-8a43cef2cde8",
+      "projectSequence": 1,
+      "projectHash": "c198a041c24eef6f9cb827f75e5d1b68d4b938e419bfd666b4a89c0a29264a7c",
+      "catalogFingerprint": "68d6026c7f508a70de2255916003d91e3607f23eb3f3afefb3a05ea82e1f215f",
+      "diagnosticFingerprint": "0f087c6b048811f6b3dcc780f9584ad191b9a7a2a638e9545053f95cce3b1161",
+      "historySequence": 0,
+      "historyHash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "task": "understand_pieces",
+    "consentVersion": "preparation-v1",
+    "model": "gemini-3.5-flash-lite",
+    "status": "failed",
+    "requests": 1,
+    "activeMs": 2751,
+    "checkpoints": [
+      {
+        "sequence": 1,
+        "event": "request_reserved",
+        "at": "2026-10-02T05:33:23.376Z",
+        "request": 1
+      },
+      {
+        "sequence": 2,
+        "event": "response_saved",
+        "at": "2026-10-02T05:33:25.799Z",
+        "request": 1
+      },
+      {
+        "sequence": 3,
+        "event": "stopped",
+        "at": "2026-10-02T05:33:26.127Z",
+        "request": 1
+      }
+    ],
+    "tools": [],
+    "createdAt": "2026-10-02T05:33:23.320Z",
+    "updatedAt": "2026-10-02T05:33:26.127Z",
+    "modelTextVerified": false,
+    "projectChanged": false,
+    "capability": "plan_only",
+    "message": "Only one registered read tool is allowed per request."
+  },
+  "acknowledgedResponseRecoveryWithoutExtraRequest": false,
+  "projectUnchanged": true,
+  "distinction": "Actual provider and knowledge retrieval; not a benchmark, maker trial or verified pattern."
+}

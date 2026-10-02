@@ -6,6 +6,7 @@ This is an isolated local research workspace, **not a production app integration
 npm ci --ignore-scripts --no-audit --no-fund --maxsockets=1
 node verify.mjs
 node verify-mapping.mjs
+node audit-sandy-conflicts.mjs
 node preview.mjs
 node check-preview.mjs
 ```
@@ -33,6 +34,8 @@ Complete mating edge/notch counterpart semantics and step DAG, independent allow
 The subsequent exact-edge study names all stitch-outline segments plus the band fold, validates named marking anchors, and binds them to a six-step **local, pending-review educational DAG**. It is not a published Sanity step graph and enables no physical actions. A length-only redraft changes the hem/opening/fold while preserving the waist edges; impact follows actual geometry, not painted highlights. Invalid prerequisites and tampered point/fold/notch data are rejected. The first comparison failed on object key ordering (fixed with structural equality); a 100.00000000000006 mm delta required a floating-point precision assertion, not a changed target.
 
 A second actual issue remains: the band center mark is 10.800786/13.200961 mm from the proposed unfolded skirt midpoint at the two inputs. There is no source-approved counterpart assignment or tolerance. These marks are **not** declared a mating pair and no automatic recut/shift is suggested. The source documentation also leaves opening/closure techniques and variants to the maker; those must be authored/reviewed before an executable guide is qualified. See mapping-verification.json.
+
+October 2 follow-up: `audit-sandy-conflicts.mjs` passes two actual pinned-engine inputs and reconstructs that offset as **half the overlap**. The engine sets `centerNotch.x = -overlap / 2`; this is not unexplained grading drift. That explains the coordinates, not a mating role: current instructions do not assign the proposed skirt-fold counterpart, so no pair or correction is approved. The curved count discrepancy is reconfirmed unchanged (engine 1, current instructions imply two curved parts). `conflict-audit.json` records raw-file SHA-256 hashes, numeric results and the remaining gate. No vendor geometry, test reference answer or Sanity record was changed. The next narrow mapping should select an exact straight-band closure/orientation method; do not infer one from a notch name.
 
 ## Rights evidence and notices
 

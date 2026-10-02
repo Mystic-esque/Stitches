@@ -1,0 +1,240 @@
+{
+  "checkedAt": "2026-10-02T12:18:45.264Z",
+  "candidate": true,
+  "entry": "actual-create-controls-native-history",
+  "syntheticPrivateGuest": true,
+  "providerRequests": 0,
+  "serverRootCount": 1,
+  "initial": {
+    "url": "http://127.0.0.1:3100/",
+    "bodyCount": 1,
+    "roots": [
+      {
+        "visible": true,
+        "style": null,
+        "heading": "From “I could make that”to “I made it.”",
+        "children": [
+          "companion-nav",
+          "maker-profile-panel",
+          "",
+          "companion-footer"
+        ]
+      }
+    ],
+    "bodyChildren": [
+      {
+        "type": 1,
+        "tag": "DIV",
+        "style": null,
+        "text": null
+      },
+      {
+        "type": 1,
+        "tag": "DIV",
+        "style": null,
+        "text": null
+      },
+      {
+        "type": 8,
+        "tag": "#comment",
+        "style": null,
+        "text": "$"
+      },
+      {
+        "type": 8,
+        "tag": "#comment",
+        "style": null,
+        "text": "/$"
+      },
+      {
+        "type": 1,
+        "tag": "SCRIPT",
+        "style": null,
+        "text": null
+      },
+      {
+        "type": 1,
+        "tag": "SCRIPT",
+        "style": null,
+        "text": null
+      },
+      {
+        "type": 1,
+        "tag": "SCRIPT",
+        "style": null,
+        "text": null
+      },
+      {
+        "type": 1,
+        "tag": "NEXT-ROUTE-ANNOUNCER",
+        "style": "position: absolute;",
+        "text": null
+      }
+    ],
+    "styles": [
+      {
+        "href": "http://127.0.0.1:3100/_next/static/css/cda7a6bfa4006928.css",
+        "loaded": true
+      },
+      {
+        "href": "http://127.0.0.1:3100/_next/static/css/80ff8a9cf215f632.css",
+        "loaded": true
+      }
+    ]
+  },
+  "opened": {
+    "url": "http://127.0.0.1:3100/?project=16601938-5d95-4868-be47-b0ae09a7d1fc",
+    "bodyCount": 1,
+    "roots": [
+      {
+        "visible": true,
+        "style": null,
+        "heading": "Synthetic restore probe",
+        "children": [
+          "companion-nav",
+          "maker-profile-panel",
+          "companion-project",
+          "companion-footer"
+        ]
+      }
+    ],
+    "bodyChildren": [
+      {
+        "type": 1,
+        "tag": "DIV",
+        "style": null,
+        "text": null
+      },
+      {
+        "type": 1,
+        "tag": "DIV",
+        "style": null,
+        "text": null
+      },
+      {
+        "type": 8,
+        "tag": "#comment",
+        "style": null,
+        "text": "$"
+      },
+      {
+        "type": 8,
+        "tag": "#comment",
+        "style": null,
+        "text": "/$"
+      },
+      {
+        "type": 1,
+        "tag": "SCRIPT",
+        "style": null,
+        "text": null
+      },
+      {
+        "type": 1,
+        "tag": "SCRIPT",
+        "style": null,
+        "text": null
+      },
+      {
+        "type": 1,
+        "tag": "SCRIPT",
+        "style": null,
+        "text": null
+      },
+      {
+        "type": 1,
+        "tag": "NEXT-ROUTE-ANNOUNCER",
+        "style": "position: absolute;",
+        "text": null
+      }
+    ],
+    "styles": [
+      {
+        "href": "http://127.0.0.1:3100/_next/static/css/cda7a6bfa4006928.css",
+        "loaded": true
+      },
+      {
+        "href": "http://127.0.0.1:3100/_next/static/css/80ff8a9cf215f632.css",
+        "loaded": true
+      }
+    ]
+  },
+  "reloaded": {
+    "url": "http://127.0.0.1:3100/?project=16601938-5d95-4868-be47-b0ae09a7d1fc",
+    "bodyCount": 1,
+    "roots": [
+      {
+        "visible": true,
+        "style": null,
+        "heading": "Synthetic restore probe",
+        "children": [
+          "companion-nav",
+          "maker-profile-panel",
+          "companion-project",
+          "companion-footer"
+        ]
+      }
+    ],
+    "bodyChildren": [
+      {
+        "type": 1,
+        "tag": "DIV",
+        "style": null,
+        "text": null
+      },
+      {
+        "type": 1,
+        "tag": "DIV",
+        "style": null,
+        "text": null
+      },
+      {
+        "type": 8,
+        "tag": "#comment",
+        "style": null,
+        "text": "$"
+      },
+      {
+        "type": 8,
+        "tag": "#comment",
+        "style": null,
+        "text": "/$"
+      },
+      {
+        "type": 1,
+        "tag": "SCRIPT",
+        "style": null,
+        "text": null
+      },
+      {
+        "type": 1,
+        "tag": "SCRIPT",
+        "style": null,
+        "text": null
+      },
+      {
+        "type": 1,
+        "tag": "SCRIPT",
+        "style": null,
+        "text": null
+      },
+      {
+        "type": 1,
+        "tag": "NEXT-ROUTE-ANNOUNCER",
+        "style": "position: absolute;",
+        "text": null
+      }
+    ],
+    "styles": [
+      {
+        "href": "http://127.0.0.1:3100/_next/static/css/cda7a6bfa4006928.css",
+        "loaded": true
+      },
+      {
+        "href": "http://127.0.0.1:3100/_next/static/css/80ff8a9cf215f632.css",
+        "loaded": true
+      }
+    ]
+  },
+  "consoleErrors": []
+}

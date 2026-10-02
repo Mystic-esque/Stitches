@@ -2,7 +2,19 @@
 
 Updated: October 2, 2026.
 
-## Next executable task — persisted private agent runs (W08/C01/C08/C09)
+## Verified W08 batch — durable contextual preparation assistant
+
+Atomic contract C01/C08/C09: implement owner-scoped, idempotent run starts; transactional request reservations and private signed provider checkpoints; explicit consent/minimized input; source/project/history staleness; cancel/continue and unknown-provider-outcome handling. Files: agent-run domain, additive GuestStore tables, run controller/routes, ProjectAssistant and focused tests. Four attempted provider requests and 120 active seconds maximum; local daily reservations capped at 8 per guest / 16 overall, including failed attempts. Only the owner-confirmed free-tier allowlisted model is enabled locally. No automatic charged retry, model write, keep, progress, diagnostic confirmation or cutting claim.
+
+Implemented and verified for this read-only envelope. Final deterministic suite **106 passed / 0 failed / 3 opt-in skipped** (`evidence/companion-durable-final-verification.json`), typecheck and final production build exit 0. Actual Sandy/Tina Gemini + dedicated Content Lake + served Context KB tasks pass at four requests each; Tina includes a labeled injected local read interruption and acknowledged-response recovery without another request. Original real parallel-tool failure is retained and fixed through provider-native stage restriction plus independent validation. The model alias/SDK are recorded, not an unobserved backend model version. Final production API at **12:51:16Z** passes strict consent, owner/Origin, replay/conflict, input bounds, persistent cancellation, stale-plan and private-state tests with zero inference. Actual Chrome at **12:50:48Z** passes five widths, real consent/start/cancel/reload, private history/stop, source outage/recovery, profile/measurement and backup journeys; zero runtime errors, overflow or broken images. Fresh assistant desktop/phone and history captures visually inspected. Browser assistant proof has zero inference; separate live receipts prove the provider integration. No complete maker-task or benchmark claim.
+
+Observed UI failure and repair: duplicate sibling keys on DiagnosticHistory and ProjectAssistant left a second history section when late source records arrived after reload. Atomic identity showed one root/main and two history panels, not two app roots or duplicated stored facts. Give each sibling a distinct prefixed key; the unchanged three-event assertion plus new one-root/main/history regression now passes. The redundant-URL guard and fresh-document waits alone did not fix it. Failed receipts remain. A later cold-start rehearsal failed while the actual catalog read stalled; unchanged rerun passed after the read recovered. Cold/network latency is still an operational limitation, not a diagnosed fix. Local credential presence/format passed without values printed. Committed inference defaults remain disabled; only local owner-confirmed free-tier configuration is enabled. Rollback retains SQLite data and evidence, disables the new gate and reverts code only.
+
+Independent focused restore rehearsal at **12:52:39Z** also passes: one app root, one project main, one history section and exactly three persisted events after actual create controls, source study and reload; zero console errors, zero inference. Receipt: `evidence/project-restore-probe-sandy-ui-study-prime-verified.json`.
+
+One next executable task: W01/W04, qualify the pinned Sandy straight-band closure/orientation and complete applicable piece/step map against actual source/version evidence. The independent two-input discrepancy audit explains the offset as minus half the overlap; it does not approve a notch mate. Curved cut count, Tina mapping, rights and physical gates remain open. Do not unlock cutting on unresolved conflicts.
+
+## Historical task — persisted private agent runs (W08/C01/C08/C09), now verified above
 
 Build on the verified read-only tool boundary below. Add strict owner-scoped run/checkpoint schemas and additive transactional storage with project/source/history binding, idempotent starts/checkpoints, cancellation and explicit stale/quota/timeout/unknown-provider-outcome states. Preserve opaque signed provider content only in private run state; never log credentials or copy it to Sanity. The controller must enforce the four-request/$0/120-second boundaries and not retry an ambiguous charged request silently. Preview minimized provider input and obtain explicit app consent before inference; manual preparation remains usable. No model keeps, observations or physical progress writes. First atomic slice: run persistence and deterministic isolation/replay/stale/cancel tests; then wire consent UI and qualify live model tasks. Rollback preserves private records and evidence. Cold-launch/catalog latency remains an operational rehearsal issue to investigate, not a proved root cause.
 
@@ -46,14 +58,14 @@ No W01–W10 release package is fully closed yet; checked slices are real finish
 
 | Package | Verified work | Still open |
 | --- | --- | --- |
-| W01 | Two distinct planning sources; real measured Sandy/edge spike | Complete Tina/source/rights/step mapping, count/notch conflicts, physical qualification |
+| W01 | Two distinct planning sources; real measured Sandy/edge spike; two-input overlap-offset audit | Complete Tina/source/rights/step mapping, approved notch counterpart and curved count conflict, physical qualification |
 | W02 | Private projects/profiles/revisions/journal, units, explicit copy, stale/replay/isolation, restart tests and backups | Step-specific progress, cleanup, deployable durability |
 | W03 | Exact scoped catalog, actual maintained Context entries, shared pending scrap diagnostic, correction/read-back | Independent review and complete making graph; import-job metadata |
 | W04 | Landing/library/intake/planning UI and source-linked educational piece studies; five-width real captures | Qualified technical pattern board and full access audit |
 | W05 | Dimension-aware body notes, saved preparation review/private brief and isolated redraft research | Production checked variation, layout and calibrated exports |
 | W06 | Conditional shared scrap diagnostic, private source-bound attempts/outcomes/pause and journal preparation; actual outage/reload/restore proof | Authored active-step journey and confirmed garment recovery |
 | W07 | Not implemented | Consent/private temporary photo observations and manual fallback |
-| W08 | Historical scoped illustrative Gemini loop; tested read-only project/preparation loop and actual two-project Context reads | Public consent UI, durable runs, quota/cancel/resume orchestration and live model task proof |
+| W08 | Durable private read-only assistant, consent/history UI, bound recovery/cancel/quota states; deterministic/API/five-width browser proof and two actual Gemini + Context tasks | Qualified making/diagnostic/variation/proposal tools, complete maker-task proof and frozen benchmark |
 | W09 | Real shared-content correction, changed fingerprints, verified served KB recovery | Complete two-project advice/proposal correction demo and frozen fair benchmark |
 | W10 | Real software/API/browser verification and screenshots | Physical print/maker trials, three user tests, complete local release/submission package |
 

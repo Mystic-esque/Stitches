@@ -1,0 +1,25 @@
+{
+  "kind": "actual-local-production-agent-control-api",
+  "checkedAt": "2026-10-02T12:51:16.537Z",
+  "base": "http://127.0.0.1:3100",
+  "providerRequests": 0,
+  "sanityWrites": 0,
+  "source": "actual-Stitches-development-Content-Lake",
+  "syntheticPrivateGuests": true,
+  "cases": {
+    "minimizedPreview": true,
+    "consentAndStrictTaskRequired": true,
+    "originAndGuestDenial": true,
+    "boundedInput": true,
+    "startReplayAndConflict": true,
+    "oneActiveRun": true,
+    "cancelPersistence": true,
+    "savedPlanMakesRunStale": true,
+    "staleStartDenied": true,
+    "privateProviderStateWithheld": true
+  },
+  "limitations": [
+    "No provider inference or physical making claim.",
+    "Independent live provider receipts cover the model integration."
+  ]
+}

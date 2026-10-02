@@ -1,0 +1,301 @@
+{
+  "checkedAt": "2026-10-02T12:36:30.313Z",
+  "candidate": true,
+  "study": true,
+  "prime": false,
+  "entry": "actual-create-controls-native-history",
+  "syntheticPrivateGuest": true,
+  "providerRequests": 0,
+  "serverRootCount": 1,
+  "initial": {
+    "url": "http://127.0.0.1:3100/",
+    "bodyCount": 1,
+    "roots": [
+      {
+        "visible": true,
+        "style": null,
+        "heading": "From “I could make that”to “I made it.”",
+        "children": [
+          "companion-nav",
+          "maker-profile-panel",
+          "",
+          "companion-footer"
+        ]
+      }
+    ],
+    "bodyChildren": [
+      {
+        "type": 1,
+        "tag": "DIV",
+        "style": null,
+        "text": null
+      },
+      {
+        "type": 1,
+        "tag": "DIV",
+        "style": null,
+        "text": null
+      },
+      {
+        "type": 8,
+        "tag": "#comment",
+        "style": null,
+        "text": "$"
+      },
+      {
+        "type": 8,
+        "tag": "#comment",
+        "style": null,
+        "text": "/$"
+      },
+      {
+        "type": 1,
+        "tag": "SCRIPT",
+        "style": null,
+        "text": null
+      },
+      {
+        "type": 1,
+        "tag": "SCRIPT",
+        "style": null,
+        "text": null
+      },
+      {
+        "type": 1,
+        "tag": "SCRIPT",
+        "style": null,
+        "text": null
+      },
+      {
+        "type": 1,
+        "tag": "NEXT-ROUTE-ANNOUNCER",
+        "style": "position: absolute;",
+        "text": null
+      }
+    ],
+    "styles": [
+      {
+        "href": "http://127.0.0.1:3100/_next/static/css/cda7a6bfa4006928.css",
+        "loaded": true
+      },
+      {
+        "href": "http://127.0.0.1:3100/_next/static/css/80ff8a9cf215f632.css",
+        "loaded": true
+      }
+    ]
+  },
+  "opened": {
+    "url": "http://127.0.0.1:3100/?project=9e80b652-e01b-4efd-812b-41e6ae7a2f73",
+    "bodyCount": 1,
+    "roots": [
+      {
+        "visible": true,
+        "style": null,
+        "heading": "Synthetic restore probe",
+        "children": [
+          "companion-nav",
+          "maker-profile-panel",
+          "companion-project",
+          "companion-footer"
+        ]
+      }
+    ],
+    "bodyChildren": [
+      {
+        "type": 1,
+        "tag": "DIV",
+        "style": null,
+        "text": null
+      },
+      {
+        "type": 1,
+        "tag": "DIV",
+        "style": null,
+        "text": null
+      },
+      {
+        "type": 8,
+        "tag": "#comment",
+        "style": null,
+        "text": "$"
+      },
+      {
+        "type": 8,
+        "tag": "#comment",
+        "style": null,
+        "text": "/$"
+      },
+      {
+        "type": 1,
+        "tag": "SCRIPT",
+        "style": null,
+        "text": null
+      },
+      {
+        "type": 1,
+        "tag": "SCRIPT",
+        "style": null,
+        "text": null
+      },
+      {
+        "type": 1,
+        "tag": "SCRIPT",
+        "style": null,
+        "text": null
+      },
+      {
+        "type": 1,
+        "tag": "NEXT-ROUTE-ANNOUNCER",
+        "style": "position: absolute;",
+        "text": null
+      }
+    ],
+    "styles": [
+      {
+        "href": "http://127.0.0.1:3100/_next/static/css/cda7a6bfa4006928.css",
+        "loaded": true
+      },
+      {
+        "href": "http://127.0.0.1:3100/_next/static/css/80ff8a9cf215f632.css",
+        "loaded": true
+      }
+    ]
+  },
+  "reloaded": {
+    "url": "http://127.0.0.1:3100/?project=9e80b652-e01b-4efd-812b-41e6ae7a2f73",
+    "bodyCount": 1,
+    "roots": [
+      {
+        "visible": true,
+        "style": null,
+        "heading": "Synthetic restore probe",
+        "children": [
+          "companion-nav",
+          "maker-profile-panel",
+          "companion-project",
+          "companion-footer"
+        ]
+      }
+    ],
+    "bodyChildren": [
+      {
+        "type": 1,
+        "tag": "DIV",
+        "style": null,
+        "text": null
+      },
+      {
+        "type": 1,
+        "tag": "DIV",
+        "style": null,
+        "text": null
+      },
+      {
+        "type": 8,
+        "tag": "#comment",
+        "style": null,
+        "text": "$"
+      },
+      {
+        "type": 8,
+        "tag": "#comment",
+        "style": null,
+        "text": "/$"
+      },
+      {
+        "type": 1,
+        "tag": "SCRIPT",
+        "style": null,
+        "text": null
+      },
+      {
+        "type": 1,
+        "tag": "SCRIPT",
+        "style": null,
+        "text": null
+      },
+      {
+        "type": 1,
+        "tag": "SCRIPT",
+        "style": null,
+        "text": null
+      },
+      {
+        "type": 1,
+        "tag": "NEXT-ROUTE-ANNOUNCER",
+        "style": "position: absolute;",
+        "text": null
+      }
+    ],
+    "styles": [
+      {
+        "href": "http://127.0.0.1:3100/_next/static/css/cda7a6bfa4006928.css",
+        "loaded": true
+      },
+      {
+        "href": "http://127.0.0.1:3100/_next/static/css/80ff8a9cf215f632.css",
+        "loaded": true
+      }
+    ],
+    "historyCount": 6,
+    "historySections": 2,
+    "historyRoots": [
+      {
+        "connected": true,
+        "parent": "companion-project",
+        "appRoot": "companion-app",
+        "appIsQueried": true
+      },
+      {
+        "connected": true,
+        "parent": "companion-project",
+        "appRoot": "companion-app",
+        "appIsQueried": true
+      }
+    ],
+    "atomic": {
+      "rootCount": 1,
+      "mainCount": 1,
+      "historyCount": 2,
+      "uniqueHistory": 2,
+      "byClass": 2,
+      "queryFunction": "function querySelectorAll() { [native code] }",
+      "sections": [
+        {
+          "rootIndex": 0,
+          "mainIndex": 0,
+          "outer": "<section class=\"diagnostic-history\" aria-labelledby=\"diagnostic-history-title\"><p class=\"companion-kicker\">YOUR SCRAP CHECK NOTEBOOK</p><h2 id=\"diagnostic-history-title\">What actually happened.</h2><p>Private, version-bound observations—not a diagnosis. Old work stays visible when a plan or source changes.</p><button class=\"history-pause\" type=\"but"
+        },
+        {
+          "rootIndex": 0,
+          "mainIndex": 0,
+          "outer": "<section class=\"diagnostic-history\" aria-labelledby=\"diagnostic-history-title\"><p class=\"companion-kicker\">YOUR SCRAP CHECK NOTEBOOK</p><h2 id=\"diagnostic-history-title\">What actually happened.</h2><p>Private, version-bound observations—not a diagnosis. Old work stays visible when a plan or source changes.</p><button class=\"history-pause\" type=\"but"
+        }
+      ],
+      "rootChildren": [
+        [
+          "companion-nav",
+          "maker-profile-panel",
+          "companion-project",
+          "companion-footer"
+        ]
+      ],
+      "mainChildren": [
+        [
+          "project-topline",
+          "project-head",
+          "project-source-strip",
+          "source-binding current",
+          "diagnostic-history",
+          "piece-study",
+          "diagnostic-study",
+          "diagnostic-history",
+          "preparation-plan",
+          "project-assistant",
+          "project-workspace"
+        ]
+      ]
+    }
+  },
+  "consoleErrors": []
+}

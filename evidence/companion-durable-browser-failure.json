@@ -1,0 +1,88 @@
+{
+  "checkedAt": "2026-10-02T12:47:57.359Z",
+  "passed": false,
+  "error": "Home did not settle at 1440px; actual page/catalog failure capture saved",
+  "state": {
+    "ready": "complete",
+    "url": "http://127.0.0.1:3100/",
+    "historyCount": 0,
+    "stopVisible": false,
+    "projectPresent": false,
+    "historySections": [],
+    "consoleErrors": [],
+    "document": {
+      "roots": [
+        {
+          "style": null,
+          "background": "rgb(244, 241, 233)",
+          "children": [
+            "companion-nav",
+            "maker-profile-panel",
+            "",
+            "companion-footer"
+          ]
+        }
+      ],
+      "scripts": [
+        "http://127.0.0.1:3100/_next/static/chunks/e21afd48-5f4278997b209717.js",
+        "http://127.0.0.1:3100/_next/static/chunks/686-93a6d8398fb8bf44.js",
+        "http://127.0.0.1:3100/_next/static/chunks/main-app-2cfe87542cc341cd.js",
+        "http://127.0.0.1:3100/_next/static/chunks/polyfills-42372ed130431b0a.js",
+        "http://127.0.0.1:3100/_next/static/chunks/webpack-2fa98188dbdcc050.js"
+      ],
+      "styles": [
+        {
+          "href": "http://127.0.0.1:3100/_next/static/css/cda7a6bfa4006928.css",
+          "loaded": true
+        },
+        {
+          "href": "http://127.0.0.1:3100/_next/static/css/80ff8a9cf215f632.css",
+          "loaded": true
+        }
+      ],
+      "bodyChildren": [
+        {
+          "tag": "DIV",
+          "type": 1,
+          "text": null
+        },
+        {
+          "tag": "DIV",
+          "type": 1,
+          "text": null
+        },
+        {
+          "tag": "#comment",
+          "type": 8,
+          "text": "$"
+        },
+        {
+          "tag": "#comment",
+          "type": 8,
+          "text": "/$"
+        },
+        {
+          "tag": "SCRIPT",
+          "type": 1,
+          "text": null
+        },
+        {
+          "tag": "SCRIPT",
+          "type": 1,
+          "text": null
+        },
+        {
+          "tag": "SCRIPT",
+          "type": 1,
+          "text": null
+        },
+        {
+          "tag": "NEXT-ROUTE-ANNOUNCER",
+          "type": 1,
+          "text": null
+        }
+      ]
+    }
+  },
+  "runtimeErrors": []
+}

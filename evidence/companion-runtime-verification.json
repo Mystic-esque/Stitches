@@ -1,6 +1,6 @@
 {
   "kind": "production-nextjs-ui",
-  "checkedAt": "2026-10-02T04:34:02.689Z",
+  "checkedAt": "2026-10-02T12:50:48.827Z",
   "base": "http://127.0.0.1:3100",
   "observations": [
     {
@@ -69,7 +69,9 @@
     "maker-profile-copy-1440.png",
     "maker-profile-copy-390.png",
     "project-measurements-tina-1440.png",
-    "project-measurements-tina-390.png"
+    "project-measurements-tina-390.png",
+    "project-assistant-1440.png",
+    "project-assistant-390.png"
   ],
   "notVerified": [
     "cut-ready geometry",
@@ -202,5 +204,15 @@
     "plainTextBriefDownloaded": true,
     "savedScrapResultsIncluded": true,
     "fiveWidthNoOverflow": true
+  },
+  "assistant": {
+    "consentRequired": true,
+    "exactMinimizedPreview": true,
+    "actualPrivateStartAndCancel": true,
+    "reloadPersistence": true,
+    "providerRequests": 0,
+    "privateTranscriptWithheld": true,
+    "fiveWidthNoOverflow": true,
+    "syntheticConsentFlow": true
   }
 }

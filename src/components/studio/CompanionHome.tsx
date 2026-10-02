@@ -1,5 +1,7 @@
 "use client";
 
+import "../../app/assistant.css";
+
 import Image from "next/image";
 import { useCallback, useEffect, useRef, useState, type ChangeEvent, type FormEvent } from "react";
 import { projectBackupSchema, type GuestProject, type ProjectNote, type ProjectPlan, type ProjectSource } from "@/domain/guest-project";
@@ -11,6 +13,7 @@ import type { DiagnosticRecord } from "@/domain/diagnostic-history";
 import { MeasurementPlan } from "./MeasurementPlan";
 import { MakerProfilePanel } from "./MakerProfilePanel";
 import { PreparationPlan } from "./PreparationPlan";
+import { ProjectAssistant } from "./ProjectAssistant";
 import { applyMeasurementDraft, measurementDraftFor, type MeasurementDraft } from "@/domain/measurement-plan";
 
 const starts = [
@@ -68,7 +71,11 @@ export function CompanionHome() {
       const data = await json(await fetch(`/api/projects/${encodeURIComponent(id)}`, { cache: "no-store" }));
       setActive(data.project); setDraft(draftFor(data.project)); setRevisions(data.revisions); setNotes(data.notes);
       setDiagnostics(data.diagnostics ?? []);
-      window.history.pushState({}, "", `/?project=${encodeURIComponent(id)}`);
+      // Restoring this URL must not dispatch a second router restore or add a back-stack entry.
+      const projectUrl = `/?project=${encodeURIComponent(id)}`;
+      if (`${window.location.pathname}${window.location.search}` !== projectUrl) {
+        window.history.pushState({}, "", projectUrl);
+      }
       window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (cause) { setError(cause instanceof Error ? cause.message : "Project unavailable."); }
   }, []);
@@ -221,10 +228,11 @@ export function CompanionHome() {
         onSaved={(record) => { if (activeId.current === record.projectId) setDiagnostics((history) => history.some((item) => item.id === record.id) ? history : [...history, record]); }}
         onReload={async () => { const data = await json(await fetch(`/api/projects/${active.id}/diagnostics`, { cache: "no-store" })); if (activeId.current === active.id) setDiagnostics(data.diagnostics); }}
         onPrepareNote={(text) => { setNoteKind("journal"); setNoteStage("check"); setNoteText(text); document.getElementById("journal-heading")?.scrollIntoView({ behavior: "smooth" }); }} />}
-      <DiagnosticHistory key={active.id} history={diagnostics} project={active} disabled={busy || unsavedChanges}
+      <DiagnosticHistory key={`history-${active.id}`} history={diagnostics} project={active} disabled={busy || unsavedChanges}
         onSaved={(record) => { if (activeId.current === record.projectId) setDiagnostics((history) => history.some((item) => item.id === record.id) ? history : [...history, record]); }}
         currentFingerprint={sourceBinding === "current" ? sourceCard?.diagnosticStudy.fingerprint : undefined} />
       <PreparationPlan project={active} source={sourceCard} history={diagnostics} dirty={unsavedChanges} />
+      <ProjectAssistant key={`assistant-${active.id}`} project={active} source={sourceCard} historySequence={diagnostics.length} dirty={unsavedChanges} />
       <div className="project-workspace"><aside className="project-rail" aria-label="Project stages"><p className="rail-caption">THE JOURNEY</p><ol><li className="current"><b>01</b><span>Plan your idea<small>Available now</small></span></li><li><b>02</b><span>Understand the pattern<small>Qualification in progress</small></span></li><li><b>03</b><span>Cut with confidence<small>Not yet verified</small></span></li><li><b>04</b><span>Make & troubleshoot<small>Not yet verified</small></span></li></ol><a href="/demo">Explore the pattern study ↗</a></aside>
         <form className="project-form" onSubmit={save}><div className="form-intro"><p className="companion-kicker">THE WORKING BRIEF</p><h2>Make it yours, one decision at a time.</h2><p>Describe what you want to make. Stitches keeps constraints together while drafting and making tools are verified.</p></div>
           <div className="field-row"><label>Project name<input value={draft.title} maxLength={100} required onChange={(event) => update("title", event.target.value)} /></label><label>Fabric structure<select value={draft.structure} onChange={(event) => update("structure", event.target.value)}><option value="unknown">Not sure yet</option><option value="woven">Woven</option><option value="knit">Knit / stretch</option></select></label></div>

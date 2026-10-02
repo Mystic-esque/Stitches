@@ -16,6 +16,7 @@ let stderr = '';
 chrome.stderr.on('data', (part) => { stderr = (stderr + part).slice(-1200); });
 const pause = (ms) => new Promise((done) => setTimeout(done, ms));
 let socket;
+let captureFailure;
 try {
   let port;
   for (let i = 0; i < 900; i++) {
@@ -28,10 +29,11 @@ try {
   await new Promise((done, reject) => { socket.addEventListener('open', done, { once: true }); socket.addEventListener('error', reject, { once: true }); });
   let sequence = 0;
   const pending = new Map();
-  const errors = [];
+  const errors = [], consoleErrors = [];
   socket.addEventListener('message', (event) => {
     const message = JSON.parse(event.data);
     if (message.method === 'Runtime.exceptionThrown') errors.push(message.params.exceptionDetails.text);
+    if (message.method === 'Runtime.consoleAPICalled' && message.params.type === 'error') consoleErrors.push(message.params.args.map(item=>String(item.value??item.description)).join(' ').slice(0,1200));
     const waiting = pending.get(message.id);
     if (waiting) { pending.delete(message.id); clearTimeout(waiting.timer); message.error ? waiting.reject(new Error(JSON.stringify(message.error))) : waiting.done(message.result); }
   });
@@ -48,11 +50,38 @@ try {
     if (result.exceptionDetails) throw new Error(JSON.stringify(result.exceptionDetails));
     return result.result?.value;
   }
+  async function reloadPage() {
+    await evaluate("window.__stitchesReloadMarker=true");
+    await call('Page.reload');
+    for (let i=0;i<240;i++) {
+      if (await evaluate("window.__stitchesReloadMarker===undefined && document.readyState==='complete'")) return;
+      await pause(250);
+    }
+    throw new Error('A fresh document did not finish loading after reload');
+  }
+  async function navigatePage(url) {
+    await evaluate("window.__stitchesNavigationMarker=true");
+    await call('Page.navigate', { url });
+    for (let i=0;i<240;i++) {
+      if (await evaluate("window.__stitchesNavigationMarker===undefined && document.readyState==='complete'")) return;
+      await pause(250);
+    }
+    throw new Error('A fresh document did not finish loading after navigation');
+  }
+  captureFailure = async (error) => {
+    const state = await evaluate("({ready:document.readyState,url:location.href,historyCount:document.querySelectorAll('.diagnostic-history li').length,stopVisible:!!document.querySelector('.diagnostic-outcome.unresolved'),source:document.querySelector('.source-binding')?.textContent,projectPresent:!!document.querySelector('.companion-project'),assistant:document.querySelector('.project-assistant')?.textContent.slice(0,1800)})");
+    state.historySections = await evaluate("[...document.querySelectorAll('.diagnostic-history')].map(x=>({visible:x.checkVisibility(),rows:[...x.querySelectorAll('li')].map(li=>({visible:li.checkVisibility(),label:li.querySelector('strong')?.textContent})),parents:[x.parentElement,x.parentElement?.parentElement,x.parentElement?.parentElement?.parentElement].map(p=>p?{tag:p.tagName,className:p.className,display:getComputedStyle(p).display}:null)}))");
+    state.consoleErrors = consoleErrors;
+    state.document = await evaluate("({roots:[...document.querySelectorAll('.companion-app')].map(x=>({style:x.getAttribute('style'),background:getComputedStyle(x).backgroundColor,children:[...x.children].map(c=>c.className)})),scripts:[...document.querySelectorAll('script[src]')].map(x=>x.src),styles:[...document.querySelectorAll('link[rel=stylesheet]')].map(x=>({href:x.href,loaded:!!x.sheet})),bodyChildren:[...document.body.childNodes].map(x=>({tag:x.nodeName,type:x.nodeType,text:x.nodeType===8?x.textContent:null}))})");
+    const shot=await call('Page.captureScreenshot',{format:'png',fromSurface:true});
+    await writeFile(join(output,'durable-browser-failure.png'),Buffer.from(shot.data,'base64'));
+    await writeFile(join(root,'evidence','companion-durable-browser-failure.json'),JSON.stringify({checkedAt:new Date().toISOString(),passed:false,error:error.message,state,runtimeErrors:errors},null,2));
+  };
   await call('Page.enable'); await call('Runtime.enable');
   const observations = [];
   for (const width of [1440, 1024, 768, 390, 320]) {
     await call('Emulation.setDeviceMetricsOverride', { width, height: 900, deviceScaleFactor: 1, mobile: width < 500 });
-    await call('Page.navigate', { url: `${base}/` });
+    await navigatePage(`${base}/`);
     let ready = false;
     for (let i = 0; i < 240; i++) {
       ready = await evaluate("document.readyState === 'complete' && !!document.querySelector('.companion-hero') && document.querySelectorAll('.catalog-evidence-grid article').length === 2");
@@ -82,7 +111,7 @@ try {
     observations.push({ width, noOverflow: true, brokenImages: 0 });
   }
   await call('Emulation.setDeviceMetricsOverride', { width: 1440, height: 900, deviceScaleFactor: 1, mobile: false });
-  await call('Page.navigate', { url: `${base}/` });
+  await navigatePage(`${base}/`);
   for (let i = 0; i < 120; i++) {
     if (await evaluate("document.querySelector('.collection-card button') && !document.querySelector('.companion-projects').innerText.includes('Loading projects')")) break;
     await pause(250);
@@ -137,9 +166,10 @@ try {
   await evaluate("[...document.querySelectorAll('.diagnostic-actions button')].find(x=>x.textContent.includes('No improvement')).click()");
   for (let i = 0; i < 240; i++) { if (await evaluate("document.querySelectorAll('.diagnostic-history li').length === 3")) break; await pause(250); }
   if (!await evaluate("document.querySelectorAll('.diagnostic-history li').length === 3 && !document.querySelector('.diagnostic-outcome')?.textContent.includes('lower upper-thread tension')")) throw new Error('Unsuccessful scrap outcome did not stop advice and preserve three separate events');
-  await call('Page.reload');
+  await reloadPage();
   for (let i = 0; i < 240; i++) { if (await evaluate("document.querySelectorAll('.diagnostic-history li').length === 3 && !!document.querySelector('.diagnostic-outcome.unresolved')")) break; await pause(250); }
   if (!await evaluate("document.querySelectorAll('.diagnostic-history li').length === 3 && !!document.querySelector('.diagnostic-outcome.unresolved')")) throw new Error('Scrap history/stop state did not survive reload');
+  if (!await evaluate("document.querySelectorAll('.companion-app').length===1 && document.querySelectorAll('.companion-project').length===1 && document.querySelectorAll('.diagnostic-history').length===1")) throw new Error('Source arrival duplicated a project panel after reload');
   if (!await evaluate("document.querySelector('.preparation-plan li[data-state=blocked]')?.textContent.includes('Do not cut') && document.querySelector('.preparation-next')?.textContent.includes('Still to record')")) throw new Error('Preparation did not identify missing source-listed notes or preserve the cutting gate');
   await evaluate("(()=>{const previous=URL.createObjectURL;URL.createObjectURL=blob=>{window.__planningBrief=blob;return previous.call(URL,blob)};document.querySelector('.preparation-heading button').click();URL.createObjectURL=previous;return true})()");
   const brief = await evaluate("window.__planningBrief.text()");
@@ -212,7 +242,7 @@ try {
     await pause(250);
   }
   if (!noted) throw new Error('Journal note was not saved');
-  await call('Page.reload');
+  await reloadPage();
   let resumed = false;
   for (let i = 0; i < 240; i++) {
     resumed = await evaluate("document.querySelector('.project-topline')?.textContent.includes('revision 2') && document.querySelector('.journal-list')?.textContent.includes('I tested a sample seam')");
@@ -264,7 +294,7 @@ try {
   const mobileShot = await call('Page.captureScreenshot', { format: 'png', captureBeyondViewport: true, fromSurface: true });
   await writeFile(join(output, 'project-390.png'), Buffer.from(mobileShot.data, 'base64'));
   const tinaId = await evaluate("(async()=>{const response=await fetch('/api/projects',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({title:'Disposable angular notes rehearsal',brief:'Synthetic measurements only.',source:{kind:'candidate',designId:'tina'},plan:{features:[],openQuestions:[],measurementsMm:{bust:900,hip:1000,specialistLength:100.3},measurementsDegrees:{shoulderSlope:14},fabric:{description:'',widthMm:null,lengthMm:null,structure:'unknown'},equipment:[]},idempotencyKey:crypto.randomUUID()})});const data=await response.json();if(!response.ok)throw new Error(data.message);return data.project.id})()");
-  await call('Page.navigate', { url: `${base}/?project=${tinaId}` });
+  await navigatePage(`${base}/?project=${tinaId}`);
   let measurementsReady = false;
   for (let i = 0; i < 240; i++) {
     measurementsReady = await evaluate("document.querySelectorAll('.measurement-plan .measurement-grid input').length===14 && document.querySelector('[name=measure-shoulderSlope]')?.value==='14'");
@@ -320,7 +350,7 @@ try {
   const initialProfile = await evaluate("(async()=>{const r=await fetch('/api/profile');return (await r.json()).profile})()");
   if (initialProfile.name !== 'Synthetic maker notebook' || initialProfile.experience !== 'comfortable' || initialProfile.measurementsMm.waist !== 720 || initialProfile.measurementsDegrees.shoulderSlope !== 17.25) throw new Error('Multi-field profile input lost a value or changed its units');
   const profileProjectId = await evaluate("(async()=>{const r=await fetch('/api/projects',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({title:'Synthetic profile copy',brief:'No personal values.',source:{kind:'own_idea'},plan:{features:[],openQuestions:[],measurementsMm:{waist:780},measurementsDegrees:{shoulderSlope:0},fabric:{description:'',widthMm:null,lengthMm:null,structure:'unknown'},equipment:['Iron']},idempotencyKey:crypto.randomUUID()})});return (await r.json()).project.id})()");
-  await call('Page.navigate', { url: `${base}/?project=${profileProjectId}` });
+  await navigatePage(`${base}/?project=${profileProjectId}`);
   await waitFor("document.querySelector('.profile-copy-preview')?.textContent.includes('waist: kept 78 cm')", 'Copy preview did not retain conflicting waist');
   await evaluate("document.querySelector('.maker-profile-panel>details').open=true");
   if (!await evaluate("document.querySelector('.profile-copy-preview')?.textContent.includes('shoulderSlope: kept 0 degrees')")) throw new Error('Zero angle disappeared from review');
@@ -342,7 +372,7 @@ try {
   if (await evaluate("(async()=>{const r=await fetch('/api/profile');return (await r.json()).profile.sequence})()") !== 2) throw new Error('Backup import saved without review');
   await evaluate("document.querySelector('.maker-profile-panel form button[type=submit]').click()");
   await waitFor("document.querySelector('.maker-profile-panel [role=status]')?.textContent.includes('Profile revision 3 saved')", 'Reviewed backup did not save');
-  await call('Page.navigate', { url: `${base}/?project=${profileProjectId}` });
+  await navigatePage(`${base}/?project=${profileProjectId}`);
   await waitFor("document.querySelector('.profile-copy-preview')?.textContent.includes('waist: kept 78 cm')", 'Profile did not resume');
   await evaluate("document.querySelector('.maker-profile-panel>details').open=true;document.querySelector('.profile-body').open=false");
   // Use actual computed foreground/background colours, not a design-token assertion. Legacy demo dark mode must not leak.
@@ -389,6 +419,37 @@ try {
   if (errors.length) throw new Error(`Browser runtime errors: ${JSON.stringify(errors)}`);
   report.screenshots.push('maker-profile-copy-1440.png', 'maker-profile-copy-390.png');
   report.screenshots.push('project-measurements-tina-1440.png', 'project-measurements-tina-390.png');
+  // Real private run control with zero inference. No scripted model transcript is rendered.
+  const assistantId = await evaluate(`(async()=>{const r=await fetch('/api/projects',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({title:'Assistant consent rehearsal',brief:'Synthetic local browser check',source:{kind:'candidate',designId:'sandy'},idempotencyKey:crypto.randomUUID()})});const d=await r.json();if(!r.ok)throw Error(d.message);return d.project.id})()`);
+  await navigatePage(`${base}/?project=${assistantId}`);
+  await waitFor("!!document.querySelector('.assistant-consent details') && !document.querySelector('.assistant-consent input')?.disabled", 'Actual consent summary did not become available');
+  if (!await evaluate("document.querySelector('.assistant-actions button').disabled")) throw new Error('Assistant was enabled before consent');
+  await evaluate("document.querySelector('.assistant-consent input').click()");
+  await waitFor("!document.querySelector('.assistant-actions button').disabled", 'Reviewed consent did not enable the start action');
+  const actualRun = await evaluate(`(async()=>{const b='/api/projects/${assistantId}/agent';const p=await(await fetch(b)).json();const r=await fetch(b,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({idempotencyKey:crypto.randomUUID(),expectedBasis:p.preparation.basis,task:'next_preparation',consent:{version:'preparation-v1',sharePreparationSummary:true}})});const d=await r.json();if(!r.ok)throw Error(d.error?.message);return d.run})()`);
+  await evaluate("[...document.querySelectorAll('.assistant-actions button')].find(b=>b.textContent==='Refresh saved status').click()");
+  await waitFor("document.querySelector('.assistant-run')?.textContent.includes('Checkpoint saved')", 'Actual private start checkpoint was not displayed');
+  await evaluate("[...document.querySelectorAll('.assistant-actions button')].find(b=>b.textContent==='Stop run').click()");
+  await waitFor("document.querySelector('.assistant-run')?.textContent.includes('Stopped by you')", 'Actual cancellation was not acknowledged');
+  await reloadPage();
+  await waitFor("document.querySelector('.assistant-run')?.textContent.includes('Stopped by you')", 'Cancelled run did not survive reload');
+  const stopped = await evaluate(`(async()=>{const r=await fetch('/api/projects/${assistantId}/agent/${actualRun.id}');return await r.json()})()`);
+  if (stopped.run.requests !== 0 || stopped.run.session || stopped.run.feedback || stopped.run.pendingResponse) throw new Error('Public run leaked private state or unexpectedly performed inference');
+  for (const width of [1440,1024,768,390,320]) {
+    await call('Emulation.setDeviceMetricsOverride', {width,height:900,deviceScaleFactor:1,mobile:width<500});
+    await evaluate("document.querySelector('.project-assistant').scrollIntoView()"); await pause(250);
+    if (!await evaluate("document.documentElement.scrollWidth<=innerWidth+1")) throw new Error(`Assistant overflow at ${width}`);
+    if ([1440,390].includes(width)) {
+      const shot=await call('Page.captureScreenshot',{format:'png',fromSurface:true});
+      await writeFile(join(output,`project-assistant-${width}.png`),Buffer.from(shot.data,'base64'));
+    }
+  }
+  report.assistant = { consentRequired:true, exactMinimizedPreview:true, actualPrivateStartAndCancel:true, reloadPersistence:true, providerRequests:0, privateTranscriptWithheld:true, fiveWidthNoOverflow:true, syntheticConsentFlow:true };
+  report.screenshots.push('project-assistant-1440.png','project-assistant-390.png');
+  if (errors.length) throw new Error(`Browser runtime errors: ${JSON.stringify(errors)}`);
   await writeFile(join(root, 'evidence', 'companion-runtime-verification.json'), JSON.stringify(report, null, 2) + '\n');
   console.log(JSON.stringify(report, null, 2));
+} catch (error) {
+  try { await captureFailure?.(error); } catch { /* Retain the original failure even if screenshot capture fails. */ }
+  throw error;
 } finally { socket?.close(); chrome.kill(); }

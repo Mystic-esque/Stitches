@@ -23,6 +23,8 @@ An instructive example: a sleeve insertion issue binds the active instructionSte
 
 ## Private project state is not shared content
 
+Private `agent_runs` and `agent_requests` now persist source/project/history-bound consent, opaque signed provider Content, checkpoints and conservative attempted-request reservations. Public run responses explicitly remove provider transcripts/feedback/leases. These additive private tables require no public Sanity type, source selection change or KB rebuild. The existing dedicated exact source graph and actual maintained KB remain dependencies; final served KB hash is checked before accepting unverified prose. No Editor credential or model write authority is used.
+
 Implemented scrap history is held only in private SQLite `diagnostic_events`, never seeded into Content Lake/Context. It references the existing exact source/test/remedy IDs and semantic fingerprints. No new public Sanity record or KB rebuild is needed for this persistence/preparation slice. A local pause during source outage is a maker fact, not a source-reviewed instruction. Restored histories cannot satisfy reviewed content or action eligibility.
 Guest profiles/projects hold personal measurements, materials/equipment on hand, photos, pattern ownership, decisions, step progress, symptoms/tests/fixes, revisions and consent. Never seed that into shared Content Lake or KB. A public pattern can reference a license; a user's purchased PDF stays private and is not redistributable.
 

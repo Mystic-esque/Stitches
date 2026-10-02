@@ -14,6 +14,8 @@ describe("Google SDK session boundary", () => {
     await model.next({ id: "inspect-1", name: "inspect_project", response: { capability: "plan_only" } });
     const tools = requests[0].config?.tools as { functionDeclarations: { name: string }[] }[];
     expect(tools.flatMap((tool) => tool.functionDeclarations.map((item) => item.name))).toEqual(["inspect_project", "resolve_exact_graph", "retrieve_context"]);
+    expect(requests[0].config?.toolConfig?.functionCallingConfig).toEqual({ mode: "ANY", allowedFunctionNames: ["inspect_project"] });
+    expect(requests[1].config?.toolConfig?.functionCallingConfig).toEqual({ mode: "ANY", allowedFunctionNames: ["resolve_exact_graph"] });
     expect((requests[1].contents as Content[])[1]).toBe(signed);
     expect((requests[1].contents as Content[])[2].parts?.[0]?.functionResponse?.id).toBe("inspect-1");
   });

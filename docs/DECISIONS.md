@@ -1,5 +1,17 @@
 # Implementation decisions
 
+## October 2, 2026 — Verify panel identity and narrow engine conflicts
+
+- Distinct dynamic sibling panels require distinct React keys, not just the same project ID. Exact reload assertions must count root/main/history identity as well as saved event rows. Atomic evidence isolated the real duplicate-history defect; fresh-document waits and URL guards alone were insufficient. The final real production browser journey passes unchanged data/stop assertions after the key repair.
+- The pinned Sandy overlap audit explains the numerical offset without approving a seam/notch pairing. Preserve raw engine output and source hashes; do not move marks or promote cutting to make a comparison look correct. Qualify closure/orientation, exact source/version and complete step applicability next. The curved count discrepancy and independent physical/rights gates remain open.
+- Treat a recovered slow catalog read as operational evidence, not a claimed root-cause fix. Preserve the cold-start failed receipt, and distinguish zero-inference browser/API checks from actual provider runs and from still-missing maker/benchmark proof.
+
+## October 2, 2026 — Durable read-only runs before expanding agent authority
+
+- Execute one acknowledged continuation per POST, not an untracked background promise. SQLite reserves an attempted request before inference; overlapping calls cannot double-charge. Four attempts, 120 active seconds and conservative persistent daily reservations (8/guest, 16/local runtime) supplement, but do not prove, provider free-quota availability.
+- Persist exact signed provider Content only in the private run. An acknowledged response can resume a failed read without repeating inference; expired/lost provider responses become unknown-outcome and are never automatically retried. Known 429 permits explicit continuation only inside the remaining original bounds. Cancel and changed basis defeat late results. Cold disk/process or network latency is not a reason to relax assertions.
+- Initial public envelope offers three preparation questions and shares presence/check summaries and public source context, not raw private text/measurements/photos. Consent is saved per run. The output remains unverified planning insight, not a proposal keep, diagnosis, making progress or cutting receipt. Use the existing dedicated Sanity exact/Context readers; private persistence needs no public schema mutation or KB rebuild.
+
 ## October 2, 2026 — Start the project agent with read authority only
 
 - First agent task is preparation inspection, not automatic garment drafting or physical progress. The model receives presence/missing/conflict summaries plus public exact records and scoped maintained KB text, not raw body values, private titles/briefs, equipment names, photos or observation prose.

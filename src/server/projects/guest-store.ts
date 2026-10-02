@@ -1,6 +1,8 @@
 import { createHash, randomUUID } from "node:crypto";
 import { mkdirSync } from "node:fs";
 import path from "node:path";
+import { startAgentRunSchema, agentRunIsActive, agentRunCanResume, type StartAgentRunInput, type AgentRunStatus, type AgentCheckpoint } from "../../domain/agent-run";
+import type { PrivateAgentRun } from "../agent/run-state";
 import { diagnosticBindingSchema, recordDiagnosticSchema, diagnosticTransitionError,
   type DiagnosticRecord, type DiagnosticBinding, type RecordDiagnosticInput } from "../../domain/diagnostic-history";
 import { DatabaseSync } from "node:sqlite";
@@ -65,6 +67,16 @@ export class GuestStore {
     if (databasePath !== ":memory:") this.db.exec("PRAGMA journal_mode=WAL");
     this.db.exec(`
       PRAGMA foreign_keys=ON;
+      CREATE TABLE IF NOT EXISTS agent_runs (
+        owner_id TEXT NOT NULL, project_id TEXT NOT NULL, id TEXT NOT NULL, data_json TEXT NOT NULL,
+        PRIMARY KEY (owner_id, id),
+        FOREIGN KEY (owner_id, project_id) REFERENCES projects(owner_id, id) ON DELETE CASCADE
+      ) STRICT;
+      CREATE TABLE IF NOT EXISTS agent_requests (
+        owner_id TEXT NOT NULL, run_id TEXT NOT NULL, request INTEGER NOT NULL, day TEXT NOT NULL,
+        PRIMARY KEY (owner_id, run_id, request),
+        FOREIGN KEY (owner_id, run_id) REFERENCES agent_runs(owner_id, id) ON DELETE CASCADE
+      ) STRICT;
       CREATE TABLE IF NOT EXISTS diagnostic_events (
         owner_id TEXT NOT NULL, project_id TEXT NOT NULL, sequence INTEGER NOT NULL, data_json TEXT NOT NULL,
         PRIMARY KEY (owner_id, project_id, sequence),
@@ -119,6 +131,136 @@ export class GuestStore {
   }
 
   close(): void { this.db.close(); }
+
+  private writeRun(ownerId: string, run: PrivateAgentRun): PrivateAgentRun {
+    const json = JSON.stringify(run);
+    if (json.length > 192_000) throw new GuestStoreError("invalid", "Agent checkpoint exceeded its private storage bound.");
+    this.db.prepare("UPDATE agent_runs SET data_json = ? WHERE owner_id = ? AND id = ?").run(json, ownerId, run.id);
+    return run;
+  }
+
+  private runEvent(run: PrivateAgentRun, event: AgentCheckpoint["event"], now: number, tool?: string): void {
+    run.updatedAt = new Date(now).toISOString();
+    run.checkpoints.push({ sequence: run.checkpoints.length + 1, event, at: run.updatedAt, request: run.requests, ...(tool ? { tool } : {}) });
+  }
+
+  private runBasisCurrent(ownerId: string, run: PrivateAgentRun): boolean {
+    const project = this.getProject(ownerId, run.projectId);
+    if (!project || project.sequence !== run.basis.projectSequence || project.basisHash !== run.basis.projectHash ||
+      project.knowledgeFingerprint !== run.basis.catalogFingerprint) return false;
+    const history = this.listDiagnostics(ownerId, run.projectId);
+    return history.length === run.basis.historySequence && createHash("sha256").update(JSON.stringify(history)).digest("hex") === run.basis.historyHash;
+  }
+
+  getAgentRun(ownerId: string, projectId: string, id: string, now = Date.now()): PrivateAgentRun {
+    const row = this.db.prepare("SELECT data_json FROM agent_runs WHERE owner_id = ? AND project_id = ? AND id = ?")
+      .get(ownerId, projectId, id) as StoredRow | undefined;
+    if (!row) throw new GuestStoreError("not_found", "Agent run not found.");
+    const run = JSON.parse(row.data_json) as PrivateAgentRun;
+    if ((agentRunIsActive(run.status) || run.status === "completed" || agentRunCanResume(run)) && !this.runBasisCurrent(ownerId, run)) {
+      run.status = "stale"; run.message = "The saved project or scrap history changed. This run is historical; review the new basis.";
+      delete run.leaseId; delete run.leaseUntil; delete run.startedMs;
+      this.runEvent(run, "stopped", now); this.writeRun(ownerId, run);
+    } else if (run.leaseUntil !== undefined && now >= run.leaseUntil) {
+      run.activeMs += Math.max(0, run.leaseUntil - (run.startedMs ?? run.leaseUntil));
+      run.status = run.pendingResponse ? "response_ready" : "unknown_outcome";
+      run.message = run.pendingResponse ? "An acknowledged response is saved. Continue without repeating that model call." : "A provider response was lost. Its usage may have been charged; this request will not be retried.";
+      delete run.leaseId; delete run.leaseUntil; delete run.startedMs;
+      this.runEvent(run, "stopped", now); this.writeRun(ownerId, run);
+    }
+    return run;
+  }
+
+  listAgentRuns(ownerId: string, projectId: string): PrivateAgentRun[] {
+    if (!this.getProject(ownerId, projectId)) throw new GuestStoreError("not_found", "Project not found.");
+    const rows = this.db.prepare("SELECT id FROM agent_runs WHERE owner_id = ? AND project_id = ? ORDER BY rowid DESC LIMIT 50")
+      .all(ownerId, projectId) as unknown as { id: string }[];
+    return rows.map((row) => this.getAgentRun(ownerId, projectId, row.id));
+  }
+
+  replayAgentRun(ownerId: string, projectId: string, raw: StartAgentRunInput): PrivateAgentRun | null {
+    const input = startAgentRunSchema.parse(raw);
+    const result = this.receipt<{ id: string }>(ownerId, input.idempotencyKey, "agent-start", hash({ projectId, input }), projectId);
+    return result ? this.getAgentRun(ownerId, projectId, result.id) : null;
+  }
+
+  startAgentRun(ownerId: string, projectId: string, raw: StartAgentRunInput, now = Date.now()): PrivateAgentRun {
+    const input = startAgentRunSchema.parse(raw);
+    return this.transaction(() => {
+      const duplicate = this.replayAgentRun(ownerId, projectId, input);
+      if (duplicate) return duplicate;
+      if (!this.getProject(ownerId, projectId)) throw new GuestStoreError("not_found", "Project not found.");
+      const timestamp = new Date(now).toISOString();
+      const run: PrivateAgentRun = { id: randomUUID(), projectId, basis: input.expectedBasis, task: input.task, consentVersion: input.consent.version,
+        model: "gemini-3.5-flash-lite", status: "ready", requests: 0, activeMs: 0, checkpoints: [], tools: [], callIds: [],
+        createdAt: timestamp, updatedAt: timestamp, modelTextVerified: false, projectChanged: false, capability: "plan_only" };
+      if (run.basis.projectId !== projectId || !this.runBasisCurrent(ownerId, run)) throw new GuestStoreError("stale", "Review the current saved project and history before consenting.");
+      const existing = this.listAgentRuns(ownerId, projectId);
+      if (existing.some((item) => agentRunIsActive(item.status))) throw new GuestStoreError("invalid", "Continue or cancel the active run first.");
+      if (existing.length >= 50) throw new GuestStoreError("invalid", "This project reached its 50-run limit. Keep its notebook and use manual preparation.");
+      this.db.prepare("INSERT INTO agent_runs (owner_id, project_id, id, data_json) VALUES (?, ?, ?, ?)").run(ownerId, projectId, run.id, JSON.stringify(run));
+      this.db.prepare("INSERT INTO mutation_receipts (owner_id, idempotency_key, operation, target_id, request_hash, result_json) VALUES (?, ?, ?, ?, ?, ?)")
+        .run(ownerId, input.idempotencyKey, "agent-start", projectId, hash({ projectId, input }), JSON.stringify({ id: run.id }));
+      return run;
+    });
+  }
+
+  claimAgentRun(ownerId: string, projectId: string, id: string, freeAuthorized: boolean, now = Date.now()): PrivateAgentRun {
+    return this.transaction(() => {
+      const run = this.getAgentRun(ownerId, projectId, id, now);
+      if (!["ready", "response_ready"].includes(run.status)) return run;
+      if (run.activeMs >= 120_000 || (run.status === "ready" && run.requests >= 4)) {
+        run.status = "limit"; run.message = "The four-request or 120-second active-time limit was reached. Manual preparation remains available.";
+        this.runEvent(run, "stopped", now); return this.writeRun(ownerId, run);
+      }
+      if (run.status === "ready") {
+        const day = new Date(now).toISOString().slice(0, 10);
+        const total = this.db.prepare("SELECT COUNT(*) AS n FROM agent_requests WHERE day = ?").get(day) as { n: number };
+        const guest = this.db.prepare("SELECT COUNT(*) AS n FROM agent_requests WHERE day = ? AND owner_id = ?").get(day, ownerId) as { n: number };
+        if (!freeAuthorized || total.n >= 16 || guest.n >= 8) {
+          run.status = "budget"; run.message = "No free request is authorized or the conservative local daily cap was reached. No paid fallback is used.";
+          this.runEvent(run, "stopped", now); return this.writeRun(ownerId, run);
+        }
+        run.requests++; run.status = "requesting";
+        this.db.prepare("INSERT INTO agent_requests (owner_id, run_id, request, day) VALUES (?, ?, ?, ?)").run(ownerId, id, run.requests, day);
+        this.runEvent(run, "request_reserved", now);
+      } else run.status = "processing";
+      run.leaseId = randomUUID(); run.startedMs = now; run.leaseUntil = now + Math.min(40_000, 120_000 - run.activeMs);
+      return this.writeRun(ownerId, run);
+    });
+  }
+
+  checkpointAgentRun(ownerId: string, next: PrivateAgentRun, event: AgentCheckpoint["event"], release: boolean, now = Date.now(), tool?: string): PrivateAgentRun {
+    return this.transaction(() => {
+      const current = this.getAgentRun(ownerId, next.projectId, next.id, now);
+      if (!next.leaseId || current.leaseId !== next.leaseId) return current; // Cancellation, stale state or another worker wins.
+      if (next.requests !== current.requests || JSON.stringify(next.basis) !== JSON.stringify(current.basis)) throw new GuestStoreError("invalid", "Invalid agent checkpoint binding.");
+      next.checkpoints = current.checkpoints;
+      this.runEvent(next, event, now, tool);
+      if (release) {
+        next.activeMs = current.activeMs + Math.max(0, now - (current.startedMs ?? now));
+        delete next.leaseId; delete next.leaseUntil; delete next.startedMs;
+      }
+      return this.writeRun(ownerId, next);
+    });
+  }
+
+  controlAgentRun(ownerId: string, projectId: string, id: string, action: "cancel" | "resume", now = Date.now()): PrivateAgentRun {
+    return this.transaction(() => {
+      const run = this.getAgentRun(ownerId, projectId, id, now);
+      if (action === "cancel" && (agentRunIsActive(run.status) || agentRunCanResume(run))) {
+        if (run.startedMs !== undefined) run.activeMs += Math.max(0, now - run.startedMs);
+        run.status = "cancelled"; run.message = "Stopped. No project was changed; an in-flight provider call may still consume quota.";
+        delete run.leaseId; delete run.leaseUntil; delete run.startedMs;
+        this.runEvent(run, "stopped", now); return this.writeRun(ownerId, run);
+      }
+      if (action === "resume" && agentRunCanResume(run)) {
+        run.status = run.pendingResponse ? "response_ready" : "ready"; delete run.message;
+        this.runEvent(run, "resumed", now); return this.writeRun(ownerId, run);
+      }
+      return run; // Idempotent cancel/resume; never resurrect unknown, stale or completed work.
+    });
+  }
 
   private transaction<T>(work: () => T): T {
     this.db.exec("BEGIN IMMEDIATE");

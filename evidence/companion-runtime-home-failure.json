@@ -1,0 +1,15 @@
+{
+  "checkedAt": "2026-10-02T12:47:56.577Z",
+  "passed": false,
+  "errors": [],
+  "failure": {
+    "url": "http://127.0.0.1:3100/",
+    "readyState": "complete",
+    "hero": true,
+    "catalogCards": 0,
+    "body": "stitches.\nHow it works\nExplore starts\nPattern study ↗\nStart making ↗\nPRIVATE / REUSABLE\nYour maker profile\nBody notes, experience & tools ＋\n\nTHE SEWING COMPANION\n\nFrom “I could make that”\nto “I made it.”\n\nStitches connects the garment you imagine to the pieces, decisions and steps needed to make it — beginning with a project that remembers your plan.\n\nExplore your starting point ↗\nFor curious beginners, hobby makers and designers.\n01 / IMAGINE\n02 / UNDERSTAND\n03 / MAKE\n↓ EXPLORE\n\nWHY STITCHES EXISTS\n\nClothing is a collection of decisions.\nLet’s make them visible.\n\nA finished garment is only the beginning. The pieces, fabric, fit and order of construction determine what you can actually make. Stitches is being built to keep those relationships connected — and help you learn as you go.\n\nSTART A PROJECT\n\nWhere will you begin?\n\nChoose a distinct garment direction or bring your own idea. These are planning starts while the pattern engines are qualified.\n\n01—03 / PROJECT STARTS\n01 / WOVEN · SKIRT\nThe circle skirt\n\nA full silhouette from measured curves\n\nWaistband, fabric width and fold layout\nStart this project ↗\n02 / KNIT · TOP\nThe wrap top\n\nOverlapping fronts and soft stretch\n\nStretch, notches and front options\nStart this project ↗\n✳\n\nWhat do you\nwant to make?\n\nYour own idea\n\nA photo, a sketch, or something you pictured.\n\nRecord your brief now. Image analysis is a future verified capability.\nBegin with an idea ↗\n\nEditorial concept images only. No card represents a verified cut-ready pattern or fit preview.\n\nWHAT THE SOURCES ACTUALLY SAY\n\nKnowledge before the cut.\n\nThese live, structured Sanity records link each starting point to its original design documentation. They do not grant pattern or cutting readiness.\n\nLoading current Sanity source records…\n\nPICK UP A THREAD\n\nYour projects\n\nSaved in this guest browser session on this local server. Keep this browser’s cookie to reopen them.\n\nImport a Stitches backup\n\nNo projects yet. Choose a starting point above and make the first decision.\n\nINSIDE THE PATTERN\n\nCurious how pieces become a garment?\n\nExplore the existing, explicitly illustrative pattern study. It links a garment, flat pieces, and a Sanity-backed construction ",
+    "catalog": {
+      "error": "TimeoutError"
+    }
+  }
+}

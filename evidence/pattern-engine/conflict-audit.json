@@ -1,0 +1,51 @@
+{
+  "checkedAt": "2026-10-02T12:05:54.994Z",
+  "engineIdentity": {
+    "engine": "@freesewing/core",
+    "version": "4.10.2",
+    "design": "@freesewing/sandy",
+    "designVersion": "4.10.2"
+  },
+  "provenance": "actual-pinned-engine-and-independent-numeric-reconstruction",
+  "sourceHashes": {
+    "straight-waistband.mjs": "fb264e8cf286381e1116b2468392f99e0fcdddd74732868b07e7faa3e8a4fac8",
+    "curved-waistband.mjs": "18363bfb1fb3063d1cd3351b24691a68a202981f1dc26189a0efb6605efe34a5"
+  },
+  "samples": [
+    {
+      "waistMm": 720,
+      "overlapMm": 21.599999999999998,
+      "engineCenterNotchXmm": -10.799999999999999,
+      "measuredCandidateDifferenceMm": 10.800786078222188,
+      "reconstructedOverlapHalfMm": 10.799999999999999,
+      "approvedCounterpart": false,
+      "curvedEngineFabricCount": 1,
+      "currentDocumentationImpliedCurvedPieces": 2
+    },
+    {
+      "waistMm": 880,
+      "overlapMm": 26.4,
+      "engineCenterNotchXmm": -13.2,
+      "measuredCandidateDifferenceMm": 13.200960762271507,
+      "reconstructedOverlapHalfMm": 13.2,
+      "approvedCounterpart": false,
+      "curvedEngineFabricCount": 1,
+      "currentDocumentationImpliedCurvedPieces": 2
+    }
+  ],
+  "findings": {
+    "notchOffsetOrigin": "The pinned engine places centerNotch at minus half the overlap, not at x=0. The measured candidate mismatch follows that formula; it is not measurement-dependent unexplained drift.",
+    "notchMeaning": "Published instructions do not assign this center mark to the proposed skirt-fold midpoint. Counterpart/orientation remains unqualified; no shifting, trimming or recutting is authorized.",
+    "curvedCount": "Pinned code sets fabric cut count to one; current instructions refer to an interfaced curved part and a second non-interfaced part. Source/version discrepancy remains open; curved output stays excluded."
+  },
+  "officialReferences": [
+    "https://freesewing.eu/docs/designs/sandy/instructions/",
+    "https://freesewing.eu/docs/designs/sandy/options/"
+  ],
+  "officialPagesCheckedAt": "2026-10-02",
+  "geometryChanged": false,
+  "sanityWrites": 0,
+  "counterpartApproved": false,
+  "cutReady": false,
+  "next": "Author the narrow straight-band closure/method and orientation map with reviewed evidence, then independently check allowance/layout/print and physical making. Do not approve a midpoint mate by name."
+}

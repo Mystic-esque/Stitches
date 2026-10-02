@@ -1,0 +1,135 @@
+{
+  "kind": "actual-gemini-content-lake-context",
+  "checkedAt": "2026-10-02T05:41:08.823Z",
+  "paidBudgetUsd": 0,
+  "syntheticPrivateProject": true,
+  "sharedSanityWrites": 0,
+  "model": "gemini-3.5-flash-lite",
+  "design": "tina",
+  "injectedContextInterruption": true,
+  "passed": true,
+  "elapsedMs": 36748,
+  "run": {
+    "id": "ecd9264a-fd93-4b4f-ac49-9481593c1fe2",
+    "projectId": "d54133eb-acf7-4408-aedf-dd83f16478ce",
+    "basis": {
+      "projectId": "d54133eb-acf7-4408-aedf-dd83f16478ce",
+      "projectSequence": 1,
+      "projectHash": "c198a041c24eef6f9cb827f75e5d1b68d4b938e419bfd666b4a89c0a29264a7c",
+      "catalogFingerprint": "68d6026c7f508a70de2255916003d91e3607f23eb3f3afefb3a05ea82e1f215f",
+      "diagnosticFingerprint": "0f087c6b048811f6b3dcc780f9584ad191b9a7a2a638e9545053f95cce3b1161",
+      "historySequence": 0,
+      "historyHash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "task": "understand_pieces",
+    "consentVersion": "preparation-v1",
+    "model": "gemini-3.5-flash-lite",
+    "status": "completed",
+    "requests": 4,
+    "activeMs": 30500,
+    "checkpoints": [
+      {
+        "sequence": 1,
+        "event": "request_reserved",
+        "at": "2026-10-02T05:41:14.600Z",
+        "request": 1
+      },
+      {
+        "sequence": 2,
+        "event": "response_saved",
+        "at": "2026-10-02T05:41:16.185Z",
+        "request": 1
+      },
+      {
+        "sequence": 3,
+        "event": "tool_completed",
+        "at": "2026-10-02T05:41:16.958Z",
+        "request": 1,
+        "tool": "inspect_project"
+      },
+      {
+        "sequence": 4,
+        "event": "request_reserved",
+        "at": "2026-10-02T05:41:17.153Z",
+        "request": 2
+      },
+      {
+        "sequence": 5,
+        "event": "response_saved",
+        "at": "2026-10-02T05:41:24.469Z",
+        "request": 2
+      },
+      {
+        "sequence": 6,
+        "event": "tool_completed",
+        "at": "2026-10-02T05:41:25.555Z",
+        "request": 2,
+        "tool": "resolve_exact_graph"
+      },
+      {
+        "sequence": 7,
+        "event": "request_reserved",
+        "at": "2026-10-02T05:41:25.584Z",
+        "request": 3
+      },
+      {
+        "sequence": 8,
+        "event": "response_saved",
+        "at": "2026-10-02T05:41:32.869Z",
+        "request": 3
+      },
+      {
+        "sequence": 9,
+        "event": "stopped",
+        "at": "2026-10-02T05:41:33.743Z",
+        "request": 3
+      },
+      {
+        "sequence": 10,
+        "event": "resumed",
+        "at": "2026-10-02T05:41:33.782Z",
+        "request": 3
+      },
+      {
+        "sequence": 11,
+        "event": "tool_completed",
+        "at": "2026-10-02T05:41:35.785Z",
+        "request": 3,
+        "tool": "retrieve_context"
+      },
+      {
+        "sequence": 12,
+        "event": "request_reserved",
+        "at": "2026-10-02T05:41:35.850Z",
+        "request": 4
+      },
+      {
+        "sequence": 13,
+        "event": "response_saved",
+        "at": "2026-10-02T05:41:43.719Z",
+        "request": 4
+      },
+      {
+        "sequence": 14,
+        "event": "completed",
+        "at": "2026-10-02T05:41:45.507Z",
+        "request": 4
+      }
+    ],
+    "tools": [
+      "inspect_project",
+      "resolve_exact_graph",
+      "retrieve_context"
+    ],
+    "createdAt": "2026-10-02T05:41:14.447Z",
+    "updatedAt": "2026-10-02T05:41:45.507Z",
+    "modelTextVerified": false,
+    "projectChanged": false,
+    "capability": "plan_only",
+    "knowledgeHash": "bc608aed02c503af7b89146e877e5d46f328554cfc8ca65d338f4b4421f09b83",
+    "text": "According to the FreeSewing Tina top documentation source (`companion-source-tina-20261001`), the listed pieces are:\n\n- **Overlapping front** (`front`): cut 2, mirrored, no fold, main material, required for every version (`always`). Source: FreeSewing Tina top documentation. Pending review.\n- **Back** (`back`): cut 1 on a single fold, not mirrored, main material, required for every version (`always`). Source: FreeSewing Tina top documentation. Pending review.\n- **Sleeve** (`sleeve`): cut 2, mirrored, no fold, main material, cut only when the `sleeves` option applies. Source: FreeSewing Tina top documentation. Pending review.\n- **Front bottom** (`front-bottom`): cut 1, not mirrored, no fold, main material, cut only when the `front-bottom` option applies. Source: FreeSewing Tina top documentation. Pending review.\n\nOne useful thing to check before cutting is **confirming your material structure**. The Tina source lists **knit** (`companion-candidate-tina-20261001`, Fabric & Material Constraints), so verifying that your fabric is a knit with appropriate stretch rather than a woven is an essential preparation step.\n\n*Pending review.*"
+  },
+  "acknowledgedResponseRecoveryWithoutExtraRequest": true,
+  "projectUnchanged": true,
+  "distinction": "Actual provider and knowledge retrieval; not a benchmark, maker trial or verified pattern."
+}
