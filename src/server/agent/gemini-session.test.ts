@@ -3,6 +3,20 @@ import type { Content, GenerateContentParameters, GenerateContentResponse } from
 import { createGeminiSession } from "./gemini-session";
 
 describe("Google SDK session boundary", () => {
+  it("offers only read tools in companion mode and preserves signed content with matched feedback", async () => {
+    const requests: GenerateContentParameters[] = [];
+    const signed = { role: "model", parts: [{ functionCall: { id: "inspect-1", name: "inspect_project", args: {} }, thoughtSignature: "opaque-companion-signature" }] };
+    const model = createGeminiSession({ apiKey: "test-key", model: "gemini-3.5-flash-lite", request: "What should I prepare?", purpose: "companion",
+      generate: async (parameters) => { requests.push(parameters); return (requests.length === 1
+        ? { candidates: [{ content: signed }], functionCalls: [{ id: "inspect-1", name: "inspect_project", args: {} }] }
+        : { candidates: [{ content: { role: "model", parts: [{ text: "Continue inspecting the source." }] } }], functionCalls: [], text: "Continue inspecting the source." }) as unknown as GenerateContentResponse; } });
+    await model.next();
+    await model.next({ id: "inspect-1", name: "inspect_project", response: { capability: "plan_only" } });
+    const tools = requests[0].config?.tools as { functionDeclarations: { name: string }[] }[];
+    expect(tools.flatMap((tool) => tool.functionDeclarations.map((item) => item.name))).toEqual(["inspect_project", "resolve_exact_graph", "retrieve_context"]);
+    expect((requests[1].contents as Content[])[1]).toBe(signed);
+    expect((requests[1].contents as Content[])[2].parts?.[0]?.functionResponse?.id).toBe("inspect-1");
+  });
   it("returns tool calls and replays the exact signed model content with matching feedback ID", async () => {
     const requests: GenerateContentParameters[] = [];
     const signedContent = { role: "model", parts: [{ functionCall: { id: "call-1", name: "get_pattern_context", args: {} }, thoughtSignature: "opaque-signature" }] };

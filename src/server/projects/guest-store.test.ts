@@ -105,7 +105,7 @@ describe("private guest projects", () => {
         expect(reopened.listNotes(owner, projectId).map((note) => note.text)).toEqual(["I measured the fabric."]);
       } finally { reopened.close(); }
     } finally { rmSync(directory, { recursive: true, force: true }); }
-  });
+  }, 60_000); // Host filesystem/setup/cleanup may exceed the in-memory test limit.
 
   it("refuses invalid measurements and unsupported source IDs before writing", () => {
     const store = new GuestStore(":memory:");

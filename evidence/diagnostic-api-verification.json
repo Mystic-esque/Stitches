@@ -1,0 +1,22 @@
+{
+  "kind": "real-local-production-api-with-live-development-catalog",
+  "checkedAt": "2026-10-02T02:27:05.899Z",
+  "base": "http://127.0.0.1:3100",
+  "cases": {
+    "separateObservationAttemptResult": true,
+    "guestAndOriginDenial": true,
+    "staleHistoryProjectSource": true,
+    "exactReplay": true,
+    "invalidTransitionDenied": true,
+    "failedRepeatDenied": true,
+    "historyRetained": true,
+    "untrustedV3Restore": true,
+    "noCapabilityPromotion": true
+  },
+  "sourceFingerprint": "2da503f12b8f6007d4e1f6f46d4c70cf25fa33b229bf6b1aad01ec75d379abb0",
+  "diagnosticFingerprint": "0f087c6b048811f6b3dcc780f9584ad191b9a7a2a638e9545053f95cce3b1161",
+  "limitations": [
+    "Synthetic user reports, not physical maker evidence.",
+    "Pending review; sacrificial sample only."
+  ]
+}

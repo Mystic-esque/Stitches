@@ -1,6 +1,6 @@
 {
   "kind": "real-local-production-api",
-  "checkedAt": "2026-10-01T18:43:22.481Z",
+  "checkedAt": "2026-10-02T02:27:10.638Z",
   "base": "http://127.0.0.1:3100",
   "syntheticOnly": true,
   "ownerIsolation": true,

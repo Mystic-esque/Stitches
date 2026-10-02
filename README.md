@@ -6,11 +6,11 @@
 
 The October 1 direction supersedes the September 29 Studio 1.0 proposal. Start with the [comparison and research assessment](docs/DIRECTION-REVIEW.md), [Sol handoff](docs/SOL_HANDOFF.md), [product](docs/PRODUCT.md), [design](docs/DESIGN.md), [experience contracts](docs/EXPERIENCE-CONTRACTS.md), [PRD](devpost/prd.md), [technical spec](devpost/spec.md), and [checklist](devpost/checklist.md). The new [Companion visual reference](design/stitches-companion.html) is a labeled concept, not the application. The [older six-screen reference](design/stitches-studio.html) and its captures remain historical.
 
-The full Companion 2.0 app is **not built yet**. The existing runtime is a tested illustrative foundation with real Sanity/Context/Gemini integration proofs; it does not produce qualified cut-ready garments. Read [actual status](docs/STATUS.md). The new schemas are local proposals, not seeded/deployed Sanity content. No public deployment/submission or provider operation occurred in this design pass.
+The full Companion 2.0 app is **not built yet**. The current `/` runtime includes distinct Sandy/Tina planning starts, isolated guest projects/revisions/journals, reusable private profiles with explicit copy, source-derived piece education, preparation review and a private scrap-check notebook. The exact catalog reads 19 dedicated development records; source/maker qualification remains pending. Planning briefs and backups are private review artifacts, not cutting patterns. `/demo` preserves the illustrative blouse and historical real Sanity/Context/Gemini proofs. Read [actual status](docs/STATUS.md) for the remaining full agent, step, geometry, rights, maker and release gates. Nothing has been deployed or submitted.
 
 Open `design/stitches-companion.html` locally to inspect the reference, or run `node scripts/check-companion-reference.mjs` for isolated browser captures and interaction checks. This is not the Next.js app and makes no API calls. The older reference can still be served with `node scripts/check-design-reference.mjs --serve`.
 
-## Existing runtime documentation (baseline; retained)
+## Historical illustrative runtime documentation (retained for `/demo`)
 
 See how it is made. Make it yours.
 
@@ -19,6 +19,28 @@ Stitches is a garment studio that connects a finished garment to its flat patter
 **Current status:** the local Next.js app opens on an Explore view of one illustrative blouse: front/back, linked pieces, seam partners, and authored assembly. Fit / Fabric / Sew retain sample revisions, staleness handling, and visible unknown states. The dedicated Stitches Sanity `development` dataset has 13 illustrative records and a Stitches-only eight-entry Context Knowledge Base. A real Content Lake edit changed the explorer, and a maintained KB correction changed a source-checked assembly explanation in the browser. A bounded, opt-in Gemini tool-use rehearsal passed against that actual KB. The model preview is not a public chat experience and cannot accept a revision. Whole-pattern drafting, verified layout, isolated guest storage, print output, physical maker proof, and deployment remain open; no illustration here is cut-ready. See [docs/STATUS.md](docs/STATUS.md) and [BUILD_LOG.md](BUILD_LOG.md) for exact results and limitations.
 
 ## Run locally
+
+The initial project-aware agent is a tested backend read-only boundary, not a public chat or durable run UI. It inspects minimized preparation checks, exact Sanity planning records and actual scoped Context entries while refusing model writes and stale bases. `evidence/companion-agent-verification.json` records 91 passing tests / two opt-in skips; `evidence/companion-agent-read-verification.json` records actual two-project reads with zero Gemini requests. To repeat only that live read check (dedicated read/Context credentials required):
+
+```powershell
+$env:STITCHES_LIVE_COMPANION_READS = 'true'
+node --env-file=.env.local node_modules/vitest/vitest.mjs run --maxWorkers=1 src/server/agent/companion-live.test.ts
+Remove-Item Env:STITCHES_LIVE_COMPANION_READS
+```
+
+This uses synthetic in-memory private projects and no shared writes. It does not prove live Gemini task completion, cut readiness, durable resume or physical making.
+
+Current Companion production preview (dependencies already installed):
+
+```powershell
+npm test -- --testTimeout=15000 --maxWorkers=2
+npm run build -- --webpack
+npm run start -- --hostname 127.0.0.1 --port 3100
+```
+
+Filesystem harness note: a later separate run also exceeded 15 seconds in two restart cases (16.36 and 16.39 seconds). All three disk-backed project/profile/diagnostic restart tests now have an explicit bounded 60-second setup/I/O/cleanup allowance; their data assertions are unchanged. Other tests retain the command's 15-second bound. Both failed reports are preserved under `evidence/companion-private-verification-timeout*.json`. This verifies persistence semantics, not a 15-second recovery performance guarantee.
+
+While the preview runs, execute `node scripts/check-diagnostic-api.mjs`, `node scripts/check-guest-api.mjs`, `node scripts/check-maker-profile-api.mjs` and `node scripts/check-companion-runtime.mjs`. These create synthetic private rehearsal records and actual local Chrome screenshots, not physical maker trials. Dedicated Sanity read credentials are required for the live catalog checks; no shared content is mutated and no Gemini inference occurs in these checks. Run disk-backed tests separately from builds on this Windows host: an overlapping run timed out three restart tests at 15 seconds; the unchanged assertions/timeouts passed with two workers after the build. Private data is in ignored `.data/`; preserve guest cookies or deliberately export private backups. v3 backups include untrusted restored scrap history, while v1/v2 remain accepted. Cleanup/multi-instance durability remain open; do not publish this local preview without separate authorization and the release gates.
 
 With Node.js 22.18+ and pnpm 11.19.0, run `pnpm install --frozen-lockfile`, then `pnpm exec next dev --hostname 127.0.0.1` and open the URL printed by Next.js. Run `pnpm typecheck`, `pnpm test`, and `pnpm build` for local checks. No secret is required for fixture mode. Do not deploy the local single-user demo store as a public service.
 

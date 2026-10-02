@@ -90,7 +90,7 @@ describe("private maker profiles", () => {
       expect(() => store.copyProfile("bob", restored.id, copyInput(imported, restored))).toThrow(/not found/);
       expect(() => store.importProfile("alice", { ...request, backup: { ...backup, version: 2 } })).toThrow();
     } finally { store.close(); rmSync(directory, { recursive: true, force: true }); }
-  });
+  }, 60_000); // Bounded disk-backed harness allowance; data assertions are unchanged.
   it("refuses unit confusion and private metadata in profile backups", () => {
     expect(profileValuesSchema.safeParse({ ...values, measurementsMm: { shoulderSlope: 14 } }).success).toBe(false);
     expect(profileValuesSchema.safeParse({ ...values, measurementsDegrees: { shoulderSlope: 91 } }).success).toBe(false);

@@ -1,5 +1,18 @@
 # Implementation decisions
 
+## October 2, 2026 — Start the project agent with read authority only
+
+- First agent task is preparation inspection, not automatic garment drafting or physical progress. The model receives presence/missing/conflict summaries plus public exact records and scoped maintained KB text, not raw body values, private titles/briefs, equipment names, photos or observation prose.
+- Re-read owner state and actual catalog around each operation; bind project sequence as well as hash and include the immutable diagnostic history head/hash. An in-flight edit is stale, not silently accepted. No model-selected project ID, GROQ, URL or KB path is allowed.
+- Three required reads plus final explanation fit the existing four-request cap. Preserve signed Gemini content without reconstructing it. A checkpoint callback is an execution boundary, not a claim that durable runs/resume are already implemented. Keep live model proof, consent UI and persisted orchestration as explicit next gates.
+
+## October 2, 2026 — Private facts do not become a diagnosis or readiness receipt
+
+- Keep scrap observation, comparison start, user-reported outcome and pause as separate immutable private events. Bind project sequence/hash, exact source IDs and catalog/diagnostic fingerprints; check concurrent history sequence transactionally. An imported history is untrusted, never an eligible observation or attempt.
+- Advice-dependent mutations require current exact applicable sources. Exact acknowledged retries replay first; a private pause can be saved from the server-held historical binding during an outage because it issues no new advice. Old evidence remains visible without rewriting its project basis.
+- Completed, unsuccessful, unsure and paused comparison paths require further review before repetition. A failed second comparison must not relabel the first observed stitch-release result as unchanged. Improvement is a maker report, not proof of cause or permission to adjust the actual garment. Pending shared content remains sample-only.
+- Preparation reviews saved inputs against exact current labels/units and material structure. Complete notes do not prove ease, fit, layout, method compatibility or cutting. Plain-text project briefs are useful review artifacts, not source instruction copies or pattern pages. No public content change/KB rebuild is needed for private persistence.
+
 ## October 1, 2026 — Profiles are private reusable notes, not mutable project dependencies
 
 - Initial slice is one named profile per guest, using the existing transaction/owner boundary and separate immutable profile revisions. Length and degree maps retain their semantics; experience and tools are explicitly supplied, not inferred from a garment image or model.

@@ -1,6 +1,6 @@
 ---
 doc: checklist
-status: ready-for-implementation
+status: implementation-in-progress
 revision: companion-2.0
 ---
 # Stitches Companion 2.0 — executable build checklist
@@ -32,11 +32,12 @@ Exit: two distinct source-qualified candidates and one fully mapped vertical jou
 
 ## W02 — Private project foundation
 - Verified measurement slice: source-specific body-note fields, separate degree storage and preservation of unexposed legacy/specialist notes. Focused tests 13/13; full suite 68 passed / one opt-in live skipped; typecheck/build/API and actual five-width Sandy/Tina browser persistence/import checks passed. Actual desktop/phone screenshots inspected. No reusable profile, fit or cutting promotion.
-- Local verified partial slice: guest owner isolation, transactional project/revision/journal store, basis-bound notes, stale/idempotent writes, restart restore, and v1/v2 latest-state backup/import. This does not yet satisfy the full W02 exit because profile, step-specific progress, cleanup and deployable durability are open.
+- Verified private slices now include projects, profiles, journals, immutable scrap history and v1/v2/v3 latest-state backup/import. Step-specific progress, cleanup and deployable durability remain open; local persistence is not the full W02 exit.
 - [x] Isolated guest sessions and durable local SQLite project store with immutable revisions; cross-guest reads/mutations denied and restart restore tested.
 - [x] Basis-bound private journal/questions; v1/v2 project backup/import, including measurement units and prior-note provenance.
 - [x] Source-specific measurement notebook: four Sandy and fourteen Tina fields, degrees separate from mm, unexposed notes preserved; actual five-width browser tests.
 - [x] Reusable private maker profile and explicit reviewed fill-missing snapshot copy; strict units, immutable profile revisions, stale/replay/isolation/restart tests and reviewed backup recovery. Actual production API and five-width browser checks pass; fresh screenshots inspected. No automatic project rewrites or fit/cutting promotion.
+- [x] Private source-bound scrap events with optimistic history/project checks, exact replay, owner isolation, restart restore and v3 untrusted-history import. Prior source/project bases remain immutable; no capability promotion.
 - [ ] Step-specific progress, safe cleanup and deployable durable-store configuration. Local project storage alone does not close these gates.
 - [ ] Bind source, measurements, fabric, equipment, operation, step, diagnostic observations and evidence to a semantic basis.
 - [x] Stale-tab refusal, idempotent project saves/source rebinding, cross-guest denial and restart restore for implemented project/journal operations.
@@ -61,6 +62,7 @@ Exit: exact graph queries validate, served KB separately verified, content absen
 Exit: maker can explain how one selected piece is cut and joined on a qualified source; unqualified example states its limit.
 
 ## W05 — Preparation and checked variation
+- [x] Saved-revision preparation review: exact current source body-note requirements/units, fabric-structure conflict, missing material/tools/questions and explicit cutting gates. Private plain-text planning brief includes limitations and reported scrap history; it is not a pattern or external instruction copy.
 - [ ] Guidance distinguishes body/finished/ease measures, fabric width/length, nap/fold, equipment and sourced method alternatives.
 - [ ] For qualified operations, redraft/check all affected pieces, joins, counts, layout and steps from one revision basis; preview and explicit keep.
 - [ ] Implement semantic `PatternCommand` → full redraft → immutable measured `PatternArtifact` → independent validation → SVG/React view. Reject arbitrary model point/path edits. Confirm viewer selection IDs resolve to the generated piece/edge/notch and correct making step.
@@ -68,10 +70,11 @@ Exit: maker can explain how one selected piece is cut and joined on a qualified 
 Exit: meaningful numerical/domain tests and browser change → checked consequence → keep → resume. No arbitrary formula or fabricated yardage.
 
 ## W06 — Step-focused Make and “I'm stuck”
-- Verified partial only: a source-bound, pending-review scrap-seam diagnostic asks for one discriminating observation, conditionally shows a sample-only comparison, stops on an unchanged sample, and prepares a basis-linked journal note. No step DAG, actual garment adjustment, confirmed remedy or maker trial exists yet.
+- Verified scrap-only slice: source-bound observations, explicit comparison starts, user-reported outcomes and private pauses persist across reload/source/project changes. Completed/unsuccessful/uncertain/paused paths do not repeat automatically or rewrite the first observation. Actual-garment confirmed recovery and the qualified step DAG remain open.
 - [ ] Resolve authored prerequisite DAG to a revision-specific plan with diagrams, orientation, micro-actions and checkpoints.
 - [ ] Save step progress; show active step context in help; symptoms lead through authored discriminating tests to source-backed remedies.
-- [ ] Record observations/attempts and distinguish confirmed fix from hypothesis; preserve history on source or project changes.
+- [x] Record private scrap observations/attempts/outcomes, label improvement as a report (not diagnosis), retain historical bases and stop unsuccessful repetition; source outage preserves history and permits a private pause without new advice.
+- [ ] Qualified active-step/actual-garment remedy confirmation and continuation, independently reviewed sources and physical maker evidence. A saved scrap result does not satisfy this gate.
 Exit: actual maker journey through pause/recovery; test wrong-step, missing source, uncertainty, obsolete method and destructive-advice refusal.
 
 ## W07 — Optional photo intelligence
@@ -81,6 +84,7 @@ Exit: actual maker journey through pause/recovery; test wrong-step, missing sour
 Exit: supported/unsupported/occluded photos and privacy/quota tests; no photo output promoted to cut-ready evidence.
 
 ## W08 — Bounded agent and real integration
+- [x] Initial read-only preparation tool/loop slice: project/source/history binding, minimized consented summary, fixed exact graph and scoped actual KB, per-request authorization and checkpoint acknowledgment. Synthetic protocol/SDK tests and separate actual two-project Content Lake/Context read rehearsal pass. Not yet public UI, durable resume, active-time controller or live Gemini proof.
 - [ ] Typed registered tool loop for project inspection, exact Sanity read, KB read, prerequisite/diagnostic checks, variant/layout checks and proposal review.
 - [ ] Durable checkpoints, idempotency, time/call/alternative bounds, cancel/resume, budget check and manual fallback.
 - [ ] Run live end-to-end tasks within free quota; record provider version, calls, outputs, timing and failures without secrets.
@@ -101,7 +105,7 @@ Exit: measured results with provenance and failures. No superiority claim withou
 Exit: STATUS separates working, digitally checked, maker reviewed and blocked capabilities. If physical evidence is unavailable, useful planning/making assistance may ship in local preview but cut-ready claim stays blocked.
 
 ## First next task
-Next: W02/W06 persist a source-bound scrap-test observation/attempt history so recovery survives reload and stale source/project changes. Reusable private profile verification is complete. Continue W01 exact rights/geometry/making qualification without pretending pending content is reviewed. The original first-three cards below remain full qualification gates, not a claim that their partial implementation is absent.
+Next: W08 persist owner-scoped source/project/history-bound runs/checkpoints using the verified read-only inspection/preparation and actual Context tools, then wire explicit consent/manual fallback UI and qualify live model tasks. First atomic slice is transactional run storage with isolation/replay/stale/cancel tests. Keep all model writes/keeps prohibited, enforce time/free-budget bounds before live calls and preserve W01 qualification gaps. The original first-three cards below remain full qualification gates, not a claim that their partial implementation is absent.
 
 ### Atomic task cards — first three and final handoff
 

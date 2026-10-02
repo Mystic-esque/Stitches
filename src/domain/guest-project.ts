@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { diagnosticRecordSchema } from "./diagnostic-history";
 
 const label = (max: number) => z.string().trim().min(1).max(max);
 const labels = z.array(label(100)).max(24);
@@ -55,6 +56,9 @@ export const projectBackupSchema = z.discriminatedUnion("version", [
   projectBackupBaseSchema.extend({ version: z.literal(1) }).strict(),
   projectBackupBaseSchema.extend({ version: z.literal(2), notes: z.array(backupNoteSchema).max(2000),
     knowledgeFingerprint: z.string().regex(/^[a-f0-9]{64}$/).nullable().optional() }).strict(),
+  projectBackupBaseSchema.extend({ version: z.literal(3), notes: z.array(backupNoteSchema).max(2000),
+    knowledgeFingerprint: z.string().regex(/^[a-f0-9]{64}$/).nullable(),
+    diagnostics: z.array(diagnosticRecordSchema).max(2000) }).strict(),
 ]);
 export const importGuestProjectSchema = z.object({
   backup: projectBackupSchema,

@@ -59,7 +59,13 @@ try {
       if (ready) break;
       await pause(250);
     }
-    if (!ready) throw new Error(`Home did not settle at ${width}px`);
+    if (!ready) {
+      const failure = await evaluate("(async()=>({url:location.href,readyState:document.readyState,hero:!!document.querySelector('.companion-hero'),catalogCards:document.querySelectorAll('.catalog-evidence-grid article').length,body:document.body.innerText.slice(0,2200),catalog:await fetch('/api/catalog',{signal:AbortSignal.timeout(12000)}).then(async response=>({status:response.status,body:await response.json()})).catch(error=>({error:error.name}))}))()");
+      const shot = await call('Page.captureScreenshot', { format: 'png', fromSurface: true });
+      await writeFile(join(output, `home-readiness-failed-${width}.png`), Buffer.from(shot.data, 'base64'));
+      await writeFile(join(root, 'evidence', 'companion-runtime-home-failure.json'), JSON.stringify({ checkedAt: new Date().toISOString(), passed: false, errors, failure }, null, 2));
+      throw new Error(`Home did not settle at ${width}px; actual page/catalog failure capture saved`);
+    }
     await evaluate("window.scrollTo(0, document.body.scrollHeight / 2)"); await pause(350);
     await evaluate("window.scrollTo(0, document.body.scrollHeight)"); await pause(350);
     await evaluate("window.scrollTo(0, 0)");
@@ -121,6 +127,39 @@ try {
   if (!await evaluate("document.querySelector('.maker-journal textarea')?.value.includes('No visible change')")) throw new Error('Diagnostic observation did not prepare a project-basis journal note');
   const studyShot = await call('Page.captureScreenshot', { format: 'png', captureBeyondViewport: true, fromSurface: true });
   await writeFile(join(output, 'project-piece-study-1440.png'), Buffer.from(studyShot.data, 'base64'));
+  // Save a real local scrap history through the rendered controls; reports are synthetic, not maker trials.
+  await evaluate("document.querySelectorAll('.diagnostic-choices button')[1].click()");
+  await evaluate("[...document.querySelectorAll('.diagnostic-actions button')].find(x=>x.textContent.includes('Save scrap')).click()");
+  for (let i = 0; i < 240; i++) { if (await evaluate("document.querySelectorAll('.diagnostic-history li').length === 1")) break; await pause(250); }
+  if (!await evaluate("document.querySelectorAll('.diagnostic-history li').length === 1")) throw new Error('Scrap observation did not persist');
+  await evaluate("[...document.querySelectorAll('.diagnostic-actions button')].find(x=>x.textContent.includes('Start source-linked')).click()");
+  for (let i = 0; i < 240; i++) { if (await evaluate("!!document.querySelector('[aria-label=\"Comparison result\"]')")) break; await pause(250); }
+  await evaluate("[...document.querySelectorAll('.diagnostic-actions button')].find(x=>x.textContent.includes('No improvement')).click()");
+  for (let i = 0; i < 240; i++) { if (await evaluate("document.querySelectorAll('.diagnostic-history li').length === 3")) break; await pause(250); }
+  if (!await evaluate("document.querySelectorAll('.diagnostic-history li').length === 3 && !document.querySelector('.diagnostic-outcome')?.textContent.includes('lower upper-thread tension')")) throw new Error('Unsuccessful scrap outcome did not stop advice and preserve three separate events');
+  await call('Page.reload');
+  for (let i = 0; i < 240; i++) { if (await evaluate("document.querySelectorAll('.diagnostic-history li').length === 3 && !!document.querySelector('.diagnostic-outcome.unresolved')")) break; await pause(250); }
+  if (!await evaluate("document.querySelectorAll('.diagnostic-history li').length === 3 && !!document.querySelector('.diagnostic-outcome.unresolved')")) throw new Error('Scrap history/stop state did not survive reload');
+  if (!await evaluate("document.querySelector('.preparation-plan li[data-state=blocked]')?.textContent.includes('Do not cut') && document.querySelector('.preparation-next')?.textContent.includes('Still to record')")) throw new Error('Preparation did not identify missing source-listed notes or preserve the cutting gate');
+  await evaluate("(()=>{const previous=URL.createObjectURL;URL.createObjectURL=blob=>{window.__planningBrief=blob;return previous.call(URL,blob)};document.querySelector('.preparation-heading button').click();URL.createObjectURL=previous;return true})()");
+  const brief = await evaluate("window.__planningBrief.text()");
+  if (!brief.includes('NOT a sewing pattern') || !brief.includes('Maker reported no improvement') || !brief.includes('PRIVATE PLANNING BRIEF')) throw new Error('Plain-text planning brief omitted limitations or saved scrap results');
+  await evaluate("document.querySelector('.preparation-next button').click()");
+  if (!await evaluate("document.activeElement?.name === 'measure-waist'")) throw new Error('Preparation review action did not focus the first missing exact measurement');
+  for (const width of [1440, 1024, 768, 390, 320]) {
+    await call('Emulation.setDeviceMetricsOverride', { width, height: 900, deviceScaleFactor: 1, mobile: width < 500 });
+    if (await evaluate("document.documentElement.scrollWidth > innerWidth")) throw new Error(`Scrap history overflow at ${width}`);
+    if (width === 1440 || width === 390) {
+      await evaluate("document.querySelector('.diagnostic-history').scrollIntoView()");
+      await pause(250);
+      const shot = await call('Page.captureScreenshot', { format: 'png', captureBeyondViewport: false, fromSurface: true });
+      await writeFile(join(output, `diagnostic-history-${width}.png`), Buffer.from(shot.data, 'base64'));
+      await evaluate("document.querySelector('.preparation-plan').scrollIntoView()"); await pause(250);
+      const prepShot = await call('Page.captureScreenshot', { format: 'png', captureBeyondViewport: false, fromSurface: true });
+      await writeFile(join(output, `preparation-plan-${width}.png`), Buffer.from(prepShot.data, 'base64'));
+    }
+  }
+  await call('Emulation.setDeviceMetricsOverride', { width: 1440, height: 900, deviceScaleFactor: 1, mobile: false });
   await evaluate("(()=>{window.__sourceFetch=window.fetch;window.fetch=(input,init)=>String(input).includes('/api/catalog')?Promise.reject(new Error('disposable source transport failure')):window.__sourceFetch(input,init);window.dispatchEvent(new Event('focus'));return true})()");
   let pausedOnFailure = false;
   for (let i = 0; i < 120; i++) {
@@ -132,6 +171,10 @@ try {
     const state = await evaluate("({binding:[...document.querySelectorAll('.source-binding')].map(x=>x.className),study:[...document.querySelectorAll('.piece-study')].map(x=>({tag:x.tagName,connected:x.isConnected,parent:x.parentElement?.className,text:x.textContent?.slice(0,80)})),diagnostic:[...document.querySelectorAll('.diagnostic-study')].map(x=>({parent:x.parentElement?.className,text:x.textContent?.slice(0,80)})),appRoots:document.querySelectorAll('.companion-app').length,alert:document.querySelector('.project-alert')?.textContent})");
     throw new Error(`Source transport failure left cached guidance visible: ${JSON.stringify(state)}`);
   }
+  if (!await evaluate("document.querySelectorAll('.diagnostic-history li').length === 3 && document.querySelector('.diagnostic-history').textContent.includes('guidance paused')")) throw new Error('Source outage hid or relabeled saved scrap history');
+  await evaluate("document.querySelector('.history-pause').click()");
+  for (let i = 0; i < 240; i++) { if (await evaluate("document.querySelectorAll('.diagnostic-history li').length === 4")) break; await pause(250); }
+  if (!await evaluate("document.querySelectorAll('.diagnostic-history li').length === 4 && document.querySelector('.diagnostic-history').textContent.includes('Paused this check')")) throw new Error('Source outage prevented a private pause fact');
   await evaluate("(()=>{window.fetch=window.__sourceFetch;window.dispatchEvent(new Event('focus'));return true})()");
   let recoveredFromFailure = false;
   for (let i = 0; i < 120; i++) {
@@ -181,7 +224,7 @@ try {
   await writeFile(join(output, 'project-journal-1440.png'), Buffer.from(journalShot.data, 'base64'));
   await evaluate("(()=>{const previous=URL.createObjectURL;URL.createObjectURL=function(blob){window.__stitchesBackupBlob=blob;return previous.call(URL,blob)};document.querySelector('.project-topline button:last-child').click();return true})()");
   const backup = await evaluate("(async()=>JSON.parse(await window.__stitchesBackupBlob.text()))()");
-  if (backup.version !== 2 || backup.notes?.length !== 1 || !backup.knowledgeFingerprint) throw new Error('Downloaded backup omitted the journal or source binding');
+  if (backup.version !== 3 || backup.notes?.length !== 1 || backup.diagnostics?.length !== 4 || !backup.knowledgeFingerprint) throw new Error('Downloaded backup omitted the journal, scrap history or source binding');
   if (!Object.entries({ waist: 720, hips: 960, waistToFloor: 1000, waistToHips: 200 }).every(([key, value]) => backup.plan.measurementsMm[key] === value)) throw new Error('Source-listed body notes did not survive save/reload/export with mm units');
   backup.knowledgeFingerprint = '0'.repeat(64); // Disposable import rehearsal of a prior Sanity source revision.
   await evaluate("document.querySelector('.project-topline button:first-child').click()");
@@ -198,6 +241,7 @@ try {
     await pause(250);
   }
   if (!imported) throw new Error('Backup import did not restore the journal and provenance');
+  if (!await evaluate("document.querySelectorAll('.diagnostic-history li').length === 4 && document.querySelector('.diagnostic-history').textContent.includes('Imported history · not verified')")) throw new Error('Backup import lost or trusted scrap history');
   const staleBinding = await evaluate("document.querySelector('.source-binding.stale')?.textContent.includes('Source changed')");
   if (!staleBinding) throw new Error('Outdated source binding was not shown as stale');
   if (await evaluate("!!document.querySelector('.piece-study') || !!document.querySelector('.diagnostic-study')")) throw new Error('Stale source still exposed source-linked teaching');
@@ -336,6 +380,12 @@ try {
   await evaluate("window.fetch=window.profileOriginalFetch;delete window.profileOriginalFetch");
   if (!concurrentDraftPreserved) throw new Error('Profile response erased an in-flight brief edit');
   report.makerProfile.concurrentDraftPreserved = concurrentDraftPreserved;
+  report.projectJourney.backupVersion = backup.version;
+  report.scrapHistory = { savedObservationAttemptResult: true, unsuccessfulStopsAdvice: true, reloadPersistence: true,
+    sourceOutageRetainsHistory: true, pauseDuringSourceTransportFailure: true, untrustedRestore: true, fiveWidthNoOverflow: true, syntheticNotMakerTrial: true };
+  report.screenshots.push('diagnostic-history-1440.png', 'diagnostic-history-390.png');
+  report.preparation = { missingSourceNotesIdentified: true, cuttingRemainsBlocked: true, plainTextBriefDownloaded: true, savedScrapResultsIncluded: true, fiveWidthNoOverflow: true };
+  report.screenshots.push('preparation-plan-1440.png', 'preparation-plan-390.png');
   if (errors.length) throw new Error(`Browser runtime errors: ${JSON.stringify(errors)}`);
   report.screenshots.push('maker-profile-copy-1440.png', 'maker-profile-copy-390.png');
   report.screenshots.push('project-measurements-tina-1440.png', 'project-measurements-tina-390.png');

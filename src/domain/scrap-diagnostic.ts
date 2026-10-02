@@ -1,5 +1,12 @@
 export type ScrapObservation = "not-tested" | "relaxes" | "unchanged";
 
+export function pausedScrapAdvice() {
+  return { state: "unresolved" as const, title: "This comparison path needs review",
+    explanation: "A saved comparison was completed, unsuccessful, uncertain or paused. That does not rewrite your first observation or establish the cause.",
+    nextAction: "Keep the observations and comparison result together. Do not repeat this path automatically or transfer the sample result to the garment; ask for further source-qualified review.",
+    confirmation: null };
+}
+
 export function resolveScrapObservation<T extends { tensionIssue: string; tensionRiskNotes: string;
   unresolvedIssue: string; unresolvedRiskNotes: string; howToCheck: string; safeAction: string;
   confirmationCheck: string }>(study: T, result: ScrapObservation) {

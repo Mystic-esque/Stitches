@@ -17,6 +17,7 @@ export async function GET(request: NextRequest, context: RouteContext) {
       project,
       revisions: getLocalGuestStore().listRevisions(identity.ownerId, id),
       notes: getLocalGuestStore().listNotes(identity.ownerId, id),
+      diagnostics: getLocalGuestStore().listDiagnostics(identity.ownerId, id),
     });
   } catch (error) {
     return guestErrorResponse(error);

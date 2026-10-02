@@ -1,13 +1,16 @@
 "use client";
 
 import Image from "next/image";
-import { useCallback, useEffect, useState, type ChangeEvent, type FormEvent } from "react";
+import { useCallback, useEffect, useRef, useState, type ChangeEvent, type FormEvent } from "react";
 import { projectBackupSchema, type GuestProject, type ProjectNote, type ProjectPlan, type ProjectSource } from "@/domain/guest-project";
 import type { CompanionCatalogCard } from "@/server/knowledge/companion-catalog";
 import { PieceStudy } from "./PieceStudy";
 import { DiagnosticStudy } from "./DiagnosticStudy";
+import { DiagnosticHistory } from "./DiagnosticHistory";
+import type { DiagnosticRecord } from "@/domain/diagnostic-history";
 import { MeasurementPlan } from "./MeasurementPlan";
 import { MakerProfilePanel } from "./MakerProfilePanel";
+import { PreparationPlan } from "./PreparationPlan";
 import { applyMeasurementDraft, measurementDraftFor, type MeasurementDraft } from "@/domain/measurement-plan";
 
 const starts = [
@@ -42,8 +45,11 @@ export function CompanionHome() {
   const [catalog, setCatalog] = useState<CompanionCatalogCard[]>([]);
   const [catalogState, setCatalogState] = useState<"loading" | "ready" | "unavailable">("loading");
   const [active, setActive] = useState<GuestProject | null>(null);
+  const activeId = useRef<string | undefined>(undefined);
+  activeId.current = active?.id;
   const [revisions, setRevisions] = useState<GuestProject[]>([]);
   const [notes, setNotes] = useState<ProjectNote[]>([]);
+  const [diagnostics, setDiagnostics] = useState<DiagnosticRecord[]>([]);
   const [noteText, setNoteText] = useState("");
   const [noteKind, setNoteKind] = useState<"journal" | "question">("journal");
   const [noteStage, setNoteStage] = useState<"plan" | "prepare" | "make" | "check">("plan");
@@ -61,6 +67,7 @@ export function CompanionHome() {
       setError(""); setNotice("");
       const data = await json(await fetch(`/api/projects/${encodeURIComponent(id)}`, { cache: "no-store" }));
       setActive(data.project); setDraft(draftFor(data.project)); setRevisions(data.revisions); setNotes(data.notes);
+      setDiagnostics(data.diagnostics ?? []);
       window.history.pushState({}, "", `/?project=${encodeURIComponent(id)}`);
       window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (cause) { setError(cause instanceof Error ? cause.message : "Project unavailable."); }
@@ -109,6 +116,7 @@ export function CompanionHome() {
     try {
       const data = await json(await fetch("/api/projects", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ title: newTitle, brief: newBrief, source: newSource, idempotencyKey: crypto.randomUUID() }) }));
       setProjects((current) => [data.project, ...current]); setNewSource(null); setActive(data.project); setDraft(draftFor(data.project)); setRevisions([data.project]); setNotes([]);
+      setDiagnostics([]);
       window.history.pushState({}, "", `/?project=${data.project.id}`);
       setNotice("Project saved privately in this browser's guest workspace.");
       window.scrollTo({ top: 0, behavior: "smooth" });
@@ -126,13 +134,14 @@ export function CompanionHome() {
     } catch (cause) { setError(cause instanceof Error ? cause.message : "Could not save project."); }
     finally { setBusy(false); }
   }
-  const back = () => { setActive(null); setDraft(null); setRevisions([]); setNotes([]); setError(""); setNotice(""); window.history.pushState({}, "", "/"); };
+  const back = () => { setActive(null); setDraft(null); setRevisions([]); setNotes([]); setDiagnostics([]); setError(""); setNotice(""); window.history.pushState({}, "", "/"); };
   const update = (field: keyof Draft, value: string) => setDraft((current) => current ? { ...current, [field]: value } : current);
 
   function downloadBackup() {
     if (!active) return;
-    const backup = projectBackupSchema.parse({ format: "stitches-project-backup", version: 2, title: active.title, brief: active.brief, source: active.source, plan: active.plan,
+    const backup = projectBackupSchema.parse({ format: "stitches-project-backup", version: 3, title: active.title, brief: active.brief, source: active.source, plan: active.plan,
       knowledgeFingerprint: active.knowledgeFingerprint,
+      diagnostics,
       notes: notes.map(({ kind, stage, text, basisSequence, basisHash, createdAt, importedFromSequence }) => ({
         kind, stage, text, basisSequence: importedFromSequence ?? basisSequence, basisHash, createdAt,
       })) });
@@ -150,8 +159,9 @@ export function CompanionHome() {
       setBusy(true);
       const data = await json(await fetch("/api/projects/import", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ backup, idempotencyKey: crypto.randomUUID() }) }));
       setProjects((current) => [data.project, ...current]); setActive(data.project); setDraft(draftFor(data.project)); setRevisions([data.project]); setNotes(data.notes);
+      setDiagnostics(data.diagnostics ?? []);
       window.history.pushState({}, "", `/?project=${data.project.id}`);
-      setNotice("Backup imported as a new private project, including its journal. Original revision snapshots are not included.");
+      setNotice("Backup imported as a new private project, including its journal and unverified check history. Original revision snapshots are not included.");
     } catch (cause) { setError(cause instanceof Error ? cause.message : "Could not import backup."); }
     finally { setBusy(false); }
   }
@@ -207,7 +217,14 @@ export function CompanionHome() {
       {active.source.kind === "candidate" && <section className="project-source-strip" aria-label="Current source research">{sourceCard ? <><p className="companion-kicker">LIVE SANITY CONTENT LAKE · PLANNING SOURCE</p><strong>{sourceCard.title}</strong><p>{sourceBinding === "stale" ? "This source record changed after your saved project basis. Review and refresh it before using the new planning facts." : sourceCard.cuttingCaveat}</p><span>{sourceCard.materialStructure} · {sourceCard.requiredMeasurements.length} source-listed measurements · {sourceCard.reviewStatus} review · plan only</span><a href={sourceCard.sourceUrl} target="_blank" rel="noreferrer">Read {sourceCard.sourceTitle} ↗</a></> : <p role="status">{catalogState === "loading" ? "Checking the current Sanity source record…" : "Current Sanity source details are unavailable. Your private plan is still saved, but do not use this card to cut."}</p>}</section>}
       {sourceBinding && <div className={`source-binding ${sourceBinding}`} role="status"><span>{sourceBinding === "current" ? "This plan is bound to the current Sanity source revision. It is still planning-only." : sourceBinding === "stale" ? "Source changed since this project revision. Source-dependent advice is stale; earlier maker notes are preserved." : sourceBinding === "unbound" ? "This project has no saved Sanity source binding yet. Review the current source before attaching it." : "Sanity source check is unavailable. Source-dependent guidance is paused."}</span>{(sourceBinding === "stale" || sourceBinding === "unbound") && <button type="button" disabled={busy || unsavedChanges} onClick={refreshSource}>Review & bind current source ↗</button>}{unsavedChanges && sourceBinding !== "current" && <small>Save plan edits first.</small>}</div>}
       {sourceBinding === "current" && sourceCard && <PieceStudy key={`piece-${sourceCard.designKey}`} card={sourceCard} />}
-      {sourceBinding === "current" && sourceCard && <DiagnosticStudy key={`diagnostic-${sourceCard.designKey}`} study={sourceCard.diagnosticStudy} onPrepareNote={(text) => { setNoteKind("journal"); setNoteStage("check"); setNoteText(text); document.getElementById("journal-heading")?.scrollIntoView({ behavior: "smooth" }); }} />}
+      {sourceBinding === "current" && sourceCard && <DiagnosticStudy key={`diagnostic-${active.id}-${active.sequence}-${sourceCard.diagnosticStudy.fingerprint}`} study={sourceCard.diagnosticStudy} project={active} history={diagnostics} disabled={busy || unsavedChanges}
+        onSaved={(record) => { if (activeId.current === record.projectId) setDiagnostics((history) => history.some((item) => item.id === record.id) ? history : [...history, record]); }}
+        onReload={async () => { const data = await json(await fetch(`/api/projects/${active.id}/diagnostics`, { cache: "no-store" })); if (activeId.current === active.id) setDiagnostics(data.diagnostics); }}
+        onPrepareNote={(text) => { setNoteKind("journal"); setNoteStage("check"); setNoteText(text); document.getElementById("journal-heading")?.scrollIntoView({ behavior: "smooth" }); }} />}
+      <DiagnosticHistory key={active.id} history={diagnostics} project={active} disabled={busy || unsavedChanges}
+        onSaved={(record) => { if (activeId.current === record.projectId) setDiagnostics((history) => history.some((item) => item.id === record.id) ? history : [...history, record]); }}
+        currentFingerprint={sourceBinding === "current" ? sourceCard?.diagnosticStudy.fingerprint : undefined} />
+      <PreparationPlan project={active} source={sourceCard} history={diagnostics} dirty={unsavedChanges} />
       <div className="project-workspace"><aside className="project-rail" aria-label="Project stages"><p className="rail-caption">THE JOURNEY</p><ol><li className="current"><b>01</b><span>Plan your idea<small>Available now</small></span></li><li><b>02</b><span>Understand the pattern<small>Qualification in progress</small></span></li><li><b>03</b><span>Cut with confidence<small>Not yet verified</small></span></li><li><b>04</b><span>Make & troubleshoot<small>Not yet verified</small></span></li></ol><a href="/demo">Explore the pattern study ↗</a></aside>
         <form className="project-form" onSubmit={save}><div className="form-intro"><p className="companion-kicker">THE WORKING BRIEF</p><h2>Make it yours, one decision at a time.</h2><p>Describe what you want to make. Stitches keeps constraints together while drafting and making tools are verified.</p></div>
           <div className="field-row"><label>Project name<input value={draft.title} maxLength={100} required onChange={(event) => update("title", event.target.value)} /></label><label>Fabric structure<select value={draft.structure} onChange={(event) => update("structure", event.target.value)}><option value="unknown">Not sure yet</option><option value="woven">Woven</option><option value="knit">Knit / stretch</option></select></label></div>

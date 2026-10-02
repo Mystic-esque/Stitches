@@ -1,8 +1,32 @@
 # Status
 
-Updated: October 1, 2026.
+Updated: October 2, 2026.
 
-## Active W02 — reusable private maker profile
+## Next executable task — persisted private agent runs (W08/C01/C08/C09)
+
+Build on the verified read-only tool boundary below. Add strict owner-scoped run/checkpoint schemas and additive transactional storage with project/source/history binding, idempotent starts/checkpoints, cancellation and explicit stale/quota/timeout/unknown-provider-outcome states. Preserve opaque signed provider content only in private run state; never log credentials or copy it to Sanity. The controller must enforce the four-request/$0/120-second boundaries and not retry an ambiguous charged request silently. Preview minimized provider input and obtain explicit app consent before inference; manual preparation remains usable. No model keeps, observations or physical progress writes. First atomic slice: run persistence and deterministic isolation/replay/stale/cancel tests; then wire consent UI and qualify live model tasks. Rollback preserves private records and evidence. Cold-launch/catalog latency remains an operational rehearsal issue to investigate, not a proved root cause.
+
+## Verified W08 first slice — read-only project-aware agent boundary
+
+Contract C01/C08/C09. At the owner's request, advance independent agent work while final private-history/preparation verification runs. Input basis: saved owner-scoped project plus its current exact applicable catalog and immutable scrap-history head. Files: `src/server/agent/companion-{tools,loop}.ts`, the existing Gemini adapter, synthetic protocol tests and an opt-in actual read-only Context rehearsal. Acceptance: consented minimized preparation summary; no body values/private prose/photos; fixed exact graph and server-selected Stitches KB paths; reject arbitrary arguments, writes, stale/in-flight changes, missing retrieval, quota authorization denial, cancellation, repeated calls and premature answers. At most four model requests; no model keep or diagnostic mutation. Checkpoint callback must acknowledge before continuation.
+
+This is a backend first slice, not a shipped public agent or durable resume implementation. The callback is not yet connected to a persisted run repository; consent UI, transport, cancellation/resume orchestration, live Gemini task proof and maintained-KB factual qualification remain open. No provider inference or Sanity write has been made by this slice. Rollback: revert the new unwired modules, retaining all private data and evidence. Next executable task: verify these boundaries, then wire a private persisted run controller and explicit consent/manual fallback UI.
+
+Read boundary verified: focused agent/SDK suite **14 passed**; full suite **91 passed / zero failed / two opt-in live skipped** (`evidence/companion-agent-verification.json`); `npm run typecheck` exit 0. Separate opt-in live rehearsal passed at **03:41:17Z** against actual dedicated development Content Lake and Context for both Sandy/Tina, with synthetic in-memory private projects, unchanged saved bases and zero Gemini requests. Receipt: `evidence/companion-agent-read-verification.json`. This is live read-tool integration, not live model, benchmark, maker or KB factual-review proof. Next executable task is the persisted private run controller plus consent/manual fallback UI.
+
+Prior slice's bounded rerun: JSON report records **81 passed / zero failed / one opt-in live skipped**; it also emitted a worker-termination timeout warning, retained as an operational issue. Final production build exits 0; compile, TypeScript, static generation and traces completed. Refined Chrome production rehearsal passes at **04:34:02Z** across five widths, including the input-focus shortcut and actual v3 download metadata. Fresh captures reviewed. Earlier readiness/spawn failures are retained; underlying intermittent launch/source latency was not isolated. Direct loopback preview is running and HEAD returns HTTP 200.
+
+## Verified W02/W06 slice — persistent scrap troubleshooting
+
+Final milestone verification supersedes the pending notes below: full suite 91 pass / two opt-in skips, typecheck/build exit 0. Actual Chrome at **04:34:02Z** passes all five widths with zero runtime errors/overflow/broken images; saved observation/start/result, unsuccessful stop/reload, source-outage history plus private pause, recovery and untrusted v3 restore all pass. Saved preparation/brief/first-missing-input focus pass. Four fresh desktop/phone history/preparation captures visually inspected. `evidence/companion-runtime-verification.json` now records the actual downloaded backup version 3. Earlier home-readiness failures and restricted Chrome launch are real failed rehearsals, not erased by this pass; underlying intermittent launch/source latency is not isolated. No UI assertion was loosened: the only later harness change adds failure captures if readiness fails.
+
+Contract C01/C04/C07/C09. Inputs: saved private project, exact applicable Sanity catalog/diagnostic fingerprints and maker-reported scrap observations. Implement immutable owner-scoped observation/start/result/pause events, strict transition and optimistic history checks, source/project staleness, replay before dependent source reads, and private versioned backup. UI must retain history when live guidance is unavailable; pending content remains sample-only and never confirms cause or actual-garment remedy.
+
+Files: diagnostic domain contract, guest repository/routes, DiagnosticStudy/history UI, project backup integration, deterministic/API/browser checks. Acceptance: isolation, replay, stale source/project/history denial, failed-comparison stop, restart and untrusted restore; useful manual recovery without provider inference. Verification pending. Rollback: revert code only; retain private SQLite records and evidence. Next executable task: implement and verify this slice, then advance independent preparation readiness work.
+
+Independent C06 preparation slice implemented: review saved notes against current exact source measurement/material requirements, explicitly retain unknowns and cutting gates, and download a private plain-text planning brief. It contains no pattern pages or copied external instructions. Current verification: four diagnostic storage tests pass; initial full run passed 79 tests but failed route import resolution. Added documented Vitest alias (no dependency change); next full run passed 80 / one opt-in live skipped. Final amended pause, production/API/browser verification pending. Source qualification and physical gates are not bypassed.
+
+## Verified W02 slice — reusable private maker profile
 
 Contract: C01/C04/C06/C09. Implemented one named guest profile with typed body notes, experience, equipment and immutable SQLite revisions. Explicit fill-missing copy checks both saved bases and writes a new project revision; no live link, automatic overwrite or measurement aliases. Profile backup is plain private JSON, staged before explicit reviewed import. Existing project backup preserves copy history without profile access. Ordinary plan edits cannot forge copy provenance.
 
@@ -14,7 +38,7 @@ Observed recovery: initial keyboard rehearsal stopped before acceptance; a verif
 
 Evidence: `evidence/maker-profile-api-verification.json`, `evidence/guest-api-verification.json`, `evidence/companion-runtime-verification.json`, `evidence/screenshots/companion-runtime/maker-profile-copy-{1440,390}.png`. All test inputs are synthetic; personal data remains private. Local preview runs at `http://127.0.0.1:3100` (`npm run start -- --hostname 127.0.0.1 --port 3100`). No new dependency, Sanity write, Gemini inference, deployment or physical maker claim.
 
-**Next executable task:** persist source-bound scrap-test observations/attempts so recovery survives reload and stale source/project changes, with explicit user-reported outcomes and safe unresolved states. Do not promote pending-review scrap content to an actual-garment remedy or guided-making receipt. Exact engine/step/rights, print and physical cutting qualification remain open.
+**Historical next task at the profile milestone:** persist source-bound scrap-test observations/attempts. This is now implemented and verified above; the current next executable task is private agent-run persistence. Pending-review scrap content still cannot become an actual-garment remedy or guided-making receipt. Exact engine/step/rights, print and physical cutting qualification remain open.
 
 ### Checklist snapshot — completed slices versus full packages
 
@@ -26,10 +50,10 @@ No W01–W10 release package is fully closed yet; checked slices are real finish
 | W02 | Private projects/profiles/revisions/journal, units, explicit copy, stale/replay/isolation, restart tests and backups | Step-specific progress, cleanup, deployable durability |
 | W03 | Exact scoped catalog, actual maintained Context entries, shared pending scrap diagnostic, correction/read-back | Independent review and complete making graph; import-job metadata |
 | W04 | Landing/library/intake/planning UI and source-linked educational piece studies; five-width real captures | Qualified technical pattern board and full access audit |
-| W05 | Dimension-aware body notes and isolated redraft research | Production checked variation, layout and calibrated exports |
-| W06 | Conditional shared scrap diagnostic and journal preparation | Persistent attempts next; authored active-step journey and confirmed recovery |
+| W05 | Dimension-aware body notes, saved preparation review/private brief and isolated redraft research | Production checked variation, layout and calibrated exports |
+| W06 | Conditional shared scrap diagnostic, private source-bound attempts/outcomes/pause and journal preparation; actual outage/reload/restore proof | Authored active-step journey and confirmed garment recovery |
 | W07 | Not implemented | Consent/private temporary photo observations and manual fallback |
-| W08 | Preserved historical scoped illustrative Gemini tool loop | Full project-aware agent, durable runs, quota/cancel/resume and live task proof |
+| W08 | Historical scoped illustrative Gemini loop; tested read-only project/preparation loop and actual two-project Context reads | Public consent UI, durable runs, quota/cancel/resume orchestration and live model task proof |
 | W09 | Real shared-content correction, changed fingerprints, verified served KB recovery | Complete two-project advice/proposal correction demo and frozen fair benchmark |
 | W10 | Real software/API/browser verification and screenshots | Physical print/maker trials, three user tests, complete local release/submission package |
 

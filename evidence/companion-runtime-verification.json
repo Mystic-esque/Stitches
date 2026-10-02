@@ -1,6 +1,6 @@
 {
   "kind": "production-nextjs-ui",
-  "checkedAt": "2026-10-01T18:44:41.905Z",
+  "checkedAt": "2026-10-02T04:34:02.689Z",
   "base": "http://127.0.0.1:3100",
   "observations": [
     {
@@ -48,7 +48,7 @@
     "saved": true,
     "noted": true,
     "resumed": true,
-    "backupVersion": 2,
+    "backupVersion": 3,
     "imported": true,
     "mobileNoOverflow": true
   },
@@ -62,6 +62,10 @@
     "project-source-stale-1440.png",
     "project-source-recovered-1440.png",
     "project-390.png",
+    "diagnostic-history-1440.png",
+    "diagnostic-history-390.png",
+    "preparation-plan-1440.png",
+    "preparation-plan-390.png",
     "maker-profile-copy-1440.png",
     "maker-profile-copy-390.png",
     "project-measurements-tina-1440.png",
@@ -181,5 +185,22 @@
       }
     ],
     "concurrentDraftPreserved": true
+  },
+  "scrapHistory": {
+    "savedObservationAttemptResult": true,
+    "unsuccessfulStopsAdvice": true,
+    "reloadPersistence": true,
+    "sourceOutageRetainsHistory": true,
+    "pauseDuringSourceTransportFailure": true,
+    "untrustedRestore": true,
+    "fiveWidthNoOverflow": true,
+    "syntheticNotMakerTrial": true
+  },
+  "preparation": {
+    "missingSourceNotesIdentified": true,
+    "cuttingRemainsBlocked": true,
+    "plainTextBriefDownloaded": true,
+    "savedScrapResultsIncluded": true,
+    "fiveWidthNoOverflow": true
   }
 }

@@ -43,7 +43,7 @@ export type CompanionCatalogCard = { designKey: "sandy" | "tina"; title: string;
   requiredMeasurements: string[]; cuttingCaveat: string; sourceTitle: string; sourceUrl: string;
   sourceLocator: string; reviewStatus: "pending" | "reviewed"; fingerprint: string; capability: "plan_only";
   pieceStudy: CompanionPlanningPiece[]; diagnosticStudy: CompanionDiagnosticStudy };
-export type CompanionDiagnosticStudy = { title: string; purpose: string; makerQuestion: string; howToCheck: string;
+export type CompanionDiagnosticStudy = { sourceId: string; testId: string; remedyId: string; title: string; purpose: string; makerQuestion: string; howToCheck: string;
   riskNotes: string; tensionIssue: string; tensionRiskNotes: string; unresolvedIssue: string; unresolvedRiskNotes: string;
   safeAction: string; confirmationCheck: string;
   sourceTitle: string; sourceUrl: string; reviewStatus: "pending" | "reviewed"; capability: "sample_check_only"; fingerprint: string };
@@ -85,7 +85,8 @@ export function resolveCompanionCatalog(raw: unknown): CompanionCatalogCard[] {
       graph.test.possibleOutcomes.join("|") !== "relaxes|unchanged|not-tested")
     throw new CatalogError("invalid", "Shared diagnostic references or outcomes are inconsistent.");
   const diagnosticFingerprint = createHash("sha256").update(JSON.stringify(graph)).digest("hex");
-  const diagnosticStudy: CompanionDiagnosticStudy = { title: graph.procedure.title, purpose: graph.procedure.purpose,
+  const diagnosticStudy: CompanionDiagnosticStudy = { sourceId: graph.source._id, testId: graph.test._id, remedyId: graph.remedy._id,
+    title: graph.procedure.title, purpose: graph.procedure.purpose,
     makerQuestion: graph.test.makerQuestion, howToCheck: graph.test.howToCheck, riskNotes: graph.test.riskNotes,
     tensionIssue: graph.tension.title, tensionRiskNotes: graph.tension.riskNotes,
     unresolvedIssue: graph.unresolved.title, unresolvedRiskNotes: graph.unresolved.riskNotes,

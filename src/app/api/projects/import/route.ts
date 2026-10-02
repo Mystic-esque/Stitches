@@ -10,6 +10,7 @@ export async function POST(request: NextRequest) {
     assertSameOriginJson(request);
     const identity = guestForRequest(request);
     const project = getLocalGuestStore().importBackup(identity.ownerId, await request.json());
-    return guestResponse(request, identity, { project, notes: getLocalGuestStore().listNotes(identity.ownerId, project.id) }, 201);
+    return guestResponse(request, identity, { project, notes: getLocalGuestStore().listNotes(identity.ownerId, project.id),
+      diagnostics: getLocalGuestStore().listDiagnostics(identity.ownerId, project.id) }, 201);
   } catch (error) { return guestErrorResponse(error); }
 }

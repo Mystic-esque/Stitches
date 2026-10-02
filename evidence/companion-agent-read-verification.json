@@ -1,0 +1,58 @@
+{
+  "capturedAt": "2026-10-02T03:41:17.231Z",
+  "passed": true,
+  "provenance": "Actual development Content Lake + actual dedicated Context KB; synthetic private projects; no model inference",
+  "providerRequests": 0,
+  "results": [
+    {
+      "design": "sandy",
+      "evidence": {
+        "projectId": "10ee2db4-ad58-4654-8026-0439944b4904",
+        "projectSequence": 2,
+        "projectHash": "f48e4f8636d00b4e25b12cd05550e73f1cb251210f329dd24f8b7416b9abf6ee",
+        "catalogFingerprint": "2da503f12b8f6007d4e1f6f46d4c70cf25fa33b229bf6b1aad01ec75d379abb0",
+        "diagnosticFingerprint": "0f087c6b048811f6b3dcc780f9584ad191b9a7a2a638e9545053f95cce3b1161",
+        "historySequence": 0,
+        "historyHash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "knowledgeBaseId": "kbkvu1vrPsLG",
+        "paths": [
+          "sandy_skirt",
+          "fabric_constraints"
+        ],
+        "knowledgeHash": "e056748f12c71ff6ee61997e75997d2541d82b8dd94a537fb99f1a60b7b7c3cf",
+        "kbRole": "maintained_explanation_not_exact_authority",
+        "capability": "plan_only"
+      },
+      "toolSequence": [
+        "inspect_project",
+        "resolve_exact_graph",
+        "retrieve_context"
+      ]
+    },
+    {
+      "design": "tina",
+      "evidence": {
+        "projectId": "48d1fd38-3036-4664-9792-7d678b3285f7",
+        "projectSequence": 2,
+        "projectHash": "776cec1699d808880392d7d9bf27e984714791474e9a656e8a3832c5160b0f3e",
+        "catalogFingerprint": "68d6026c7f508a70de2255916003d91e3607f23eb3f3afefb3a05ea82e1f215f",
+        "diagnosticFingerprint": "0f087c6b048811f6b3dcc780f9584ad191b9a7a2a638e9545053f95cce3b1161",
+        "historySequence": 0,
+        "historyHash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "knowledgeBaseId": "kbkvu1vrPsLG",
+        "paths": [
+          "tina_top",
+          "fabric_constraints"
+        ],
+        "knowledgeHash": "bc608aed02c503af7b89146e877e5d46f328554cfc8ca65d338f4b4421f09b83",
+        "kbRole": "maintained_explanation_not_exact_authority",
+        "capability": "plan_only"
+      },
+      "toolSequence": [
+        "inspect_project",
+        "resolve_exact_graph",
+        "retrieve_context"
+      ]
+    }
+  ]
+}

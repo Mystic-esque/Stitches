@@ -1,6 +1,8 @@
 import { createHash, randomUUID } from "node:crypto";
 import { mkdirSync } from "node:fs";
 import path from "node:path";
+import { diagnosticBindingSchema, recordDiagnosticSchema, diagnosticTransitionError,
+  type DiagnosticRecord, type DiagnosticBinding, type RecordDiagnosticInput } from "../../domain/diagnostic-history";
 import { DatabaseSync } from "node:sqlite";
 import { copyMakerProfileSchema, importMakerProfileSchema, profileValuesSchema, saveMakerProfileSchema, profileCopyPreview,
   type MakerProfile, type SaveMakerProfileInput, type CopyMakerProfileInput } from "../../domain/maker-profile";
@@ -63,6 +65,11 @@ export class GuestStore {
     if (databasePath !== ":memory:") this.db.exec("PRAGMA journal_mode=WAL");
     this.db.exec(`
       PRAGMA foreign_keys=ON;
+      CREATE TABLE IF NOT EXISTS diagnostic_events (
+        owner_id TEXT NOT NULL, project_id TEXT NOT NULL, sequence INTEGER NOT NULL, data_json TEXT NOT NULL,
+        PRIMARY KEY (owner_id, project_id, sequence),
+        FOREIGN KEY (owner_id, project_id) REFERENCES projects(owner_id, id) ON DELETE CASCADE
+      ) STRICT;
       CREATE TABLE IF NOT EXISTS maker_profiles (
         owner_id TEXT PRIMARY KEY, data_json TEXT NOT NULL
       ) STRICT;
@@ -225,6 +232,46 @@ export class GuestStore {
     return rows.map((row) => JSON.parse(row.data_json) as ProjectNote);
   }
 
+  listDiagnostics(ownerId: string, projectId: string): DiagnosticRecord[] {
+    if (!this.getProject(ownerId, projectId)) throw new GuestStoreError("not_found", "Project not found.");
+    const rows = this.db.prepare("SELECT data_json FROM diagnostic_events WHERE owner_id = ? AND project_id = ? ORDER BY sequence")
+      .all(ownerId, projectId) as unknown as StoredRow[];
+    return rows.map((row) => JSON.parse(row.data_json) as DiagnosticRecord);
+  }
+
+  replayDiagnostic(ownerId: string, projectId: string, rawInput: RecordDiagnosticInput): DiagnosticRecord | null {
+    const input = recordDiagnosticSchema.parse(rawInput);
+    return this.receipt<DiagnosticRecord>(ownerId, input.idempotencyKey, "diagnostic", hash({ projectId, input }), projectId);
+  }
+
+  recordDiagnostic(ownerId: string, projectId: string, rawInput: RecordDiagnosticInput, trustedBinding: DiagnosticBinding): DiagnosticRecord {
+    const input = recordDiagnosticSchema.parse(rawInput), binding = diagnosticBindingSchema.parse(trustedBinding);
+    return this.transaction(() => {
+      const duplicate = this.replayDiagnostic(ownerId, projectId, input);
+      if (duplicate) return duplicate;
+      const project = this.getProject(ownerId, projectId);
+      if (!project) throw new GuestStoreError("not_found", "Project not found.");
+      if (project.source.kind !== "candidate") throw new GuestStoreError("invalid", "This project has no applicable source-linked sample check.");
+      if (project.sequence !== input.expectedProjectSequence || project.basisHash !== input.expectedBasisHash ||
+        project.knowledgeFingerprint !== binding.catalogFingerprint || input.expectedDiagnosticFingerprint !== binding.diagnosticFingerprint)
+        throw new GuestStoreError("stale", "Project or diagnostic source changed. Review the current basis before recording a new check.");
+      const history = this.listDiagnostics(ownerId, projectId);
+      if (history.length >= 2000) throw new GuestStoreError("invalid", "This notebook has reached its 2000-event limit. Keep a backup and start a separate project for further checks.");
+      if (history.length !== input.expectedHistorySequence) throw new GuestStoreError("stale", "Another check was saved. Reload the history and review before continuing.");
+      const transitionError = diagnosticTransitionError(history, input.event, project.basisHash, binding, project.sequence);
+      if (transitionError) throw new GuestStoreError("invalid", transitionError);
+      const record: DiagnosticRecord = { id: randomUUID(), projectId, sequence: history.length + 1,
+        basisSequence: project.sequence, basisHash: project.basisHash, binding, event: input.event,
+        createdAt: new Date().toISOString(), imported: false };
+      const json = JSON.stringify(record);
+      this.db.prepare("INSERT INTO diagnostic_events (owner_id, project_id, sequence, data_json) VALUES (?, ?, ?, ?)")
+        .run(ownerId, projectId, record.sequence, json);
+      this.db.prepare("INSERT INTO mutation_receipts (owner_id, idempotency_key, operation, target_id, request_hash, result_json) VALUES (?, ?, ?, ?, ?, ?)")
+        .run(ownerId, input.idempotencyKey, "diagnostic", projectId, hash({ projectId, input }), json);
+      return record;
+    });
+  }
+
   recordNote(ownerId: string, projectId: string, rawInput: RecordProjectNoteInput): ProjectNote {
     const input = recordProjectNoteSchema.parse(rawInput);
     const requestHash = hash({ projectId, input });
@@ -282,7 +329,7 @@ export class GuestStore {
 
   importBackup(ownerId: string, rawInput: ImportGuestProjectInput): GuestProject {
     const input = importGuestProjectSchema.parse(rawInput);
-    if (input.backup.source.kind === "own_idea" && input.backup.version === 2 && input.backup.knowledgeFingerprint)
+    if (input.backup.source.kind === "own_idea" && input.backup.version !== 1 && input.backup.knowledgeFingerprint)
       throw new GuestStoreError("invalid", "A personal idea cannot claim a catalog knowledge binding.");
     const requestHash = hash(input);
     return this.transaction(() => {
@@ -292,7 +339,7 @@ export class GuestStore {
       const base = {
         id: randomUUID(), title: input.backup.title, brief: input.backup.brief, source: input.backup.source,
         plan: input.backup.plan, capability: "plan_only" as const, sequence: 1,
-        knowledgeFingerprint: input.backup.version === 2 ? input.backup.knowledgeFingerprint ?? null : null,
+        knowledgeFingerprint: input.backup.version !== 1 ? input.backup.knowledgeFingerprint ?? null : null,
         createdAt: now, updatedAt: now,
       };
       const project: GuestProject = { ...base, basisHash: projectBasisHash(base) };
@@ -301,7 +348,7 @@ export class GuestStore {
         .run(ownerId, project.id, project.sequence, json, now);
       this.db.prepare("INSERT INTO project_revisions (owner_id, project_id, sequence, basis_hash, snapshot_json) VALUES (?, ?, ?, ?, ?)")
         .run(ownerId, project.id, project.sequence, project.basisHash, json);
-      if (input.backup.version === 2) {
+      if (input.backup.version !== 1) {
         for (const original of input.backup.notes) {
           const note: ProjectNote = {
             id: randomUUID(), projectId: project.id, kind: original.kind, stage: original.stage,
@@ -311,6 +358,17 @@ export class GuestStore {
           const key = randomUUID();
           this.db.prepare("INSERT INTO project_notes (owner_id, project_id, id, idempotency_key, request_hash, data_json, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)")
             .run(ownerId, project.id, note.id, key, hash({ importKey: input.idempotencyKey, noteId: note.id }), JSON.stringify(note), note.createdAt);
+        }
+      }
+      if (input.backup.version === 3) {
+        const originals = input.backup.diagnostics;
+        if (new Set(originals.map((item) => item.id)).size !== originals.length || originals.some((item, index) => item.sequence !== index + 1))
+          throw new GuestStoreError("invalid", "The imported diagnostic history is not a unique ordered sequence.");
+        for (const original of originals) {
+          // Preserve source IDs/basis and original event links, but do not trust an imported claim.
+          const record: DiagnosticRecord = { ...original, projectId: project.id, imported: true };
+          this.db.prepare("INSERT INTO diagnostic_events (owner_id, project_id, sequence, data_json) VALUES (?, ?, ?, ?)")
+            .run(ownerId, project.id, record.sequence, JSON.stringify(record));
         }
       }
       this.db.prepare("INSERT INTO mutation_receipts (owner_id, idempotency_key, operation, target_id, request_hash, result_json) VALUES (?, ?, ?, ?, ?, ?)")

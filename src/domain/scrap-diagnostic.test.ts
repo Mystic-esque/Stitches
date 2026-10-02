@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
-import { resolveScrapObservation } from "./scrap-diagnostic";
+import { pausedScrapAdvice, resolveScrapObservation } from "./scrap-diagnostic";
 
 const docs = JSON.parse(readFileSync(new URL("../../fixtures/companion-diagnostic.json", import.meta.url), "utf8")).documents;
 const find = (type: string, key?: string) => docs.find((item: Record<string, string>) => item._type === type && (!key || item.issueKey === key));
@@ -10,6 +10,13 @@ const study = { tensionIssue: find("issuePattern", "tension-pucker").title, tens
   confirmationCheck: find("remedy").confirmationCheck };
 
 describe("scrap-only seam-puckering decision", () => {
+  it("withholds repeat advice after a saved outcome without relabelling the earlier observation", () => {
+    const stopped = pausedScrapAdvice();
+    expect(stopped.state).toBe("unresolved");
+    expect(stopped.explanation).toContain("does not rewrite your first observation");
+    expect(stopped.nextAction).not.toContain("lower upper-thread tension");
+    expect(stopped.confirmation).toBeNull();
+  });
   it("withholds an adjustment before a discriminating observation", () => {
     const result = resolveScrapObservation(study, "not-tested");
     expect(result.state).toBe("not-tested");
