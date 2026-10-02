@@ -2,7 +2,7 @@
 
 The executable task ledger is ../devpost/checklist.md W01–W10. The technical contracts are ../devpost/spec.md and PATTERN-ENGINE-DECISION.md; the current visual contract is DESIGN.md. This file explains dependency order; STATUS.md records actual state.
 
-The existing implementation is an illustrative vertical slice: garment/piece links, development Sanity/KB proof and one live bounded Gemini loop. The September 29 Studio 1.0 static reference did not ship to production and its six-card gallery/piece tray are superseded.
+The current implementation includes private planning/profile/revision/history/backup, source-derived piece education, durable read-only preparation assistant with actual two-source Gemini/Context proof, and a production Sandy measured pattern study with named edges/marks/fold/grain and full-redraft comparison. These are verified slices, not completed W01–W10 packages or qualified cutting/making. Complete source/rights/Sanity-authored step/physical and benchmark gates remain open. The September 29 Studio 1.0 static reference did not ship to production and its six-card gallery/piece tray are superseded. Historical illustrative proof remains at `/demo`.
 
 | Package | Outcome | Dependency |
 | --- | --- | --- |

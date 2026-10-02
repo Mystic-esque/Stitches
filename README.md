@@ -6,7 +6,7 @@
 
 The October 1 direction supersedes the September 29 Studio 1.0 proposal. Start with the [comparison and research assessment](docs/DIRECTION-REVIEW.md), [Sol handoff](docs/SOL_HANDOFF.md), [product](docs/PRODUCT.md), [design](docs/DESIGN.md), [experience contracts](docs/EXPERIENCE-CONTRACTS.md), [PRD](devpost/prd.md), [technical spec](devpost/spec.md), and [checklist](devpost/checklist.md). The new [Companion visual reference](design/stitches-companion.html) is a labeled concept, not the application. The [older six-screen reference](design/stitches-studio.html) and its captures remain historical.
 
-The full Companion 2.0 app is **not built yet**. The current `/` runtime includes distinct Sandy/Tina planning starts, isolated guest projects/revisions/journals, reusable private profiles with explicit copy, source-derived piece education, preparation review and a private scrap-check notebook. The exact catalog reads 19 dedicated development records; source/maker qualification remains pending. Planning briefs and backups are private review artifacts, not cutting patterns. `/demo` preserves the illustrative blouse and historical real Sanity/Context/Gemini proofs. Read [actual status](docs/STATUS.md) for the remaining full agent, step, geometry, rights, maker and release gates. Nothing has been deployed or submitted.
+The full Companion 2.0 app is **not built yet**. The current `/` runtime includes distinct Sandy/Tina planning starts, isolated guest projects/revisions/journals, reusable private profiles with explicit copy, source-derived piece education, preparation review, private scrap history and a durable consented read-only preparation assistant. Sandy now has an actual server-generated measured study: named edges/marks, fold/grain/count, pending source-step inspector, original/redrafted length overlay and numerical impacts. It is non-cuttable and cannot keep an approved alteration. The exact catalog reads 19 dedicated development records; complete Sanity-authored making, source/rights/layout/print/maker qualification remain pending. Planning briefs and backups are private review artifacts, not cutting patterns. `/demo` preserves the illustrative blouse and historical integration proof. Read [actual status](docs/STATUS.md) and [local runbook](docs/AGENT-RUNBOOK.md) for implemented versus open gates. Nothing has been deployed or submitted.
 
 Open `design/stitches-companion.html` locally to inspect the reference, or run `node scripts/check-companion-reference.mjs` for isolated browser captures and interaction checks. This is not the Next.js app and makes no API calls. The older reference can still be served with `node scripts/check-design-reference.mjs --serve`.
 
@@ -20,7 +20,7 @@ Stitches is a garment studio that connects a finished garment to its flat patter
 
 ## Run locally
 
-The initial project-aware agent is a tested backend read-only boundary, not a public chat or durable run UI. It inspects minimized preparation checks, exact Sanity planning records and actual scoped Context entries while refusing model writes and stale bases. `evidence/companion-agent-verification.json` records 91 passing tests / two opt-in skips; `evidence/companion-agent-read-verification.json` records actual two-project reads with zero Gemini requests. To repeat only that live read check (dedicated read/Context credentials required):
+The implemented private assistant has three registered preparation questions, minimized consent preview, durable run/history controls, cancellation and bounded recovery. It reads exact Sanity records and actual scoped Context entries; no model write or physical-action authority. Actual two-source Gemini receipts are recorded in STATUS; [AGENT-RUNBOOK](docs/AGENT-RUNBOOK.md) covers configuration, $0 authorization and limits. The earlier `evidence/companion-agent-read-verification.json` proves the read boundary alone. To repeat only that read check (dedicated read/Context credentials required):
 
 ```powershell
 $env:STITCHES_LIVE_COMPANION_READS = 'true'
@@ -37,6 +37,8 @@ npm test -- --testTimeout=15000 --maxWorkers=2
 npm run build -- --webpack
 npm run start -- --hostname 127.0.0.1 --port 3100
 ```
+
+For the new zero-inference measured-board/API/browser rehearsal run `node scripts/check-pattern-board.mjs`; for durable assistant-control boundaries run `node scripts/check-agent-api.mjs`. Both use synthetic private guests and actual dedicated catalog reads, not model output or physical maker evidence. The measured board requires four saved Sandy body notes and explicit consent; it refuses unsupported sources and offers no cutting download. Latest full suite: 112 passed / three opt-in skipped. Desktop/phone captures and retained failed rehearsals are under `evidence/screenshots/pattern-board` and `evidence/pattern-board-verification.json`.
 
 Filesystem harness note: a later separate run also exceeded 15 seconds in two restart cases (16.36 and 16.39 seconds). All three disk-backed project/profile/diagnostic restart tests now have an explicit bounded 60-second setup/I/O/cleanup allowance; their data assertions are unchanged. Other tests retain the command's 15-second bound. Both failed reports are preserved under `evidence/companion-private-verification-timeout*.json`. This verifies persistence semantics, not a 15-second recovery performance guarantee.
 

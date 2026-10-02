@@ -1,0 +1,136 @@
+{
+  "kind": "actual-production-measured-board-api-and-browser",
+  "checkedAt": "2026-10-02T14:53:17.873Z",
+  "passed": true,
+  "providerRequests": 0,
+  "sanityWrites": 0,
+  "syntheticPrivateGuests": true,
+  "source": "actual-Stitches-development-Content-Lake",
+  "cutReady": false,
+  "api": {
+    "deterministicFullRedraft": true,
+    "twoDistinctMeasurementInputs": true,
+    "changedEdges": [
+      "sandy.skirt/hem",
+      "sandy.skirt/opening",
+      "sandy.skirt/fold"
+    ],
+    "guestOriginStrictInputBounds": true,
+    "staleCurrentBasis": true,
+    "missingAndUnsupported": true,
+    "privateProjectUnchanged": true,
+    "beforeHash": "1965350a67d7595aa795a5ea1d5bd56ba80d02d4c30a4dd44145dcc6b789bf1a",
+    "afterHash": "1f051bed5ecb6eeae1877bd80a69c4cdebbd73981c47015d641ac422cd4b2986"
+  },
+  "browser": {
+    "layouts": [
+      {
+        "width": 1440,
+        "noOverflow": true,
+        "defaultPatternFits": true
+      },
+      {
+        "width": 1024,
+        "noOverflow": true,
+        "defaultPatternFits": true
+      },
+      {
+        "width": 768,
+        "noOverflow": true,
+        "defaultPatternFits": true
+      },
+      {
+        "width": 390,
+        "noOverflow": true,
+        "defaultPatternFits": true
+      },
+      {
+        "width": 320,
+        "noOverflow": true,
+        "defaultPatternFits": true
+      }
+    ],
+    "contrast": [
+      {
+        "selector": ".pattern-warning",
+        "ratio": 11.663122112445075
+      },
+      {
+        "selector": ".pattern-controls span",
+        "ratio": 6.434017048106549
+      },
+      {
+        "selector": ".pattern-controls span",
+        "ratio": 6.434017048106549
+      },
+      {
+        "selector": ".pattern-controls span",
+        "ratio": 6.434017048106549
+      },
+      {
+        "selector": ".pattern-inspector dt",
+        "ratio": 6.745882216984766
+      },
+      {
+        "selector": ".pattern-inspector dt",
+        "ratio": 6.745882216984766
+      },
+      {
+        "selector": ".pattern-inspector dt",
+        "ratio": 6.745882216984766
+      },
+      {
+        "selector": ".pattern-inspector dt",
+        "ratio": 6.745882216984766
+      },
+      {
+        "selector": ".pattern-inspector dt",
+        "ratio": 6.745882216984766
+      },
+      {
+        "selector": ".pattern-inspector dd",
+        "ratio": 14.53206309749928
+      },
+      {
+        "selector": ".pattern-inspector dd",
+        "ratio": 14.53206309749928
+      },
+      {
+        "selector": ".pattern-inspector dd",
+        "ratio": 14.53206309749928
+      },
+      {
+        "selector": ".pattern-inspector dd",
+        "ratio": 14.53206309749928
+      },
+      {
+        "selector": ".pattern-inspector dd",
+        "ratio": 14.53206309749928
+      },
+      {
+        "selector": ".pattern-legend",
+        "ratio": 11.752521326733202
+      },
+      {
+        "selector": ".pattern-overlay",
+        "ratio": 14.738954976603571
+      },
+      {
+        "selector": ".pattern-capability",
+        "ratio": 11.954973263912015
+      },
+      {
+        "selector": ".pattern-view-label",
+        "ratio": 14.738954976603571
+      }
+    ],
+    "actualConsentAndGeneration": true,
+    "keyboardEdgeStepSelection": true,
+    "engineMarkUncertainty": true,
+    "bandUnchanged": true,
+    "zoomContained": true,
+    "reducedMotion": true,
+    "injectedTransportFailureAndActualRecovery": true,
+    "runtimeErrors": []
+  }
+}

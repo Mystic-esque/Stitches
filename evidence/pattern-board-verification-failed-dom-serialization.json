@@ -1,0 +1,25 @@
+{
+  "kind": "actual-production-measured-board-api-and-browser",
+  "checkedAt": "2026-10-02T14:29:25.496Z",
+  "passed": false,
+  "providerRequests": 0,
+  "sanityWrites": 0,
+  "syntheticPrivateGuests": true,
+  "source": "actual-Stitches-development-Content-Lake",
+  "cutReady": false,
+  "api": {
+    "deterministicFullRedraft": true,
+    "changedEdges": [
+      "sandy.skirt/hem",
+      "sandy.skirt/opening",
+      "sandy.skirt/fold"
+    ],
+    "guestOriginStrictInputBounds": true,
+    "staleCurrentBasis": true,
+    "missingAndUnsupported": true,
+    "privateProjectUnchanged": true,
+    "beforeHash": "1965350a67d7595aa795a5ea1d5bd56ba80d02d4c30a4dd44145dcc6b789bf1a",
+    "afterHash": "1f051bed5ecb6eeae1877bd80a69c4cdebbd73981c47015d641ac422cd4b2986"
+  },
+  "failure": "{\"code\":-32000,\"message\":\"Object reference chain is too long\"}"
+}

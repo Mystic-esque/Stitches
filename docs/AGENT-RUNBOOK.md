@@ -20,6 +20,13 @@ Run `npm run dev`, or `npm run build -- --webpack` then `node node_modules/next/
 
 ## Verification
 
+### Manual measured pattern study (zero inference)
+
+Open an actual Sanity-linked Sandy project, save its four exact body notes and save/discard any current edits. Under “The pattern, connected / measured study,” explicitly consent to a local non-cuttable draft. Inspect named edges/marks, fold/grain/count and source-linked pending study steps; compare original/redrafted length and inspect the numerical impact. Body values stay in the private guest runtime, not Gemini or shared Sanity. This research command does not keep a variation, approve sewing instructions or enable a cutting download. Tina receives no substituted geometry. A lost cookie, unavailable/stale source or missing notes stops the dependent study while leaving manual preparation usable. Studies regenerate on request; they are not durable approved artifacts in backups.
+
+Production verification: `node scripts/check-pattern-board.mjs` checks actual local API plus disposable Chrome, two synthetic measurement inputs, private owner/Origin/bounds/stale refusals, exact edge/step inspection, five widths, targeted contrast/reduced-motion and an explicitly injected transport fault followed by actual recovery. Zero inference and zero Sanity writes. Receipt and screenshots live under `evidence/pattern-board-verification.json` and `evidence/screenshots/pattern-board`. `src/server/patterns/FREESEWING-LICENSE.txt` preserves upstream code attribution; independent rights and physical qualification remain release gates.
+
+
 `node node_modules/vitest/vitest.mjs run --maxWorkers=2 --testTimeout=15000` is deterministic; opt-in live tests skip by default. `node --env-file=.env.local node_modules/vitest/vitest.mjs run --maxWorkers=1 src/server/agent/run-live.test.ts` requires `STITCHES_LIVE_AGENT_RUN=true` and uses at most four actual model attempts. Optional `STITCHES_LIVE_AGENT_DESIGN=tina` / `STITCHES_LIVE_AGENT_INTERRUPT=true` rehearses a clearly labeled **injected local Context transport failure**, then actual retrieval and saved-response recovery. It is not evidence of a Sanity service outage or a physical sewing trial. Private synthetic rehearsal state stays under `.data/rehearsals`; redacted receipts are under `evidence`.
 
 `node scripts/check-companion-runtime.mjs` checks actual local Chrome UI at five widths. Its assistant branch checks real consent preview, private start, cancel and reload with **zero inference**, not a scripted model answer. Local child-process permission may be required for Vite/Chrome on Windows; EPERM is not a passed app test.

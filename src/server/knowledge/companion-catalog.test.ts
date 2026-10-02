@@ -1,5 +1,5 @@
 import { readFileSync } from "node:fs";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { COMPANION_CATALOG_QUERY, createCompanionCatalogClient, loadCompanionCatalog, resolveCompanionCatalog } from "./companion-catalog";
 
 const fixture = JSON.parse(readFileSync(new URL("../../../fixtures/companion-candidates.json", import.meta.url), "utf8"));
@@ -52,9 +52,10 @@ describe("Sanity-backed planning catalog", () => {
 
   it("uses only a fixed parameterized query and refuses a wrong project/dataset", async () => {
     let actualQuery = "";
-    const cards = await loadCompanionCatalog({ fetch: async (query: string, params: Record<string, unknown>) => {
+    const cards = await loadCompanionCatalog({ fetch: async (query: string, params: Record<string, unknown>, options: { signal: AbortSignal }) => {
       actualQuery = query;
       expect(params.ids).toHaveLength(19);
+      expect(options.signal).toBeInstanceOf(AbortSignal);
       return published;
     } } as never);
     expect(actualQuery).toBe(COMPANION_CATALOG_QUERY);
@@ -63,5 +64,24 @@ describe("Sanity-backed planning catalog", () => {
       .toThrow(/Dedicated Stitches/);
     expect(() => createCompanionCatalogClient({ SANITY_PROJECT_ID: "l4eeamth", SANITY_DATASET: "production", SANITY_READ_TOKEN: "x" }))
       .toThrow(/Dedicated Stitches/);
+  });
+
+  it("passes a bounded abort to the transport and rejects an outage without a fixture fallback", async () => {
+    // Synthetic accelerated deadline: verify the configured real bound without waiting 12 seconds.
+    const controller = new AbortController();
+    const deadline = vi.spyOn(AbortSignal, "timeout").mockImplementation(ms => {
+      expect(ms).toBe(12000);
+      setTimeout(() => controller.abort(new DOMException("Synthetic source deadline", "TimeoutError")), 20);
+      return controller.signal;
+    });
+    let calls = 0;
+    try {
+      await expect(loadCompanionCatalog({ fetch: async (_query: string, _params: unknown, options: { signal: AbortSignal }) => {
+        ++calls;
+        return await new Promise((_resolve, reject) => options.signal.addEventListener("abort", () => reject(options.signal.reason), { once: true }));
+      } } as never)).rejects.toMatchObject({ name: "TimeoutError", message: "Synthetic source deadline" });
+      expect(calls).toBe(1);
+      expect(deadline).toHaveBeenCalledOnce();
+    } finally { deadline.mockRestore(); }
   });
 });

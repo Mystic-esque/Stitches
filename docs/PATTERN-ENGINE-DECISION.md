@@ -1,6 +1,6 @@
 # Pattern authority and rendering decision — October 1, 2026
 
-Status: **architecture accepted for the Companion 2.0 target; engine and source garment not yet qualified or implemented**. This evaluates the owner's attached SVG/parametric-pattern research, not its unresolved citation markers. Actual code/evidence remains in STATUS.md.
+Status: **architecture accepted; a restricted Sandy 4.10.2 non-cuttable production study is implemented, full engine/source qualification remains open**. This evaluates the owner's attached SVG/parametric-pattern research, not its unresolved citation markers. Actual code/evidence remains in STATUS.md. The server-only measured study exposes exact engine edges/marks and full-redraft length comparisons without a proposal keep, model tool or cutting capability. Tina, curved-band count, notch counterpart, complete source/rights/allowance/layout/physical gates remain unresolved. Earlier prototype-first recommendations below describe the qualification target, not an absence of the current partial implementation.
 
 ## Decision
 

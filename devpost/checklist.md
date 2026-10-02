@@ -22,6 +22,7 @@ This replaces the September 29 Studio 1.0 W01–W12 target. Existing proof is pr
 - [ ] Full companion release remains open: qualified cutting, step-specific making/recovery, public project-aware agent and maker validation. Private guest persistence and pending-review scrap diagnostics now have verified slices below.
 
 ## W01 — Qualify distinct sources and a real making journey
+- [x] Maintain candidate/version/rights/closure ledger and upstream code notice; official commercial-use FAQ supports engine use. Independent rights review, complete source mapping and physical qualification remain open (`../evidence/pattern-qualification.md`).
 - [x] Narrow the actual Sandy notch/count discrepancies at two inputs: pinned straight-band center mark is minus half overlap; current source does not approve the proposed mate, and curved count remains conflicted. `conflict-audit.json` records formula, actual values and raw source hashes. Research only, no geometry correction or capability promotion.
 - Verified partial engine spike: isolated core/Sandy 4.10.2 drafts at two synthetic inputs pass deterministic/canonical artifacts, stable part/path/notch IDs, independent straight-band scalar comparisons and invalid-input refusals. Real five-width engine-study preview/screenshots pass; it is not production app or cut-ready evidence. Exact gitHead MIT notice retained. A real curved-waistband count conflict remains (engine one vs documentation two), and Tina drafting, complete edge/step mapping, independent rights, allowances/layout/physical print/maker gates are open. See `../tools/pattern-spike/README.md` and `../evidence/pattern-engine/verification.json`; do not tick the full spike/source exit on partial proof.
 - [ ] Inspect exact top and skirt candidates, source/version/license/output rights and real piece/edge/step data. Reject decorative clones.
@@ -55,6 +56,8 @@ Exit: two sessions cannot cross-read; actual project resumes after restart; stal
 Exit: exact graph queries validate, served KB separately verified, content absence/contradiction visible. Schema code alone is not live content.
 
 ## W04 — Companion UI and pattern literacy
+- [x] Production non-cuttable Sandy measured board: actual named flat pieces/edges/marks, fold/grain/count/engine allowance, source-linked pending study-step inspector, before/after outline and exact numerical impact. Actual API/Chrome proof uses two synthetic measurement inputs; source and cutting qualification remain separate.
+- [x] Measured-board five-width, keyboard edge selection, zoom, reduced-motion, targeted contrast and actual screenshot/failure-recovery checks. This is a targeted check, not the complete accessibility exit below.
 - [x] Implement project-first landing, distinct gallery, private project library, planning intake, premium workspace and mobile-focused navigation. Local planning-only runtime passed responsive production browser rehearsal; this does not complete W04's pattern-literacy or accessibility exit gates.
 - [x] Show source-derived educational cut/fold/mirroring counts for two distinct candidate garments, with conditional options, pending-review labels and source-failure/stale-basis pause. Production browser rehearsal passed five widths and actual captures. This is not a qualified pattern board or maker-verified cutting guide.
 - [ ] Build 2D pattern-connected board: garment ↔ named flat pieces ↔ seams/steps, cut/fold/grain/count/marking legends, changed-edge before/after and impact trail.
@@ -63,6 +66,7 @@ Exit: exact graph queries validate, served KB separately verified, content absen
 Exit: maker can explain how one selected piece is cut and joined on a qualified source; unqualified example states its limit.
 
 ## W05 — Preparation and checked variation
+- [x] Strict production `study_hem_length` → two full pinned-engine drafts → validated numeric artifact → before/after SVG with stable exact edge/step IDs. Saved plan unchanged, missing/stale/unsupported/point-path inputs refused; no approved variation keep/layout/print claim.
 - [x] Saved-revision preparation review: exact current source body-note requirements/units, fabric-structure conflict, missing material/tools/questions and explicit cutting gates. Private plain-text planning brief includes limitations and reported scrap history; it is not a pattern or external instruction copy.
 - [ ] Guidance distinguishes body/finished/ease measures, fabric width/length, nap/fold, equipment and sourced method alternatives.
 - [ ] For qualified operations, redraft/check all affected pieces, joins, counts, layout and steps from one revision basis; preview and explicit keep.
@@ -103,6 +107,7 @@ Exit: real multi-step maker task and observed interruption/recovery; fixtures on
 Exit: measured results with provenance and failures. No superiority claim without evidence.
 
 ## W10 — Maker evidence and release package
+- [x] Latest measured-board software slice: 112 deterministic tests pass / three opt-in skipped, production build passes, actual API plus five-width browser checks and desktop/phone screenshots retained. Zero model calls/Sanity writes in this batch; full release/maker/security review below remains open.
 - [ ] Print/calibration and physical trial for each claimed cut-ready project/variant; record reviewer, scope, measurements/material and limitations with consent.
 - [ ] Observe at least three intended users through actual tasks; fix material friction and accessibility issues.
 - [ ] Build/tests/browser/security/backup-restore clean rehearsal; actual desktop/mobile screenshots.
@@ -110,7 +115,7 @@ Exit: measured results with provenance and failures. No superiority claim withou
 Exit: STATUS separates working, digitally checked, maker reviewed and blocked capabilities. If physical evidence is unavailable, useful planning/making assistance may ship in local preview but cut-ready claim stays blocked.
 
 ## First next task
-Next after the current browser milestone: return to W01/W04's source qualification and first complete piece/step map. Reconcile the documented Sandy band-count/fold/notch conflicts with the actual pinned engine, record exact supported/unknown boundaries, then author/test the first applicable making-step prerequisite and checkpoint map. Do not expand model authority or unlock cutting on an unresolved graph. The original first-three cards below remain full qualification gates, not a claim that their partial implementation is absent.
+Next: W01/W03/W06, qualify the exact straight-band closure/side/method/checkpoint contract for Sandy's first version-bound Sanity-authored making step. The narrow production measured board and full-redraft comparison are verified; they do not approve a notch mate or close complete pattern/source/rights/physical gates. Keep the curved count conflict and Tina engine work separate. Do not expand model authority or unlock physical actions/cutting on unresolved evidence. The original first-three cards below remain full qualification gates, not a claim that their partial implementation is absent.
 
 ### Atomic task cards — first three and final handoff
 

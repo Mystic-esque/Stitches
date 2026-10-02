@@ -1,0 +1,23 @@
+{
+  "kind": "verified-local-non-cuttable-measured-study-batch",
+  "date": "2026-10-02",
+  "scope": ["W01 partial", "W04 partial", "W05 partial", "C09 partial"],
+  "deterministic": { "passed": 112, "failed": 0, "optInSkipped": 3, "receipt": "pattern-board-tests.json" },
+  "productionBuild": { "command": "node node_modules/next/dist/bin/next build --webpack", "exitCode": 0, "includesMobileFitFix": true },
+  "patternApiAndBrowser": { "checkedAt": "2026-10-02T14:53:17.873Z", "passed": true, "receipt": "pattern-board-verification.json", "measurementInputs": 2, "widths": [1440, 1024, 768, 390, 320] },
+  "existingJourneys": { "checkedAt": "2026-10-02T14:54:26.887Z", "passed": true, "receipt": "companion-runtime-verification.json" },
+  "agentControlApi": { "checkedAt": "2026-10-02T14:55:55.648Z", "passed": true, "receipt": "agent-api-verification.json" },
+  "targetedTextContrastRange": [6.43, 14.74],
+  "runtimeErrors": 0,
+  "sanityWrites": 0,
+  "modelRequests": 0,
+  "sourceReads": "actual dedicated Stitches development Content Lake",
+  "newContextReadOrRebuild": false,
+  "privateTestInputs": "synthetic guests and measurements; not a maker trial",
+  "recovery": "explicitly injected local transport interruption then actual server regeneration; not a Sanity service outage",
+  "retainedFailures": ["pattern-board-verification-failed-dom-serialization.json", "screenshots/pattern-board/pattern-workbench-390-before-fit.png"],
+  "cutReady": false,
+  "projectMutationByStudy": false,
+  "deploymentOrSubmission": false,
+  "remaining": ["complete independently reviewed source/rights/step graph", "Tina engine mapping", "approved mark counterparts", "qualified variation keep", "allowance/layout/print checks", "physical maker and user trials", "fair frozen benchmark", "full release package"]
+}

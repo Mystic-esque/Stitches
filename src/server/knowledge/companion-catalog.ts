@@ -128,7 +128,7 @@ export function resolveCompanionCatalog(raw: unknown): CompanionCatalogCard[] {
 
 type QueryClient = Pick<SanityClient, "fetch">;
 export async function loadCompanionCatalog(client: QueryClient): Promise<CompanionCatalogCard[]> {
-  const raw = await client.fetch<unknown>(COMPANION_CATALOG_QUERY, { ids: [...IDS] });
+  const raw = await client.fetch<unknown>(COMPANION_CATALOG_QUERY, { ids: [...IDS] }, { signal: AbortSignal.timeout(12000) });
   return resolveCompanionCatalog(raw);
 }
 
@@ -136,5 +136,5 @@ export function createCompanionCatalogClient(env: Record<string, string | undefi
   if (env.SANITY_PROJECT_ID !== "l4eeamth" || env.SANITY_DATASET !== "development" || !env.SANITY_READ_TOKEN)
     throw new CatalogError("unavailable", "Dedicated Stitches development read configuration is missing.");
   return createClient({ projectId: "l4eeamth", dataset: "development", apiVersion: env.SANITY_API_VERSION || "2026-09-28",
-    useCdn: false, perspective: "published", token: env.SANITY_READ_TOKEN });
+    useCdn: false, perspective: "published", token: env.SANITY_READ_TOKEN, timeout: 12000, maxRetries: 0 });
 }

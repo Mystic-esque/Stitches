@@ -1,5 +1,14 @@
 # Implementation decisions
 
+## October 2, 2026 — Measured teaching board without cutting authority
+
+- Bring the numerically checked Sandy 4.10.2 straight-band spike into a server-only production study adapter. Four exact saved body-note keys and the current Sanity candidate cut/fold/measurement contract are mandatory. Recheck owner/project/source after drafting. This is a restricted educational slice, not adoption of an independently qualified cutting engine; the earlier isolated-engine rule remains applicable to untested branches.
+- A strict `study_hem_length` command performs two complete drafts. Return validated numeric operations, stable edges/marks, units and actual changed-edge/step impact. Client renders derived SVG only; arbitrary points/paths, sample measurement substitution, Tina substitution and stale inputs are refused. No keep, persistence of an approved variation, model tool or physical action is added.
+- Preserve the engine's notch disagreement and curved count conflict. Source-linked local paraphrases remain pending with execution disabled, not Sanity-authored making steps. The production UI shows fold/grain/count and engine allowance but never calls that allowance a qualified cut line or the numerical waist comparison a sewing tolerance.
+- Pin all four required FreeSewing runtime packages exactly to 4.10.2, retain upstream MIT notice and credits, disable install scripts. Independent rights/source/physical review remains open despite the official commercial-use FAQ supporting engine use.
+- Bound exact catalog reads with a 12-second AbortSignal plus client timeout and zero transport retries; browser catalog reads stop after 15 seconds. Expose manual/retry states without a fixture fallback. This limits a stalled read; it does not establish the root cause of the earlier cold-network failure.
+
+
 ## October 2, 2026 — Verify panel identity and narrow engine conflicts
 
 - Distinct dynamic sibling panels require distinct React keys, not just the same project ID. Exact reload assertions must count root/main/history identity as well as saved event rows. Atomic evidence isolated the real duplicate-history defect; fresh-document waits and URL guards alone were insufficient. The final real production browser journey passes unchanged data/stop assertions after the key repair.

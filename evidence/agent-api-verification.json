@@ -1,6 +1,6 @@
 {
   "kind": "actual-local-production-agent-control-api",
-  "checkedAt": "2026-10-02T12:51:16.537Z",
+  "checkedAt": "2026-10-02T14:55:55.648Z",
   "base": "http://127.0.0.1:3100",
   "providerRequests": 0,
   "sanityWrites": 0,

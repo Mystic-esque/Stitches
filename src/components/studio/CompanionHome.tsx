@@ -7,6 +7,7 @@ import { useCallback, useEffect, useRef, useState, type ChangeEvent, type FormEv
 import { projectBackupSchema, type GuestProject, type ProjectNote, type ProjectPlan, type ProjectSource } from "@/domain/guest-project";
 import type { CompanionCatalogCard } from "@/server/knowledge/companion-catalog";
 import { PieceStudy } from "./PieceStudy";
+import { PatternBoard } from "./PatternBoard";
 import { DiagnosticStudy } from "./DiagnosticStudy";
 import { DiagnosticHistory } from "./DiagnosticHistory";
 import type { DiagnosticRecord } from "@/domain/diagnostic-history";
@@ -99,7 +100,7 @@ export function CompanionHome() {
     const refresh = async () => {
       const currentRequest = ++request;
       try {
-        const data = await json(await fetch("/api/catalog", { cache: "no-store" }));
+        const data = await json(await fetch("/api/catalog", { cache: "no-store", signal: AbortSignal.timeout(15000) }));
         if (mounted && currentRequest === request) { setCatalog(data.cards); setCatalogState("ready"); }
       } catch { if (mounted && currentRequest === request) { setCatalog([]); setCatalogState("unavailable"); } }
     };
@@ -224,6 +225,7 @@ export function CompanionHome() {
       {active.source.kind === "candidate" && <section className="project-source-strip" aria-label="Current source research">{sourceCard ? <><p className="companion-kicker">LIVE SANITY CONTENT LAKE · PLANNING SOURCE</p><strong>{sourceCard.title}</strong><p>{sourceBinding === "stale" ? "This source record changed after your saved project basis. Review and refresh it before using the new planning facts." : sourceCard.cuttingCaveat}</p><span>{sourceCard.materialStructure} · {sourceCard.requiredMeasurements.length} source-listed measurements · {sourceCard.reviewStatus} review · plan only</span><a href={sourceCard.sourceUrl} target="_blank" rel="noreferrer">Read {sourceCard.sourceTitle} ↗</a></> : <p role="status">{catalogState === "loading" ? "Checking the current Sanity source record…" : "Current Sanity source details are unavailable. Your private plan is still saved, but do not use this card to cut."}</p>}</section>}
       {sourceBinding && <div className={`source-binding ${sourceBinding}`} role="status"><span>{sourceBinding === "current" ? "This plan is bound to the current Sanity source revision. It is still planning-only." : sourceBinding === "stale" ? "Source changed since this project revision. Source-dependent advice is stale; earlier maker notes are preserved." : sourceBinding === "unbound" ? "This project has no saved Sanity source binding yet. Review the current source before attaching it." : "Sanity source check is unavailable. Source-dependent guidance is paused."}</span>{(sourceBinding === "stale" || sourceBinding === "unbound") && <button type="button" disabled={busy || unsavedChanges} onClick={refreshSource}>Review & bind current source ↗</button>}{unsavedChanges && sourceBinding !== "current" && <small>Save plan edits first.</small>}</div>}
       {sourceBinding === "current" && sourceCard && <PieceStudy key={`piece-${sourceCard.designKey}`} card={sourceCard} />}
+      {sourceBinding === "current" && sourceCard?.designKey === "sandy" && <PatternBoard key={`pattern-${active.id}`} project={active} source={sourceCard} dirty={unsavedChanges} />}
       {sourceBinding === "current" && sourceCard && <DiagnosticStudy key={`diagnostic-${active.id}-${active.sequence}-${sourceCard.diagnosticStudy.fingerprint}`} study={sourceCard.diagnosticStudy} project={active} history={diagnostics} disabled={busy || unsavedChanges}
         onSaved={(record) => { if (activeId.current === record.projectId) setDiagnostics((history) => history.some((item) => item.id === record.id) ? history : [...history, record]); }}
         onReload={async () => { const data = await json(await fetch(`/api/projects/${active.id}/diagnostics`, { cache: "no-store" })); if (activeId.current === active.id) setDiagnostics(data.diagnostics); }}
