@@ -1,0 +1,27 @@
+{
+  "kind": "actual-production-construction-api-and-browser",
+  "checkedAt": "2026-10-02T16:22:53.114Z",
+  "passed": false,
+  "syntheticPrivateGuests": true,
+  "source": "actual-Stitches-development-Content-Lake",
+  "providerRequests": 0,
+  "sanityWrites": 0,
+  "kbBuildNotProvedByThisHarness": true,
+  "physicalWorkNotClaimed": true,
+  "api": {
+    "distinctStepCounts": [
+      5,
+      8
+    ],
+    "exactPendingSourceGraph": true,
+    "conditionalPrerequisites": true,
+    "ownerOriginStrictBounds": true,
+    "privateIdempotency": true,
+    "currentStepDiagnosticBinding": true,
+    "staleStepContextDenied": true,
+    "v4ImportedFactsNeverAuthority": true,
+    "privateProjectUnchanged": true
+  },
+  "failure": "Uncaught",
+  "failedUi": "{\"focus\":\"<body><div hidden=\\\"\\\"><!--$--><!--/$--></div><div class=\\\"companion-app\\\"><header class=\\\"companion-nav\\\"><a href=\\\"/\\\" class=\\\"companion-logo\\\" aria-label=\\\"Stitches home\\\">stitches<span>.</span></a><nav aria-label=\\\"Main navigation\\\"><a href=\\\"/#how-it-works\\\">How it works</a><a href=\\\"/#collection\\\">Explore starts</a><a href=\\\"/demo\\\">Pattern study ↗</a></nav><button type=\\\"button\\\" class=\\\"nav-action\\\">All projects<!-- --> ↗</button></header><section class=\\\"maker-profile-panel\\\" aria-labelledby=\\\"_r_0_\\\"><details><su\",\"making\":\"THE MAKING NOTEBOOK / SOURCE → STEP → CHECKUnderstand the next seam.One relationship at a time. Keep questions and review checkpoints with the version you actually studied.Learning plan · physical review pendingScope & source · Tina: markings to finishesLearning plan with explicitly confirmed dart, sleeve and lower-front branches. Binding and finishes need the selected pattern instructions. No cut-ready geometry or physical review.This is an authored learning summary, not complete sewing instructions. Follow your qualified pattern for allowances, material handling and physical sewing.Read the original construction instructions ↗Sanity plan companion-making-tina-v1 · revision fingerprint 06acf488bef4 · no Context rebuild assumedFirst, confirm the version.Select only features actually present in your source pattern. This changes the prerequisite path; it does not draft a new pattern.My chosen version includesSleevesLower-front pieceBust dartConfirm & open the learning path ↗Keep the current study sessionRefresh source & notebookSave a private pausePrivate making history · 4 entriesreviewed10/2/2026, 5:23:12 PMshouldersProject revision 1 · source 06acf488bef4 · private maker recordhelp requested10/2/2026, 5:23:10 PMSynthetic sample question, no physical claim.Project revision 1 · source 06acf488bef4 · private maker recordreviewed10/2/2026, 5:23:08 PMmarksProject revision 1 · source 06acf488bef4 · private maker recordconfigured10/2/2026, 5:23:00 PMConfirmed features: none of the optional Tina featuresProject revision 1 · source 06acf488bef4 · private maker record\"}"
+}

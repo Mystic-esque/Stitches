@@ -1,6 +1,14 @@
 # Stitches shared content model — Companion 2.0
 
-Target authoring contract, not a claim that these types or records are deployed. Existing 13 development records and the 8-entry Context KB are illustrative proofs. Schema changes require guarded development migration and live read-back.
+Target authoring contract plus implemented slices described below. The original 13 records remain illustrative. The current distinct-candidate catalog reads 19 exact planning/diagnostic records; the construction batch adds 15 separate pending learning records. Actual read-back is recorded independently from the seven-entry rebuilt KB. Schema source is local; no Studio/schema deployment is claimed.
+
+## Implemented construction-learning records
+
+`constructionPlan` (two records) references exact `constructionStep` records (five Sandy, eight Tina), the candidate and documentation source. Each step stores its condition, prerequisites, named pieces, supported edge IDs, orientation, study action, checkpoint and diagnostic eligibility. `src/server/knowledge/making-plan.ts` validates the bounded six/nine-record set, all references, known piece/edge IDs, step conditions and acyclic authored order. Exact source revisions and the candidate fingerprint bind the learning plan. These types deliberately do not impersonate a reviewed `instructionStep`/pattern version or confer guided-making authority.
+
+`scripts/seed-construction-plans.mjs` dry-runs exact IDs and uses atomic createIfNotExists only in l4eeamth/development; existing records cannot be overwritten. All 15 published records matched the payload after the authorized write. The existing 19-ID catalog stays bounded; its fingerprints do not change merely because an unrelated learning document was added. Source-edited construction fingerprints invalidate future notebook eligibility without erasing private historical facts.
+
+The KB selector was expanded by the owner and a full rebuild regrouped the content into construction and garment_planning plus seam_quality. Seven entries is a reasonable consolidation, not proof of semantic completeness. New served attribution/eligibility defects remain documented; actual MCP review is required after every correction. Private `making_events` are never part of this source selection.
 
 ## Exact graph in Sanity Content Lake
 | Record | Purpose and mandatory relationships |

@@ -1,5 +1,7 @@
 # Local project assistant
 
+Current KB note (October 2): the owner rebuilt the KB into seven grouped entries. The adapter resolves observed planning paths from the actual outline and rejects numeric body citations with unreliable attribution. Page-specific rewrites repaired the two planning pages and construction order/eligibility; actual two-project preparation read tools pass with zero inference. Full editorial verification is 14/15: diagnostic test/remedy IDs remain absent. Earlier actual Gemini receipts remain dated evidence. Making/scrap actions use exact records; diagnostic agent retrieval is not qualified. See KB-CONSTRUCTION-REVIEW.md and KB-PAGE-CORRECTIONS.md.
+
 This is read-only preparation assistance, not qualified making, diagnosis, drafting, cutting or an autonomous save. The project's manual preparation table remains available without Gemini. Production publication is not authorized.
 
 ## Configuration
@@ -12,11 +14,17 @@ Run `npm run dev`, or `npm run build -- --webpack` then `node node_modules/next/
 
 ## Persistence and recovery
 
-- Private `.data/stitches-guest.sqlite` holds guest projects, runs, attempted-request ledger and signed Gemini history. Treat it as private; use restrictive filesystem access and a persistent local volume for any separately authorized deployment. Standard version-3 project exports do **not** include provider transcripts or resumable agent runs. Do not publish the database, environment file or cookie. A lost guest cookie means these records cannot be recovered through an unauthenticated project ID.
+- Private `.data/stitches-guest.sqlite` holds guest projects, runs, attempted-request ledger and signed Gemini history. Treat it as private; use restrictive filesystem access and a persistent local volume for any separately authorized deployment. Standard version-4 project exports do **not** include provider transcripts or resumable agent runs. Do not publish the database, environment file or cookie. A lost guest cookie means these records cannot be recovered through an unauthenticated project ID.
 - A run start saves consent and basis without inference. Each advance reserves at most one request transactionally. The SDK's pinned `retryOptions.attempts=1` means one initial attempt, zero retries. Four attempted requests/run, 120 active seconds, 8 reserved attempts/guest/day and 16/local database/day. UTC daily counts persist through process restart. Failures still consume reservations; these conservative caps are not a provider billing guarantee.
 - Only `inspect_project`, `resolve_exact_graph`, `retrieve_context` are exposed to this provider task. Source, project and history are rechecked around operations. Before accepting final prose, reread the actual KB and compare its text hash. No model-selected URLs, IDs, queries or write tools.
 - Reload never sends an inference request. Continue requires an explicit action. Known quota rejection can continue only within remaining original bounds. A saved response can repeat a failed **read**, without another model request. Lost/timeout/in-flight provider outcomes become `unknown_outcome`; no automatic or resume retry is allowed. Cancel and changed basis defeat late worker results.
 - A 40-second continuation lease (or shorter remaining active allowance) bounds a tick. An expired request lease becomes unknown; an expired acknowledged-response lease can recover its non-charging read. Pauses between ticks do not consume active time. Source changes and physical notes are never rewritten to fit an old answer.
+
+## Construction notebook and backup
+
+Open a saved Sandy or Tina project and confirm the version in the making notebook. Tina's explicit dart, sleeve and lower-front choices resolve the authored prerequisite path. Review eligible learning checkpoints or record a current-step question; only seam-eligible steps offer the source-linked scrap check. These pending records track study, not physical sewing. Source outage removes new advice but preserves private history and pause. A current-step diagnostic cannot move to another step silently.
+
+`node scripts/check-making-workspace.mjs` checks actual production API and disposable Chrome with synthetic guests: owner/origin/input bounds, optional prerequisites, source/current-step bindings, v4 import, native keyboard, lost-save acknowledgement and receipt replay, five widths, source interruption/recovery and private brief download. It makes zero model requests and Sanity writes. Version-4 project backups take saved project/notes/diagnostic/making histories from one transaction; restored events remain historical. v1–v3 imports remain supported. They do not include provider transcripts, old revisions or generated pattern artifacts.
 
 ## Verification
 

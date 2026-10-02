@@ -5,6 +5,8 @@ import { mkdir, writeFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { SanityContextKnowledgeBase, contextConfiguration } from '../src/server/knowledge/context-mcp.ts';
 import { createCompanionCatalogClient, loadCompanionCatalog } from '../src/server/knowledge/companion-catalog.ts';
+import { companionKbPaths, kbAttributionNeedsReview } from '../src/server/knowledge/companion-kb-paths.ts';
+import { constructionRecords } from './content/construction-records.mjs';
 
 const config = contextConfiguration();
 if (config.organizationId !== 'o3i0aqvqq' || config.mcpName !== 'stitches-garments' ||
@@ -13,7 +15,11 @@ const context = new SanityContextKnowledgeBase(config);
 const [cards, outline] = await Promise.all([
   loadCompanionCatalog(createCompanionCatalogClient()), context.initialContext(),
 ]);
-const paths = ['sandy_skirt', 'tina_top', 'seam_puckering', 'fabric_constraints'];
+const planningPaths = Object.fromEntries(cards.map(card => [card.designKey, companionKbPaths(outline.text, card.designKey)]));
+const grouped = /^seam_quality(?:\s|$)/m.test(outline.text);
+const diagnosticPath = grouped ? 'seam_quality' : 'seam_puckering';
+const constructionPaths = grouped ? ['construction/sandy_circle_skirt', 'construction/tina_faux_wrap_top'] : [];
+const paths = [...new Set([...Object.values(planningPaths).flat(), diagnosticPath, ...constructionPaths])];
 for (const path of paths) if (!new RegExp(`^${path}(?:\\s|$)`, 'm').test(outline.text))
   throw new Error(`Required entry is absent from the actual outline: ${path}`);
 const entries = await Promise.all(paths.map(async (path) => ({ path, result: await context.readPaths([path]) })));
@@ -23,12 +29,12 @@ await mkdir(directory, { recursive: true });
 const hash = (text) => createHash('sha256').update(text).digest('hex');
 async function snapshot(name, text) {
   const digest = hash(text);
-  const filename = `${name}-${digest.slice(0, 16)}.md`;
+  const filename = `${name.replaceAll('/', '-')}-${digest.slice(0, 16)}.md`;
   try { await writeFile(resolve(directory, filename), text, { flag: 'wx' }); }
   catch (error) { if (error.code !== 'EEXIST') throw error; }
   return { sha256: digest, file: `evidence/context-companion-review/${filename}`, characters: text.length };
 }
-const diagnostic = entries.find(({ path }) => path === 'seam_puckering').result.text;
+const diagnostic = entries.find(({ path }) => path === diagnosticPath).result.text;
 // Accept the two observed paragraph/table representations; require an explicit test-first branch.
 const notTestedLine = diagnostic.split(/\r?\n/).find((line) =>
   /\*\*Not[ -]tested(?::)?\*\*|^\|[^|]*not-tested[^|]*\|/i.test(line)) ?? '';
@@ -43,36 +49,58 @@ const stableSourceIdentities = !/\[\d+\]/.test(body) && sourceIdentities.every((
   body.split(/\r?\n/).some((line, index, lines) => line.includes(title) &&
     lines.slice(index, index + 5).join('\n').includes(id)));
 const entryBody = (path) => entries.find((entry) => entry.path === path).result.text.split('## Sources')[0];
-const planningBodies = cards.map((card) => ({ card, text: entryBody(card.designKey === 'sandy' ? 'sandy_skirt' : 'tina_top') }));
+const planningBodies = cards.map((card) => ({ card, text: entryBody(planningPaths[card.designKey][0]) }));
 const planningIdentities = planningBodies.every(({ card, text }) => !/\[\d+\]/.test(text) &&
   text.includes(`companion-candidate-${card.designKey}-20261001`) &&
   text.includes(`companion-source-${card.designKey}-20261001`) &&
   card.pieceStudy.every((piece) => text.includes(`companion-piece-${card.designKey}-${piece.pieceKey}-20261001`)));
+// Table column order and boolean spelling may change; named fields must still equal the exact catalog.
+const tableCells = row => row.split('|').slice(1, -1).map(cell => cell.replace(/[`*]/g, '').trim().toLowerCase());
 const planningRowsMatch = planningBodies.every(({ card, text }) => card.pieceStudy.every((piece) => {
   const id = `companion-piece-${card.designKey}-${piece.pieceKey}-20261001`;
-  const row = text.split(/\r?\n/).find((line) => line.startsWith('|') && line.includes(id));
-  if (!row) return false;
-  const cells = row.split('|').slice(1, -1).map((cell) => cell.replace(/[`*]/g, '').trim().toLowerCase());
-  return JSON.stringify(cells.slice(-5)) === JSON.stringify([
-    piece.condition, String(piece.cutCount), piece.fold, piece.material, piece.mirrored ? 'yes' : 'no',
-  ]);
+  const lines = text.split(/\r?\n/), index = lines.findIndex(line => line.startsWith('|') && line.includes(id));
+  const header = lines.slice(0, index).reverse().find(line => line.startsWith('|') && /\bCondition\b/i.test(line) && /\bFold\b/i.test(line));
+  if (index < 0 || !header) return false;
+  const columns = tableCells(header), cells = tableCells(lines[index]);
+  const field = name => cells[columns.indexOf(name)];
+  return field('condition') === piece.condition && field('cut count') === String(piece.cutCount) &&
+    field('fold') === piece.fold && field('material') === piece.material &&
+    (piece.mirrored ? ['yes', 'true'] : ['no', 'false']).includes(field('mirrored'));
 }));
-const materialBody = entryBody('fabric_constraints');
+const materialBody = grouped ? planningBodies.map(entry => entry.text).join('\n') : entryBody('fabric_constraints');
 const materialIdentities = !/\[\d+\]/.test(materialBody) && cards.every((card) =>
   materialBody.includes(`companion-candidate-${card.designKey}-20261001`) &&
   materialBody.includes(`companion-source-${card.designKey}-20261001`));
 // Regression for the specific unsubstantiated additions observed during full editorial review.
 // This is not a general semantic-certification algorithm; new prose still requires review.
 const materialUnsupportedClaimsAbsent = !/no inherent stretch|grain direction governs|sufficient stretch to accommodate|Stretch required for fit/i.test(materialBody);
+const constructionBodies = constructionPaths.map(path => ({ path, text: entryBody(path) }));
+const exactConstruction = grouped ? await createCompanionCatalogClient().fetch(
+  '*[_id in $ids][0...16]{_id,_type,title,diagnostic,condition}', { ids: constructionRecords.map(record => record._id) },
+  { signal: AbortSignal.timeout(12000) }) : [];
+const constructionIdentities = !grouped || (exactConstruction.length === 15 && constructionBodies.every(({ path, text }) => {
+  const design = path.includes('sandy') ? 'sandy' : 'tina';
+  return !kbAttributionNeedsReview(text) && exactConstruction.filter(record => record._id.startsWith(`companion-making-${design}-`))
+    .every(record => text.includes(record._id));
+}));
+const constructionDiagnosticFlags = !grouped || constructionBodies.every(({ path, text }) => {
+  const design = path.includes('sandy') ? 'sandy' : 'tina';
+  return exactConstruction.filter(record => record._type === 'constructionStep' && record._id.startsWith(`companion-making-${design}-`)).every(record => {
+    const section = text.split(/^### /m).find(section => section.includes(record._id)) ?? '';
+    const flag = section.match(/\*\*Diagnostic:\*\*\s*(yes|no)/i)?.[1]?.toLowerCase();
+    return flag === (record.diagnostic ? 'yes' : 'no');
+  });
+});
 const checks = {
   bothDistinctCandidatesPresent: entries[0].result.text.includes('companion-candidate-sandy-20261001') &&
     entries[1].result.text.includes('companion-candidate-tina-20261001'),
   diagnosticPendingReviewDisclosed: /pending[ -]review|pending\*?\*? review|reviewStatus.{0,20}pending/i.test(diagnostic),
   diagnosticOriginAttributed: /\bCoats\b|coats\.com/i.test(diagnostic),
   observedUntestedShortcutAbsent: Boolean(notTestedLine) &&
-    /perform (?:this|the).{0,60}test first|do not proceed/i.test(notTestedLine) &&
+    /perform (?:this|the).{0,60}test first|do not proceed|perform it before proceeding/i.test(notTestedLine) &&
     !/(?<!do not )proceed to (?:the )?(?:sample[ -]tension|lower[ -]tension)/i.test(notTestedLine),
-  garmentUnpickingProhibited: /Do not remove stitches from the actual garment|never on the actual garment|do not unpick a finished garment/i.test(diagnostic),
+  garmentUnpickingProhibited: /Do not remove stitches from the actual garment|never on the actual garment|do not unpick a finished garment|never unpick or alter the finished garment/i.test(diagnostic),
+  diagnosticDoesNotFalselyExcludeTension: !/thread tension is not (?:the issue|the cause)|rules out (?:thread )?tension/i.test(body),
   diagnosticStableSourceIdentities: stableSourceIdentities,
   planningStableSourceIdentities: planningIdentities,
   planningPieceRowsMatchExactCatalog: planningRowsMatch,
@@ -80,6 +108,13 @@ const checks = {
     card.requiredMeasurements.every((measurement) => text.toLowerCase().includes(measurement.toLowerCase()))),
   fabricStableSourceIdentities: materialIdentities,
   fabricObservedUnsubstantiatedClaimsAbsent: materialUnsupportedClaimsAbsent,
+  constructionStableSourceIdentities: constructionIdentities,
+  constructionDiagnosticEligibilityMatchesExactRecords: constructionDiagnosticFlags,
+  constructionOptionalStepsCarryPrerequisites: !grouped ||
+    (/carry.{0,30}prerequisites/i.test(entryBody('construction/tina_faux_wrap_top')) &&
+      /do not require the omitted physical action/i.test(entryBody('construction/tina_faux_wrap_top'))) ||
+    ['dart', 'sleeves', 'front-bottom'].every(branch => new RegExp(`When the ${branch} branch is absent, its prerequisite.{0,100}carries through`, 'i')
+      .test(entryBody('construction/tina_faux_wrap_top'))),
 };
 const report = {
   capturedAt, provenance: 'live-content-lake-and-context-mcp', knowledgeBaseId: config.knowledgeBaseId,
@@ -93,6 +128,7 @@ const report = {
   diagnosticCitationIdentityReviewRequired: !stableSourceIdentities,
   planningCitationIdentityReviewRequired: !planningIdentities || !planningRowsMatch,
   materialEditorialReviewRequired: !materialIdentities || !materialUnsupportedClaimsAbsent,
+  constructionEditorialReviewRequired: !constructionIdentities || !constructionDiagnosticFlags,
   makerReviewNotEstablished: true,
   importCountAndBuildJobNotVerified: true,
 };

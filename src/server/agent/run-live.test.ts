@@ -25,7 +25,7 @@ it.skipIf(process.env.STITCHES_LIVE_AGENT_RUN !== "true")("qualifies one actual 
       expectedBasis: companionBasis(initial), consent: { version: "preparation-v1", sharePreparationSummary: true } });
     let current = run;
     const actualReader = createStitchesCompanionReader(); let interrupted = false, recovered = false;
-    const reader = { readPaths: async (paths: string[]) => {
+    const reader = { initialContext: () => actualReader.initialContext(), readPaths: async (paths: string[]) => {
       if (injectInterruption && !interrupted) { interrupted = true; throw new Error("Deliberate local transport interruption, not a Sanity service outage"); }
       return actualReader.readPaths(paths);
     } };

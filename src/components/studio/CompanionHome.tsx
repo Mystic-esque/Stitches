@@ -8,6 +8,7 @@ import { projectBackupSchema, type GuestProject, type ProjectNote, type ProjectP
 import type { CompanionCatalogCard } from "@/server/knowledge/companion-catalog";
 import { PieceStudy } from "./PieceStudy";
 import { PatternBoard } from "./PatternBoard";
+import { MakeWorkspace, type ScrapStepContext } from "./MakeWorkspace";
 import { DiagnosticStudy } from "./DiagnosticStudy";
 import { DiagnosticHistory } from "./DiagnosticHistory";
 import type { DiagnosticRecord } from "@/domain/diagnostic-history";
@@ -54,6 +55,8 @@ export function CompanionHome() {
   const [revisions, setRevisions] = useState<GuestProject[]>([]);
   const [notes, setNotes] = useState<ProjectNote[]>([]);
   const [diagnostics, setDiagnostics] = useState<DiagnosticRecord[]>([]);
+  const [scrapStep, setScrapStep] = useState<ScrapStepContext | null>(null);
+  useEffect(() => { setScrapStep(null); }, [active?.id, active?.sequence]);
   const [noteText, setNoteText] = useState("");
   const [noteKind, setNoteKind] = useState<"journal" | "question">("journal");
   const [noteStage, setNoteStage] = useState<"plan" | "prepare" | "make" | "check">("plan");
@@ -145,24 +148,41 @@ export function CompanionHome() {
   const back = () => { setActive(null); setDraft(null); setRevisions([]); setNotes([]); setDiagnostics([]); setError(""); setNotice(""); window.history.pushState({}, "", "/"); };
   const update = (field: keyof Draft, value: string) => setDraft((current) => current ? { ...current, [field]: value } : current);
 
-  function downloadBackup() {
-    if (!active) return;
-    const backup = projectBackupSchema.parse({ format: "stitches-project-backup", version: 3, title: active.title, brief: active.brief, source: active.source, plan: active.plan,
-      knowledgeFingerprint: active.knowledgeFingerprint,
-      diagnostics,
-      notes: notes.map(({ kind, stage, text, basisSequence, basisHash, createdAt, importedFromSequence }) => ({
-        kind, stage, text, basisSequence: importedFromSequence ?? basisSequence, basisHash, createdAt,
-      })) });
-    const href = URL.createObjectURL(new Blob([JSON.stringify(backup, null, 2)], { type: "application/json" }));
-    const link = document.createElement("a"); link.href = href; link.download = `stitches-${active.id.slice(0, 8)}.json`; link.click();
-    window.setTimeout(() => URL.revokeObjectURL(href), 1000);
+  async function downloadBackup(asBrief = false) {
+    if (!active || busy) return;
+    setBusy(true); setError("");
+    try {
+      const data = await json(await fetch(`/api/projects/${active.id}/backup`, { cache: "no-store", signal: AbortSignal.timeout(15000) }));
+      const backup = projectBackupSchema.parse(data.backup);
+      if (activeId.current !== active.id) return;
+      const text = asBrief ? ["STITCHES / PRIVATE MAKING BRIEF", backup.title, backup.brief,
+        "Planning and learning only. No cut-ready pattern, fit approval or verified physical work.",
+        `Source: ${backup.source.kind === "candidate" ? backup.source.designId : "personal idea"}`,
+        `Knowledge: ${backup.version !== 1 ? backup.knowledgeFingerprint ?? "not bound" : "not bound"}`,
+        `Fabric: ${backup.plan.fabric.description || "unknown"} (${backup.plan.fabric.structure})`,
+        `Equipment: ${backup.plan.equipment.join(", ") || "not recorded"}`,
+        `Measurements (mm): ${JSON.stringify(backup.plan.measurementsMm)}`,
+        `Angles (degrees): ${JSON.stringify(backup.plan.measurementsDegrees ?? {})}`,
+        `Open questions: ${backup.plan.openQuestions.join("; ") || "none recorded"}`,
+        "MAKING HISTORY / original source and project bindings retained",
+        ...(backup.version === 4 ? backup.making.map((entry) => `Revision ${entry.basisSequence} | ${entry.createdAt} | ${entry.planFingerprint.slice(0, 12)} | ${entry.imported ? "imported history" : "private report"} | ${JSON.stringify(entry.event)}`) : []),
+        "JOURNAL", ...(backup.version !== 1 ? backup.notes.map((note) => `${note.stage}: ${note.text}`) : []),
+        "SCRAP CHECKS / sample observations are not confirmed garment diagnoses",
+        ...((backup.version === 3 || backup.version === 4) ? backup.diagnostics.map((entry) => JSON.stringify(entry.event)) : []),
+      ].join("\n\n") : JSON.stringify(backup, null, 2);
+      const href = URL.createObjectURL(new Blob([text], { type: asBrief ? "text/plain" : "application/json" }));
+      const link = document.createElement("a"); link.href = href; link.download = `stitches-${active.id.slice(0, 8)}.${asBrief ? "txt" : "json"}`; link.click();
+      window.setTimeout(() => URL.revokeObjectURL(href), 1000);
+      setNotice("Downloaded the latest saved state, including making history. Unsaved brief edits are not included.");
+    } catch (cause) { setError(cause instanceof Error ? cause.message : "Backup unavailable. No incomplete backup was downloaded."); }
+    finally { setBusy(false); }
   }
   async function importBackup(event: ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0]; event.target.value = "";
     if (!file) return;
     setError(""); setNotice("");
     try {
-      if (file.size > 4_000_000) throw new Error("Choose a Stitches backup smaller than 4 MB.");
+      if (file.size > 32_000_000) throw new Error("Choose a Stitches backup smaller than 32 MB.");
       const backup = projectBackupSchema.parse(JSON.parse(await file.text()));
       setBusy(true);
       const data = await json(await fetch("/api/projects/import", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ backup, idempotencyKey: crypto.randomUUID() }) }));
@@ -220,13 +240,16 @@ export function CompanionHome() {
       setNotice("Profile copy saved. Any edits made while copying remain unsaved; review your working brief before saving.");
     }} />}
     {active && draft ? <main className="companion-project">
-      <div className="project-topline"><button type="button" onClick={back}>← All projects</button><span>Private guest project · revision {active.sequence}</span><button type="button" onClick={downloadBackup}>Download latest-state backup ↓</button></div>
+      <div className="project-topline"><button type="button" onClick={back}>← All projects</button><span>Private guest project · revision {active.sequence}</span><button type="button" disabled={busy} onClick={() => downloadBackup()}>Download latest-state backup ↓</button><button type="button" disabled={busy} onClick={() => downloadBackup(true)}>Take a making brief ↓</button></div>
       <div className="project-head"><div><p className="companion-kicker">YOUR MAKING COMPANION / 01</p><h1>{active.title}</h1><p>Carry your idea, materials and decisions in one place. Every save becomes a reviewable revision.</p></div><span className="capability-chip">Planning only · no cutting yet</span></div>
       {active.source.kind === "candidate" && <section className="project-source-strip" aria-label="Current source research">{sourceCard ? <><p className="companion-kicker">LIVE SANITY CONTENT LAKE · PLANNING SOURCE</p><strong>{sourceCard.title}</strong><p>{sourceBinding === "stale" ? "This source record changed after your saved project basis. Review and refresh it before using the new planning facts." : sourceCard.cuttingCaveat}</p><span>{sourceCard.materialStructure} · {sourceCard.requiredMeasurements.length} source-listed measurements · {sourceCard.reviewStatus} review · plan only</span><a href={sourceCard.sourceUrl} target="_blank" rel="noreferrer">Read {sourceCard.sourceTitle} ↗</a></> : <p role="status">{catalogState === "loading" ? "Checking the current Sanity source record…" : "Current Sanity source details are unavailable. Your private plan is still saved, but do not use this card to cut."}</p>}</section>}
       {sourceBinding && <div className={`source-binding ${sourceBinding}`} role="status"><span>{sourceBinding === "current" ? "This plan is bound to the current Sanity source revision. It is still planning-only." : sourceBinding === "stale" ? "Source changed since this project revision. Source-dependent advice is stale; earlier maker notes are preserved." : sourceBinding === "unbound" ? "This project has no saved Sanity source binding yet. Review the current source before attaching it." : "Sanity source check is unavailable. Source-dependent guidance is paused."}</span>{(sourceBinding === "stale" || sourceBinding === "unbound") && <button type="button" disabled={busy || unsavedChanges} onClick={refreshSource}>Review & bind current source ↗</button>}{unsavedChanges && sourceBinding !== "current" && <small>Save plan edits first.</small>}</div>}
       {sourceBinding === "current" && sourceCard && <PieceStudy key={`piece-${sourceCard.designKey}`} card={sourceCard} />}
       {sourceBinding === "current" && sourceCard?.designKey === "sandy" && <PatternBoard key={`pattern-${active.id}`} project={active} source={sourceCard} dirty={unsavedChanges} />}
+      <MakeWorkspace key={`making-${active.id}-${active.sequence}`} project={active} source={sourceBinding === "current" ? sourceCard : undefined} dirty={busy || unsavedChanges}
+        onScrapHelp={(context) => setScrapStep(context)} onContextInvalidated={() => setScrapStep(null)} />
       {sourceBinding === "current" && sourceCard && <DiagnosticStudy key={`diagnostic-${active.id}-${active.sequence}-${sourceCard.diagnosticStudy.fingerprint}`} study={sourceCard.diagnosticStudy} project={active} history={diagnostics} disabled={busy || unsavedChanges}
+        makingContext={scrapStep} onClearContext={() => setScrapStep(null)}
         onSaved={(record) => { if (activeId.current === record.projectId) setDiagnostics((history) => history.some((item) => item.id === record.id) ? history : [...history, record]); }}
         onReload={async () => { const data = await json(await fetch(`/api/projects/${active.id}/diagnostics`, { cache: "no-store" })); if (activeId.current === active.id) setDiagnostics(data.diagnostics); }}
         onPrepareNote={(text) => { setNoteKind("journal"); setNoteStage("check"); setNoteText(text); document.getElementById("journal-heading")?.scrollIntoView({ behavior: "smooth" }); }} />}

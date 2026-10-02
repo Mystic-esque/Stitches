@@ -1,0 +1,111 @@
+{
+  "kind": "actual-production-construction-api-and-browser",
+  "checkedAt": "2026-10-02T18:15:42.967Z",
+  "passed": true,
+  "syntheticPrivateGuests": true,
+  "source": "actual-Stitches-development-Content-Lake",
+  "providerRequests": 0,
+  "sanityWrites": 0,
+  "kbBuildNotProvedByThisHarness": true,
+  "physicalWorkNotClaimed": true,
+  "api": {
+    "distinctStepCounts": [
+      5,
+      8
+    ],
+    "exactPendingSourceGraph": true,
+    "conditionalPrerequisites": true,
+    "ownerOriginStrictBounds": true,
+    "privateIdempotency": true,
+    "currentStepDiagnosticBinding": true,
+    "staleStepContextDenied": true,
+    "v4ImportedFactsNeverAuthority": true,
+    "privateProjectUnchanged": true
+  },
+  "browser": {
+    "layouts": [
+      {
+        "width": 1440,
+        "noOverflow": true,
+        "minimum44pxButtons": true
+      },
+      {
+        "width": 1024,
+        "noOverflow": true,
+        "minimum44pxButtons": true
+      },
+      {
+        "width": 768,
+        "noOverflow": true,
+        "minimum44pxButtons": true
+      },
+      {
+        "width": 390,
+        "noOverflow": true,
+        "minimum44pxButtons": true
+      },
+      {
+        "width": 320,
+        "noOverflow": true,
+        "minimum44pxButtons": true
+      }
+    ],
+    "contrast": [
+      {
+        "selector": ".making-badge",
+        "ratio": 7.92292489283583
+      },
+      {
+        "selector": ".making-action",
+        "ratio": 13.227814278765202
+      },
+      {
+        "selector": ".making-step-top>span",
+        "ratio": 8.495560929325869
+      },
+      {
+        "selector": ".making-checkpoint>span",
+        "ratio": 7.286659718539348
+      },
+      {
+        "selector": ".making-rail small",
+        "ratio": 6.2378654287554
+      },
+      {
+        "selector": ".making-rail small",
+        "ratio": 6.6887123803036435
+      },
+      {
+        "selector": ".making-rail small",
+        "ratio": 6.2378654287554
+      },
+      {
+        "selector": ".making-rail small",
+        "ratio": 6.2378654287554
+      },
+      {
+        "selector": ".making-rail small",
+        "ratio": 6.2378654287554
+      },
+      {
+        "selector": ".making-rail small",
+        "ratio": 6.2378654287554
+      },
+      {
+        "selector": ".making-pieces li span",
+        "ratio": 6.6887123803036435
+      },
+      {
+        "selector": ".making-primary",
+        "ratio": 9.02232720913999
+      }
+    ],
+    "nativeKeyboardConfiguration": true,
+    "confirmedConditionalReconfigurationPersists": true,
+    "actualCommittedSaveLostAcknowledgementExactReplayNoDuplicate": true,
+    "injectedReadFailurePreservesHistoryAndActualRecovery": true,
+    "restoredHistoryRequiresFreshConfiguration": true,
+    "plainPrivateBrief": true,
+    "runtimeErrors": []
+  }
+}

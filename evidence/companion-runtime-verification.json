@@ -1,6 +1,6 @@
 {
   "kind": "production-nextjs-ui",
-  "checkedAt": "2026-10-02T14:54:26.887Z",
+  "checkedAt": "2026-10-02T18:47:56.402Z",
   "base": "http://127.0.0.1:3100",
   "observations": [
     {
@@ -48,7 +48,7 @@
     "saved": true,
     "noted": true,
     "resumed": true,
-    "backupVersion": 3,
+    "backupVersion": 4,
     "imported": true,
     "mobileNoOverflow": true
   },
@@ -87,6 +87,7 @@
     "sourceSpecificTinaFields": 14,
     "angularUnitsPreserved": true,
     "unexposedLegacyNotesPreserved": true,
+    "sourceRebindingRequired": false,
     "layouts": [
       {
         "width": 1440,
@@ -213,6 +214,7 @@
     "providerRequests": 0,
     "privateTranscriptWithheld": true,
     "fiveWidthNoOverflow": true,
-    "syntheticConsentFlow": true
+    "syntheticConsentFlow": true,
+    "sourceRebindingRequired": false
   }
 }

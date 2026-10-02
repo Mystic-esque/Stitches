@@ -13,7 +13,7 @@ export function companionFreeAuthorized(env: Record<string, string | undefined> 
 /** One durable continuation per HTTP request. No background promises, automatic retries or model writes. */
 export async function advanceCompanionRun(input: {
   store: GuestStore; ownerId: string; projectId: string; runId: string; freeAuthorized: boolean;
-  loadSnapshot: () => Promise<CompanionSnapshot>; reader: { readPaths: (paths: string[]) => Promise<ContextResult> };
+  loadSnapshot: () => Promise<CompanionSnapshot>; reader: { initialContext?: () => Promise<ContextResult>; readPaths: (paths: string[]) => Promise<ContextResult> };
   createSession?: (options: Pick<GeminiSessionOptions, "request" | "state">) => DurableGeminiSession;
   env?: Record<string, string | undefined>; now?: () => number;
 }): Promise<PrivateAgentRun> {

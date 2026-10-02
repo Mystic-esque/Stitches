@@ -29,6 +29,19 @@ export class GuestHttpError extends Error {
   constructor(public readonly status: number, public readonly code: string, message: string) { super(message); }
 }
 
+export async function readBoundedJson(request: NextRequest, maxBytes = 4096): Promise<unknown> {
+  const reader = request.body?.getReader();
+  if (!reader) throw new GuestHttpError(400, "invalid_input", "Missing JSON body.");
+  const chunks: Uint8Array[] = []; let size = 0;
+  while (true) {
+    const part = await reader.read(); if (part.done) break;
+    size += part.value.byteLength;
+    if (size > maxBytes) { await reader.cancel(); throw new GuestHttpError(413, "input_too_large", "The request exceeds its byte limit."); }
+    chunks.push(part.value);
+  }
+  return JSON.parse(Buffer.concat(chunks).toString("utf8"));
+}
+
 export function guestErrorResponse(error: unknown): NextResponse {
   if (error instanceof GuestHttpError) return NextResponse.json({ error: error.code, message: error.message }, { status: error.status });
   if (error instanceof ZodError || error instanceof SyntaxError) {

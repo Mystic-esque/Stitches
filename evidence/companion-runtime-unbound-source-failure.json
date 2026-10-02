@@ -1,0 +1,114 @@
+{
+  "checkedAt": "2026-10-02T18:22:31.977Z",
+  "passed": false,
+  "error": "Actual consent summary did not become available",
+  "state": {
+    "ready": "complete",
+    "url": "http://127.0.0.1:3100/?project=27b59e11-c4b3-4b72-b07f-e51acbff3fee",
+    "historyCount": 0,
+    "stopVisible": false,
+    "source": "This project has no saved Sanity source binding yet. Review the current source before attaching it.Review & bind current source ↗",
+    "projectPresent": true,
+    "assistant": "A SECOND PAIR OF EYESUnderstand your next move.A read-only companion checks this saved plan, its exact Sanity pieces and the maintained Knowledge Base. You stay in charge of every making decision.Private notebook · no automatic saves or sewing actionsContinue with the manual preparation plan ↓What would help now?Find my next preparation actionHelp me understand these piecesReview the gaps before I makeBefore anything goes to GeminiWhat should I prepare next for this saved project, and why?Shared: this question, required/missing note labels, preparation states and counts, source/piece records, version IDs and public KB excerpts. Not shared: body values, your name or brief, tool names, fabric description, observation text or photos.I agree to send this minimized summary and public source context to Gemini for this run.gemini-3.5-flash-lite · at most 4 requests / 120 active seconds · $0 paid budget · no paid fallbackCurrent source-linked preparation is unavailable. Earlier runs and private notes are preserved.Check my saved project ↗Refresh saved status",
+    "historySections": [
+      {
+        "visible": true,
+        "rows": [],
+        "parents": [
+          {
+            "tag": "MAIN",
+            "className": "companion-project",
+            "display": "block"
+          },
+          {
+            "tag": "DIV",
+            "className": "companion-app",
+            "display": "block"
+          },
+          {
+            "tag": "BODY",
+            "className": "",
+            "display": "block"
+          }
+        ]
+      }
+    ],
+    "consoleErrors": [],
+    "document": {
+      "roots": [
+        {
+          "style": null,
+          "background": "rgb(244, 241, 233)",
+          "children": [
+            "companion-nav",
+            "maker-profile-panel",
+            "companion-project",
+            "companion-footer"
+          ]
+        }
+      ],
+      "scripts": [
+        "http://127.0.0.1:3100/_next/static/chunks/e21afd48-5f4278997b209717.js",
+        "http://127.0.0.1:3100/_next/static/chunks/686-93a6d8398fb8bf44.js",
+        "http://127.0.0.1:3100/_next/static/chunks/main-app-2cfe87542cc341cd.js",
+        "http://127.0.0.1:3100/_next/static/chunks/447-88638c61baf5b4b3.js",
+        "http://127.0.0.1:3100/_next/static/chunks/app/page-8e2283b654d3c2bf.js",
+        "http://127.0.0.1:3100/_next/static/chunks/polyfills-42372ed130431b0a.js",
+        "http://127.0.0.1:3100/_next/static/chunks/webpack-6b4ff246b5fb3653.js"
+      ],
+      "styles": [
+        {
+          "href": "http://127.0.0.1:3100/_next/static/css/cda7a6bfa4006928.css",
+          "loaded": true
+        },
+        {
+          "href": "http://127.0.0.1:3100/_next/static/css/3a5ffb638e000da0.css",
+          "loaded": true
+        }
+      ],
+      "bodyChildren": [
+        {
+          "tag": "DIV",
+          "type": 1,
+          "text": null
+        },
+        {
+          "tag": "DIV",
+          "type": 1,
+          "text": null
+        },
+        {
+          "tag": "#comment",
+          "type": 8,
+          "text": "$"
+        },
+        {
+          "tag": "#comment",
+          "type": 8,
+          "text": "/$"
+        },
+        {
+          "tag": "SCRIPT",
+          "type": 1,
+          "text": null
+        },
+        {
+          "tag": "SCRIPT",
+          "type": 1,
+          "text": null
+        },
+        {
+          "tag": "SCRIPT",
+          "type": 1,
+          "text": null
+        },
+        {
+          "tag": "NEXT-ROUTE-ANNOUNCER",
+          "type": 1,
+          "text": null
+        }
+      ]
+    }
+  },
+  "runtimeErrors": []
+}

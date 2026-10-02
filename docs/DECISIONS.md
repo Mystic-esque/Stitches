@@ -1,5 +1,15 @@
 # Implementation decisions
 
+## October 2, 2026 — Exact construction learning and independent KB qualification
+
+- Author separate pending constructionPlan/constructionStep records for two real, distinct source designs. A learning checkpoint records understanding, not a physical action or guided-making capability. The exact graph controls optional prerequisites, pieces and diagnostic eligibility; generated Context prose cannot override it.
+- Make configuration/history immutable and bind every event to project, catalog, construction fingerprint and session. A new option selection starts a new session. Preserve prior events on source correction/import. A restored history cannot authorize an action, even if IDs and hashes happen to match.
+- Attach scrap help only to a saved current-step question and current making-history head. Validate both at HTTP and transaction boundaries. A question about markings cannot authorize a seam remedy. Private pauses and acknowledged receipt retries remain usable without new source advice.
+- Export latest saved project plus notes/diagnostic/making history in one SQLite transaction (v4); keep v1–v3 import compatibility. Provider transcripts and generated artifacts stay excluded. Add local review/physical-evidence protocols without claiming human review occurred.
+- A full KB rebuild may regroup entries; leaf count is not a quality gate. Resolve known paths from the actual outline, never model guesses. Preserve failed served snapshots and reject unreliable numeric body attribution. Historical live-model proofs remain dated; do not spend more inference quota until current editorial retrieval passes.
+- Active instructions do not prove compliant generated prose. After the repeated attribution defects, use the observed page-specific Rewrite workflow with explicit exact-record mappings, then read the real endpoint. Do not weaken reference facts, silently substitute snapshots, or continuously request whole-KB rebuilds.
+- Preserve the manual project when creation cannot obtain a source binding. Source-specific fields and agent consent remain unavailable until explicit review/rebinding. Browser checks follow this visible contract and derive subsequent revision numbers from the actual saved basis; they do not silently bind through an API or relax measurement preservation. Keep transient source-recovery failures as operational evidence, even when a later actual read/rehearsal passes.
+
 ## October 2, 2026 — Measured teaching board without cutting authority
 
 - Bring the numerically checked Sandy 4.10.2 straight-band spike into a server-only production study adapter. Four exact saved body-note keys and the current Sanity candidate cut/fold/measurement contract are mandatory. Recheck owner/project/source after drafting. This is a restricted educational slice, not adoption of an independently qualified cutting engine; the earlier isolated-engine rule remains applicable to untested branches.

@@ -10,11 +10,14 @@ export const diagnosticEventSchema = z.discriminatedUnion("kind", [
 export const diagnosticBindingSchema = z.object({
   catalogFingerprint: fingerprint, diagnosticFingerprint: fingerprint,
   sourceId: z.string().min(1).max(160), testId: z.string().min(1).max(160), remedyId: z.string().min(1).max(160),
+  makingContext: z.object({ eventId: z.string().uuid(), planFingerprint: fingerprint,
+    stepId: z.string().min(1).max(160), historySequence: z.number().int().positive() }).strict().optional(),
 }).strict();
 export const recordDiagnosticSchema = z.object({
   expectedProjectSequence: z.number().int().min(1), expectedBasisHash: fingerprint,
   expectedHistorySequence: z.number().int().min(0), expectedDiagnosticFingerprint: fingerprint,
   idempotencyKey: z.string().uuid(), event: diagnosticEventSchema,
+  makingEventId: z.string().uuid().optional(),
 }).strict();
 export const diagnosticRecordSchema = z.object({
   id: z.string().uuid(), projectId: z.string().uuid(), sequence: z.number().int().min(1),
@@ -34,13 +37,16 @@ export function diagnosticTransitionError(history: DiagnosticRecord[], event: Di
   if (event.kind === "observation") return last?.event.kind === "comparison_started" ? "Record the comparison result or pause before another observation." : null;
   if (event.kind === "paused") return !last || last.event.kind === "paused" ? "There is no active check to pause." : null;
   if (event.kind === "comparison_started") {
+    if (last?.binding.makingContext?.eventId !== binding.makingContext?.eventId)
+      return "The comparison must retain its original making-step context.";
     if (!last || last.id !== event.observationId || last.event.kind !== "observation" || last.event.observation !== "relaxes")
       return "A current saved relaxed-sample observation is required before this comparison.";
     if (eligible.some((item) => item.event.kind === "comparison_result") ||
       eligible.some((item) => item.event.kind === "paused")) return "Do not repeat a completed, unsuccessful or paused comparison on this basis. Keep the evidence and seek review.";
     return null;
   }
-  return last?.event.kind === "comparison_started" && last.id === event.attemptId ? null : "This result must belong to the active, current scrap comparison.";
+  return last?.event.kind === "comparison_started" && last.id === event.attemptId &&
+    last.binding.makingContext?.eventId === binding.makingContext?.eventId ? null : "This result must belong to the active, current scrap comparison.";
 }
 
 export function diagnosticEventLabel(event: DiagnosticEvent): string {

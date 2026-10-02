@@ -267,9 +267,36 @@ const remedy = defineType({
   ],
 });
 
+const constructionBindings = () => [
+  defineField({ name: "candidate", type: "reference", to: [{ type: "planningCandidate" }], validation: required }),
+  defineField({ name: "source", type: "reference", to: [{ type: "sourceDocument" }], validation: required }),
+  reviewField(),
+];
+const constructionPlan = defineType({ name: "constructionPlan", title: "Construction learning plan", type: "document", fields: [
+  defineField({ name: "title", type: "string", validation: required }),
+  defineField({ name: "designKey", type: "string", options: { list: ["sandy", "tina"] }, validation: required }),
+  defineField({ name: "version", type: "number", validation: required }),
+  defineField({ name: "sourceUrl", type: "url", validation: required }),
+  defineField({ name: "envelope", type: "text", description: "Applicable configuration and explicit exclusions. Not a cutting qualification.", validation: required }),
+  defineField({ name: "steps", type: "array", of: [defineArrayMember({ type: "reference", to: [{ type: "constructionStep" }] })], validation: required }),
+  ...constructionBindings(),
+] });
+const constructionStep = defineType({ name: "constructionStep", title: "Construction learning step", type: "document", fields: [
+  defineField({ name: "title", type: "string", validation: required }),
+  defineField({ name: "stepKey", type: "string", validation: required }),
+  defineField({ name: "plan", type: "reference", to: [{ type: "constructionPlan" }], validation: required }),
+  defineField({ name: "ordinal", type: "number", validation: required }),
+  defineField({ name: "condition", type: "string", options: { list: ["always", "sleeves", "front-bottom", "dart"] }, validation: required }),
+  defineField({ name: "prerequisites", type: "array", of: [defineArrayMember({ type: "reference", to: [{ type: "constructionStep" }] })] }),
+  ...["pieceKeys", "edgeIds"].map((name) => defineField({ name, type: "array", of: [defineArrayMember({ type: "string" })] })),
+  ...["orientation", "action", "checkpoint"].map((name) => defineField({ name, type: "text", validation: required })),
+  defineField({ name: "diagnostic", type: "boolean", description: "Allows the shared sacrificial-sample check; never a garment remedy." }),
+  ...constructionBindings(),
+] });
+
 export const schemaTypes = [
   sourceDocument, pattern, patternVersion, patternPiece, seamConnection,
   adjustmentRule, instructionStep, fabricRequirement, planningCandidate, planningPiece, garmentComponent,
   sewingTechnique, equipmentClass, fabricClass, constructionProcedure,
-  issuePattern, diagnosticTest, remedy,
+  issuePattern, diagnosticTest, remedy, constructionPlan, constructionStep,
 ];

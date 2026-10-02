@@ -1,5 +1,7 @@
 # Build plan — Stitches Companion 2.0
 
+October 2 construction batch adds two exact pending Sanity learning graphs, the focused making notebook, current-step scrap context, immutable private progress/questions/pauses, and transactional v4 backups. It does not close source/rights/physical or complete making-agent gates. The owner rebuilt the KB into seven leaves; targeted rewrites still have attribution/eligibility defects. Follow the newest STATUS evidence before reusing historical live-provider results. RELEASE-REVIEW and MAKER-REVIEW prepare the remaining local/human checks.
+
 The executable task ledger is ../devpost/checklist.md W01–W10. The technical contracts are ../devpost/spec.md and PATTERN-ENGINE-DECISION.md; the current visual contract is DESIGN.md. This file explains dependency order; STATUS.md records actual state.
 
 The current implementation includes private planning/profile/revision/history/backup, source-derived piece education, durable read-only preparation assistant with actual two-source Gemini/Context proof, and a production Sandy measured pattern study with named edges/marks/fold/grain and full-redraft comparison. These are verified slices, not completed W01–W10 packages or qualified cutting/making. Complete source/rights/Sanity-authored step/physical and benchmark gates remain open. The September 29 Studio 1.0 static reference did not ship to production and its six-card gallery/piece tray are superseded. Historical illustrative proof remains at `/demo`.

@@ -5,6 +5,7 @@ import type { DiagnosticRecord } from "../../domain/diagnostic-history";
 import { preparationPlan } from "../../domain/preparation-plan";
 import type { CompanionCatalogCard } from "../knowledge/companion-catalog";
 import { contextConfiguration, SanityContextKnowledgeBase, type ContextResult } from "../knowledge/context-mcp";
+import { companionKbPaths, kbAttributionNeedsReview } from "../knowledge/companion-kb-paths";
 
 export const COMPANION_TOOLS = ["inspect_project", "inspect_preparation", "resolve_exact_graph", "retrieve_context"] as const;
 export type CompanionTool = typeof COMPANION_TOOLS[number];
@@ -41,7 +42,7 @@ export function companionBasis(snapshot: CompanionSnapshot): CompanionBasis {
 export function createCompanionTools(input: {
   snapshot: CompanionSnapshot;
   loadCurrent: () => Promise<CompanionSnapshot>; // Re-read owner-scoped state AND current exact catalog.
-  reader: { readPaths: (paths: string[]) => Promise<ContextResult> };
+  reader: { initialContext?: () => Promise<ContextResult>; readPaths: (paths: string[]) => Promise<ContextResult> };
   knowledgeBaseId: string;
   consent: { sharePreparationSummary: boolean };
   signal?: AbortSignal;
@@ -49,7 +50,7 @@ export function createCompanionTools(input: {
   if (input.consent.sharePreparationSummary !== true) throw new CompanionAgentError("consent", "Review and consent to the minimized preparation summary first.");
   if (input.knowledgeBaseId !== STITCHES_KB_ID) throw new CompanionAgentError("missing_knowledge", "Only the dedicated Stitches Knowledge Base is supported.");
   const snapshot = structuredClone(input.snapshot), basis = companionBasis(snapshot);
-  const paths = [snapshot.source.designKey === "sandy" ? "sandy_skirt" : "tina_top", "fabric_constraints"];
+  let paths = [snapshot.source.designKey === "sandy" ? "sandy_skirt" : "tina_top", "fabric_constraints"];
   let knowledgeHash: string | undefined;
   const checks = preparationPlan(snapshot.project, snapshot.source);
   const preparation = () => ({ items: checks.items, missingMeasurements: checks.missingMeasurements, next: checks.next,
@@ -85,11 +86,23 @@ export function createCompanionTools(input: {
           unsupported: ["checked geometry", "layout", "fit", "yardage", "qualified making steps", "garment remedies"] };
       } else {
         let knowledge: ContextResult;
-        try { knowledge = await input.reader.readPaths(paths); }
+        try {
+          // Production always supplies the scoped MCP reader. Legacy read-only test ports
+          // retain their fixed fixture paths; an actual outline failure never falls back.
+          if (input.reader.initialContext) {
+            const outline = await input.reader.initialContext();
+            if (outline.tool !== "initial_context" || outline.knowledgeBaseId !== input.knowledgeBaseId || outline.text.length > 100_000)
+              throw new Error("Mismatched outline.");
+            paths = companionKbPaths(outline.text, snapshot.source.designKey);
+          }
+          knowledge = await input.reader.readPaths(paths);
+        }
         catch { throw new CompanionAgentError("missing_knowledge", "Actual scoped Sanity Context retrieval failed. Manual preparation remains available."); }
         if (knowledge.tool !== "knowledge_base_read" || knowledge.knowledgeBaseId !== input.knowledgeBaseId ||
           JSON.stringify(knowledge.paths) !== JSON.stringify(paths) || !knowledge.text.trim() || knowledge.text.length > 20_000)
           throw new CompanionAgentError("missing_knowledge", "Context returned missing, oversized or mismatched evidence.");
+        if (kbAttributionNeedsReview(knowledge.text))
+          throw new CompanionAgentError("missing_knowledge", "The served KB attribution needs editorial review. Exact-source manual planning remains available; no generated answer is accepted.");
         knowledgeHash = createHash("sha256").update(knowledge.text).digest("hex");
         result = { knowledgeBaseId: input.knowledgeBaseId, paths: [...paths], knowledgeHash,
           text: knowledge.text.slice(0, 8_000), excerptTruncated: knowledge.text.length > 8_000,

@@ -72,6 +72,7 @@ try {
     const state = await evaluate("({ready:document.readyState,url:location.href,historyCount:document.querySelectorAll('.diagnostic-history li').length,stopVisible:!!document.querySelector('.diagnostic-outcome.unresolved'),source:document.querySelector('.source-binding')?.textContent,projectPresent:!!document.querySelector('.companion-project'),assistant:document.querySelector('.project-assistant')?.textContent.slice(0,1800)})");
     state.historySections = await evaluate("[...document.querySelectorAll('.diagnostic-history')].map(x=>({visible:x.checkVisibility(),rows:[...x.querySelectorAll('li')].map(li=>({visible:li.checkVisibility(),label:li.querySelector('strong')?.textContent})),parents:[x.parentElement,x.parentElement?.parentElement,x.parentElement?.parentElement?.parentElement].map(p=>p?{tag:p.tagName,className:p.className,display:getComputedStyle(p).display}:null)}))");
     state.consoleErrors = consoleErrors;
+    state.catalogProbe = await evaluate("(async()=>{const started=Date.now();try{const response=await fetch('/api/catalog',{signal:AbortSignal.timeout(15000)});const data=await response.json();return {status:response.status,elapsedMs:Date.now()-started,code:data.code,cardCount:data.cards?.length};}catch(error){return {error:error.name,elapsedMs:Date.now()-started};}})()");
     state.document = await evaluate("({roots:[...document.querySelectorAll('.companion-app')].map(x=>({style:x.getAttribute('style'),background:getComputedStyle(x).backgroundColor,children:[...x.children].map(c=>c.className)})),scripts:[...document.querySelectorAll('script[src]')].map(x=>x.src),styles:[...document.querySelectorAll('link[rel=stylesheet]')].map(x=>({href:x.href,loaded:!!x.sheet})),bodyChildren:[...document.body.childNodes].map(x=>({tag:x.nodeName,type:x.nodeType,text:x.nodeType===8?x.textContent:null}))})");
     const shot=await call('Page.captureScreenshot',{format:'png',fromSurface:true});
     await writeFile(join(output,'durable-browser-failure.png'),Buffer.from(shot.data,'base64'));
@@ -252,9 +253,10 @@ try {
   if (!resumed) throw new Error('Saved project and note did not resume after reload');
   const journalShot = await call('Page.captureScreenshot', { format: 'png', captureBeyondViewport: true, fromSurface: true });
   await writeFile(join(output, 'project-journal-1440.png'), Buffer.from(journalShot.data, 'base64'));
-  await evaluate("(()=>{const previous=URL.createObjectURL;URL.createObjectURL=function(blob){window.__stitchesBackupBlob=blob;return previous.call(URL,blob)};document.querySelector('.project-topline button:last-child').click();return true})()");
+  await evaluate("(()=>{const previous=URL.createObjectURL;URL.createObjectURL=function(blob){window.__stitchesBackupBlob=blob;return previous.call(URL,blob)};[...document.querySelectorAll('.project-topline button')].find(b=>b.textContent.includes('latest-state backup')).click();return true})()");
+  await waitFor("!!window.__stitchesBackupBlob", 'Latest saved-state backup was not returned');
   const backup = await evaluate("(async()=>JSON.parse(await window.__stitchesBackupBlob.text()))()");
-  if (backup.version !== 3 || backup.notes?.length !== 1 || backup.diagnostics?.length !== 4 || !backup.knowledgeFingerprint) throw new Error('Downloaded backup omitted the journal, scrap history or source binding');
+  if (backup.version !== 4 || !Array.isArray(backup.making) || backup.notes?.length !== 1 || backup.diagnostics?.length !== 4 || !backup.knowledgeFingerprint) throw new Error('Downloaded backup omitted the journal, making/scrap history or source binding');
   if (!Object.entries({ waist: 720, hips: 960, waistToFloor: 1000, waistToHips: 200 }).every(([key, value]) => backup.plan.measurementsMm[key] === value)) throw new Error('Source-listed body notes did not survive save/reload/export with mm units');
   backup.knowledgeFingerprint = '0'.repeat(64); // Disposable import rehearsal of a prior Sanity source revision.
   await evaluate("document.querySelector('.project-topline button:first-child').click()");
@@ -293,8 +295,16 @@ try {
   if (mobileProject.scrollWidth > 390) throw new Error(`Project mobile overflow: ${JSON.stringify(mobileProject)}`);
   const mobileShot = await call('Page.captureScreenshot', { format: 'png', captureBeyondViewport: true, fromSurface: true });
   await writeFile(join(output, 'project-390.png'), Buffer.from(mobileShot.data, 'base64'));
-  const tinaId = await evaluate("(async()=>{const response=await fetch('/api/projects',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({title:'Disposable angular notes rehearsal',brief:'Synthetic measurements only.',source:{kind:'candidate',designId:'tina'},plan:{features:[],openQuestions:[],measurementsMm:{bust:900,hip:1000,specialistLength:100.3},measurementsDegrees:{shoulderSlope:14},fabric:{description:'',widthMm:null,lengthMm:null,structure:'unknown'},equipment:[]},idempotencyKey:crypto.randomUUID()})});const data=await response.json();if(!response.ok)throw new Error(data.message);return data.project.id})()");
+  const tinaProject = await evaluate("(async()=>{const response=await fetch('/api/projects',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({title:'Disposable angular notes rehearsal',brief:'Synthetic measurements only.',source:{kind:'candidate',designId:'tina'},plan:{features:[],openQuestions:[],measurementsMm:{bust:900,hip:1000,specialistLength:100.3},measurementsDegrees:{shoulderSlope:14},fabric:{description:'',widthMm:null,lengthMm:null,structure:'unknown'},equipment:[]},idempotencyKey:crypto.randomUUID()})});const data=await response.json();if(!response.ok)throw new Error(data.message);return {id:data.project.id,bound:!!data.project.knowledgeFingerprint,sequence:data.project.sequence}})()");
+  const tinaId = tinaProject.id;
   await navigatePage(`${base}/?project=${tinaId}`);
+  if (!tinaProject.bound) {
+    await waitFor("document.querySelector('.source-binding button') && !document.querySelector('.source-binding button').disabled", 'Unbound Tina project did not offer source review');
+    if (await evaluate("!!document.querySelector('.measurement-plan')")) throw new Error('Unbound Tina project exposed source-specific measurement advice');
+    await evaluate("document.querySelector('.source-binding button').click()");
+    await waitFor("!!document.querySelector('.source-binding.current')", 'Tina source review did not save its binding');
+  }
+  const tinaSavedSequence = tinaProject.sequence + (tinaProject.bound ? 0 : 1) + 1;
   let measurementsReady = false;
   for (let i = 0; i < 240; i++) {
     measurementsReady = await evaluate("document.querySelectorAll('.measurement-plan .measurement-grid input').length===14 && document.querySelector('[name=measure-shoulderSlope]')?.value==='14'");
@@ -306,7 +316,7 @@ try {
   await evaluate("document.querySelector('.save-row button').click()");
   let angularSaved = false;
   for (let i = 0; i < 240; i++) {
-    angularSaved = await evaluate("document.querySelector('.project-topline')?.textContent.includes('revision 2')");
+    angularSaved = await evaluate(`document.querySelector('.project-topline')?.textContent.includes('revision ${tinaSavedSequence}')`);
     if (angularSaved) break;
     await pause(250);
   }
@@ -328,7 +338,7 @@ try {
     measurementLayouts.push({ width, noOverflow: true, sourceFields: 14 });
   }
   const measurementJourney = { sourceSpecificSandyFields: 4, savedLengthsInMm: true, reloadAndBackupPreservedLengths: true,
-    sourceSpecificTinaFields: 14, angularUnitsPreserved: angularSaved, unexposedLegacyNotesPreserved: true, layouts: measurementLayouts };
+    sourceSpecificTinaFields: 14, angularUnitsPreserved: angularSaved, unexposedLegacyNotesPreserved: true, sourceRebindingRequired: !tinaProject.bound, layouts: measurementLayouts };
   if (errors.length) throw new Error(`Browser runtime errors: ${JSON.stringify(errors)}`);
   const report = { kind: 'production-nextjs-ui', checkedAt: new Date().toISOString(), base, observations, sanityCatalog: { exactContentLakeCards: 2, projectSourceShown: sourceReady, educationalPieceStudy: pieceStudyReady, conditionalPiecesSwitched: switchedPieces, sharedPendingDiagnostic: diagnosticReady, conditionalScrapRemedy: conditionalRemedy, unresolvedPathStops: uncertainStops, simulatedTransportFailurePausedAdvice: pausedOnFailure, simulatedTransportRecovery: recoveredFromFailure, staleBindingObserved: staleBinding, sourceRebased: refreshed, contextKbRebuild: false }, projectJourney: { created, saved, noted, resumed, backupVersion: 2, imported, mobileNoOverflow: true }, runtimeErrors: errors, screenshots: ['home-1440.png', 'home-390.png', 'project-1440.png', 'project-piece-study-1440.png', 'project-journal-1440.png', 'project-source-stale-1440.png', 'project-source-recovered-1440.png', 'project-390.png'], notVerified: ['cut-ready geometry', 'maker review', 'agent', 'Sanity Context revalidation', 'keyboard and screen-reader audit'] };
   report.measurementJourney = measurementJourney;
@@ -420,8 +430,16 @@ try {
   report.screenshots.push('maker-profile-copy-1440.png', 'maker-profile-copy-390.png');
   report.screenshots.push('project-measurements-tina-1440.png', 'project-measurements-tina-390.png');
   // Real private run control with zero inference. No scripted model transcript is rendered.
-  const assistantId = await evaluate(`(async()=>{const r=await fetch('/api/projects',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({title:'Assistant consent rehearsal',brief:'Synthetic local browser check',source:{kind:'candidate',designId:'sandy'},idempotencyKey:crypto.randomUUID()})});const d=await r.json();if(!r.ok)throw Error(d.message);return d.project.id})()`);
+  const assistantProject = await evaluate(`(async()=>{const r=await fetch('/api/projects',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({title:'Assistant consent rehearsal',brief:'Synthetic local browser check',source:{kind:'candidate',designId:'sandy'},idempotencyKey:crypto.randomUUID()})});const d=await r.json();if(!r.ok)throw Error(d.message);return {id:d.project.id,bound:!!d.project.knowledgeFingerprint}})()`);
+  const assistantId = assistantProject.id;
   await navigatePage(`${base}/?project=${assistantId}`);
+  // Creation can preserve a usable private plan while a bounded source read fails.
+  // Exercise its explicit review/rebind UI rather than assuming a binding or bypassing consent.
+  if (!assistantProject.bound) {
+    await waitFor("document.querySelector('.source-binding button') && !document.querySelector('.source-binding button').disabled", 'Unbound project did not offer source review');
+    if (!await evaluate("document.querySelector('.assistant-actions button').disabled")) throw new Error('Unbound project enabled the assistant');
+    await evaluate("document.querySelector('.source-binding button').click()");
+  }
   await waitFor("!!document.querySelector('.assistant-consent details') && !document.querySelector('.assistant-consent input')?.disabled", 'Actual consent summary did not become available');
   if (!await evaluate("document.querySelector('.assistant-actions button').disabled")) throw new Error('Assistant was enabled before consent');
   await evaluate("document.querySelector('.assistant-consent input').click()");
@@ -444,7 +462,7 @@ try {
       await writeFile(join(output,`project-assistant-${width}.png`),Buffer.from(shot.data,'base64'));
     }
   }
-  report.assistant = { consentRequired:true, exactMinimizedPreview:true, actualPrivateStartAndCancel:true, reloadPersistence:true, providerRequests:0, privateTranscriptWithheld:true, fiveWidthNoOverflow:true, syntheticConsentFlow:true };
+  report.assistant = { consentRequired:true, exactMinimizedPreview:true, actualPrivateStartAndCancel:true, reloadPersistence:true, providerRequests:0, privateTranscriptWithheld:true, fiveWidthNoOverflow:true, syntheticConsentFlow:true, sourceRebindingRequired:!assistantProject.bound };
   report.screenshots.push('project-assistant-1440.png','project-assistant-390.png');
   if (errors.length) throw new Error(`Browser runtime errors: ${JSON.stringify(errors)}`);
   await writeFile(join(root, 'evidence', 'companion-runtime-verification.json'), JSON.stringify(report, null, 2) + '\n');

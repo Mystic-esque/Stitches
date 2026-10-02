@@ -42,6 +42,22 @@ function runner(state: ReturnType<typeof setup>, turns: ModelTurn[]) {
 }
 
 describe("read-only companion tools and bounded loop — synthetic protocol proof, not live inference", () => {
+  it("resolves an observed rebuilt outline and fails closed on lost attribution or outline access", async () => {
+    const state = setup();
+    const groupedReader = { ...state.reader, initialContext: vi.fn(async (): Promise<ContextResult> => ({
+      tool: "initial_context", knowledgeBaseId: STITCHES_KB_ID, paths: [],
+      text: "garment_planning/sandy_circle_skirt [core]\nconstruction/sandy_circle_skirt [core]\nseam_quality [core]" })) };
+    const tools = createCompanionTools({ ...state.options, reader: groupedReader });
+    await tools.execute("retrieve_context", {});
+    expect(groupedReader.readPaths).toHaveBeenCalledWith(["garment_planning/sandy_circle_skirt"]);
+    groupedReader.readPaths.mockResolvedValueOnce({ tool: "knowledge_base_read", knowledgeBaseId: STITCHES_KB_ID,
+      paths: ["garment_planning/sandy_circle_skirt"], text: "A fact with unreliable attribution [2].\n## Sources\n1. Different record" });
+    await expect(tools.execute("retrieve_context", {})).rejects.toMatchObject({ code: "missing_knowledge" });
+    groupedReader.initialContext.mockRejectedValueOnce(new Error("Explicit fixture outline outage"));
+    const calls = groupedReader.readPaths.mock.calls.length;
+    await expect(tools.execute("retrieve_context", {})).rejects.toMatchObject({ code: "missing_knowledge" });
+    expect(groupedReader.readPaths.mock.calls.length).toBe(calls);
+  });
   it.each(["sandy", "tina"] as const)("inspects the %s project, exact graph and scoped KB without disclosing private values", async (design) => {
     const state = setup(design), before = structuredClone(state.initial);
     const run = runner(state, [call("inspect_project"), call("resolve_exact_graph"), call("retrieve_context")]);

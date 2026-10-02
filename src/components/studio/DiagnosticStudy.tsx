@@ -5,6 +5,7 @@ import { diagnosticTransitionError, type DiagnosticEvent, type DiagnosticRecord 
 import type { GuestProject } from "@/domain/guest-project";
 import { pausedScrapAdvice, resolveScrapObservation, type ScrapObservation } from "@/domain/scrap-diagnostic";
 import type { CompanionDiagnosticStudy } from "@/server/knowledge/companion-catalog";
+import type { ScrapStepContext } from "./MakeWorkspace";
 
 const choices: { value: ScrapObservation; label: string }[] = [
   { value: "not-tested", label: "I haven't tested" },
@@ -12,9 +13,10 @@ const choices: { value: ScrapObservation; label: string }[] = [
   { value: "unchanged", label: "No visible change" },
 ];
 
-export function DiagnosticStudy({ study, project, history, disabled, onSaved, onReload, onPrepareNote }: {
+export function DiagnosticStudy({ study, project, history, disabled, onSaved, onReload, onPrepareNote, makingContext, onClearContext }: {
   study: CompanionDiagnosticStudy; project: GuestProject; history: DiagnosticRecord[]; disabled: boolean;
   onSaved: (record: DiagnosticRecord) => void; onReload: () => Promise<void>; onPrepareNote: (text: string) => void;
+  makingContext?: ScrapStepContext | null; onClearContext?: () => void;
 }) {
   const [observation, setObservation] = useState<ScrapObservation>(() => {
     const saved = history.filter((item) => !item.imported && item.basisHash === project.basisHash && item.basisSequence === project.sequence &&
@@ -26,13 +28,16 @@ export function DiagnosticStudy({ study, project, history, disabled, onSaved, on
   const [message, setMessage] = useState("");
   const retry = useRef<{ payload: string; key: string } | null>(null);
   const binding = { catalogFingerprint: project.knowledgeFingerprint!, diagnosticFingerprint: study.fingerprint,
-    sourceId: study.sourceId, testId: study.testId, remedyId: study.remedyId };
+    sourceId: study.sourceId, testId: study.testId, remedyId: study.remedyId,
+    ...(makingContext ? { makingContext: { eventId: makingContext.eventId, planFingerprint: makingContext.planFingerprint,
+      stepId: makingContext.stepId, historySequence: makingContext.historySequence } } : {}) };
   const current = history.filter((record) => !record.imported && record.basisHash === project.basisHash &&
     record.basisSequence === project.sequence && record.binding.diagnosticFingerprint === study.fingerprint).at(-1);
   async function record(event: DiagnosticEvent) {
     if (busy || disabled) return;
     const body = { expectedProjectSequence: project.sequence, expectedBasisHash: project.basisHash,
-      expectedHistorySequence: history.length, expectedDiagnosticFingerprint: study.fingerprint, event };
+      expectedHistorySequence: history.length, expectedDiagnosticFingerprint: study.fingerprint, event,
+      ...(makingContext ? { makingEventId: makingContext.eventId } : {}) };
     const payload = JSON.stringify(body);
     if (retry.current?.payload !== payload) retry.current = { payload, key: crypto.randomUUID() };
     setBusy(true); setMessage("");
@@ -54,6 +59,7 @@ export function DiagnosticStudy({ study, project, history, disabled, onSaved, on
     onPrepareNote(`Scrap seam check · ${study.title}\nObservation: ${choices.find((choice) => choice.value === observation)?.label}.\nWorking state: ${result.title}.\nSource basis: ${study.fingerprint.slice(0, 12)}.\nWhat I actually saw: `);
   }
   return <section className="diagnostic-study" aria-labelledby="diagnostic-study-title">
+    {makingContext && <div className="diagnostic-step-context"><strong>Scrap check for: {makingContext.stepTitle}</strong><small>Saved making question · construction source {makingContext.planFingerprint.slice(0, 12)}. The server rechecks this context before each observation or comparison.</small><button type="button" onClick={onClearContext}>Use the general project scrap check</button></div>}
     <div className="diagnostic-study-head"><p className="companion-kicker">03 / WHEN A SEAM ISN'T BEHAVING</p><h2 id="diagnostic-study-title">Pause. Observe. Then decide.</h2><p>One shared making check for both starting garments, connected to a technical source. A ripple is a symptom, not a diagnosis.</p><span>Source-linked · {study.reviewStatus} review · sample check only</span></div>
     <div className="diagnostic-study-grid"><div className="diagnostic-study-question"><span>THE QUESTION</span><h3>{study.makerQuestion}</h3><p>{study.howToCheck}</p><small>{study.riskNotes}</small></div><div className="diagnostic-study-result"><span>WHAT DID YOU OBSERVE?</span><div className="diagnostic-choices" role="group" aria-label="Scrap seam observation">{choices.map((choice) => <button key={choice.value} type="button" aria-pressed={observation === choice.value} onClick={() => setObservation(choice.value)}>{choice.label}</button>)}</div><div className={`diagnostic-outcome ${result.state}`} aria-live="polite"><small>{result.state === "possible-tension" ? "A POSSIBLE CAUSE · NOT CONFIRMED" : result.state === "unresolved" ? "STOP THIS PATH · MORE EVIDENCE NEEDED" : "NO CAUSE IDENTIFIED YET"}</small><h3>{result.title}</h3><p>{result.explanation}</p><strong>Next safe move</strong><p>{result.nextAction}</p>{result.confirmation && <p className="diagnostic-confirmation"><strong>Check the result:</strong> {result.confirmation}</p>}</div></div></div>
     <div className="diagnostic-record-controls"><label>What did you actually see? <small>Optional · private notes</small><textarea value={detail} maxLength={600} rows={3} onChange={(event) => setDetail(event.target.value)} /></label>

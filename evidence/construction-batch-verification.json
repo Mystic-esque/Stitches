@@ -1,0 +1,17 @@
+{
+  "kind": "local-construction-learning-milestone",
+  "checkedAt": "2026-10-02T18:47:56.402Z",
+  "deterministic": { "passed": 125, "failed": 0, "optInSkipped": 3, "receipt": "making-tests.json" },
+  "productionBuildExitCode": 0,
+  "makingApiAndBrowser": { "passed": true, "receipt": "making-verification.json", "widths": [1440, 1024, 768, 390, 320] },
+  "priorBrowserContinuity": { "passed": true, "receipt": "companion-runtime-verification.json", "backupVersion": 4 },
+  "agentControlApi": { "passed": true, "receipt": "agent-api-verification.json", "inferenceRequests": 0 },
+  "actualPreparationReadTools": { "passed": true, "receipt": "companion-agent-read-verification.json", "designs": ["sandy", "tina"], "inferenceRequests": 0 },
+  "actualSanityConstructionSeed": { "matchedRecords": 15, "project": "l4eeamth", "dataset": "development", "receipt": "construction-sanity.json" },
+  "maintainedKnowledgeBase": { "passedChecks": 14, "totalChecks": 15, "qualified": false, "limitation": "Diagnostic test and remedy source IDs absent from served prose", "receipt": "companion-context-verification.json" },
+  "actualScreenshots": "screenshots/making",
+  "newModelRequests": 0,
+  "physicalMakerTrials": 0,
+  "deployed": false,
+  "submitted": false
+}

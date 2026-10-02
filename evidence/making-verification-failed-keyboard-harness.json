@@ -1,0 +1,26 @@
+{
+  "kind": "actual-production-construction-api-and-browser",
+  "checkedAt": "2026-10-02T16:15:02.637Z",
+  "passed": false,
+  "syntheticPrivateGuests": true,
+  "source": "actual-Stitches-development-Content-Lake",
+  "providerRequests": 0,
+  "sanityWrites": 0,
+  "kbBuildNotProvedByThisHarness": true,
+  "physicalWorkNotClaimed": true,
+  "api": {
+    "distinctStepCounts": [
+      5,
+      8
+    ],
+    "exactPendingSourceGraph": true,
+    "conditionalPrerequisites": true,
+    "ownerOriginStrictBounds": true,
+    "privateIdempotency": true,
+    "currentStepDiagnosticBinding": true,
+    "staleStepContextDenied": true,
+    "v4ImportedFactsNeverAuthority": true,
+    "privateProjectUnchanged": true
+  },
+  "failure": "UI wait failed: document.querySelector('.making-layout')"
+}

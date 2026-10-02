@@ -1,0 +1,85 @@
+{
+  "checkedAt": "2026-10-02T15:44:32.929Z",
+  "target": "l4eeamth/development",
+  "publishedContentLakeOnly": true,
+  "kbUpdated": false,
+  "pendingPhysicalReview": true,
+  "contentHash": "02e388eb2be501057edab7b6c2da64c479e0e268db973b9917cb881bc847808a",
+  "records": [
+    {
+      "id": "companion-making-sandy-v1",
+      "type": "constructionPlan",
+      "revision": "Nki2Id6UxEzOFGJjOmy64M"
+    },
+    {
+      "id": "companion-making-sandy-v1-band",
+      "type": "constructionStep",
+      "revision": "Nki2Id6UxEzOFGJjOmy64M"
+    },
+    {
+      "id": "companion-making-sandy-v1-band-finish",
+      "type": "constructionStep",
+      "revision": "Nki2Id6UxEzOFGJjOmy64M"
+    },
+    {
+      "id": "companion-making-sandy-v1-closure-seam",
+      "type": "constructionStep",
+      "revision": "Nki2Id6UxEzOFGJjOmy64M"
+    },
+    {
+      "id": "companion-making-sandy-v1-hem",
+      "type": "constructionStep",
+      "revision": "Nki2Id6UxEzOFGJjOmy64M"
+    },
+    {
+      "id": "companion-making-sandy-v1-opening",
+      "type": "constructionStep",
+      "revision": "Nki2Id6UxEzOFGJjOmy64M"
+    },
+    {
+      "id": "companion-making-tina-v1",
+      "type": "constructionPlan",
+      "revision": "Nki2Id6UxEzOFGJjOmy64M"
+    },
+    {
+      "id": "companion-making-tina-v1-dart",
+      "type": "constructionStep",
+      "revision": "Nki2Id6UxEzOFGJjOmy64M"
+    },
+    {
+      "id": "companion-making-tina-v1-finishes",
+      "type": "constructionStep",
+      "revision": "Nki2Id6UxEzOFGJjOmy64M"
+    },
+    {
+      "id": "companion-making-tina-v1-front-bottom",
+      "type": "constructionStep",
+      "revision": "Nki2Id6UxEzOFGJjOmy64M"
+    },
+    {
+      "id": "companion-making-tina-v1-marks",
+      "type": "constructionStep",
+      "revision": "Nki2Id6UxEzOFGJjOmy64M"
+    },
+    {
+      "id": "companion-making-tina-v1-neck",
+      "type": "constructionStep",
+      "revision": "Nki2Id6UxEzOFGJjOmy64M"
+    },
+    {
+      "id": "companion-making-tina-v1-shoulders",
+      "type": "constructionStep",
+      "revision": "Nki2Id6UxEzOFGJjOmy64M"
+    },
+    {
+      "id": "companion-making-tina-v1-sides",
+      "type": "constructionStep",
+      "revision": "Nki2Id6UxEzOFGJjOmy64M"
+    },
+    {
+      "id": "companion-making-tina-v1-sleeves",
+      "type": "constructionStep",
+      "revision": "Nki2Id6UxEzOFGJjOmy64M"
+    }
+  ]
+}

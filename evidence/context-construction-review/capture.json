@@ -1,0 +1,67 @@
+{
+  "capturedAt": "2026-10-02T17:31:03.098Z",
+  "liveMcpRead": true,
+  "knowledgeBaseId": "kbkvu1vrPsLG",
+  "paths": [
+    "construction/everyday_blouse",
+    "construction/sandy_circle_skirt",
+    "construction/tina_faux_wrap_top",
+    "garment_planning/everyday_blouse",
+    "garment_planning/sandy_circle_skirt",
+    "garment_planning/tina_faux_wrap_top",
+    "seam_quality"
+  ],
+  "snapshots": [
+    {
+      "path": "outline",
+      "sha256": "5b64d68945a13dd5e97b9f66d53e40478d8aae9cf27737ecb488a97975c3273e",
+      "file": "evidence/context-construction-review/outline-5b64d68945a13dd5.md",
+      "characters": 2498
+    },
+    {
+      "path": "construction/everyday_blouse",
+      "sha256": "cb6a60912e66c9799a588dbfd79a0eee81bbbf870a8058fb5a787f9f0d2b811b",
+      "file": "evidence/context-construction-review/construction-everyday_blouse-cb6a60912e66c979.md",
+      "characters": 2919
+    },
+    {
+      "path": "construction/sandy_circle_skirt",
+      "sha256": "da2f5158e2ce1abc6b78d92c1d602e34f3ae49afa2c634d2a6f251f025dfa90b",
+      "file": "evidence/context-construction-review/construction-sandy_circle_skirt-da2f5158e2ce1abc.md",
+      "characters": 4362
+    },
+    {
+      "path": "construction/tina_faux_wrap_top",
+      "sha256": "7b7201b8671e15c13d73bf40358b14952299486820869b1b57a0839f2416f53c",
+      "file": "evidence/context-construction-review/construction-tina_faux_wrap_top-7b7201b8671e15c1.md",
+      "characters": 5750
+    },
+    {
+      "path": "garment_planning/everyday_blouse",
+      "sha256": "77aeaa31e6769be9b003e32d96e7713f01083ba821e1c37d83465c7d75a2d30c",
+      "file": "evidence/context-construction-review/garment_planning-everyday_blouse-77aeaa31e6769be9.md",
+      "characters": 2042
+    },
+    {
+      "path": "garment_planning/sandy_circle_skirt",
+      "sha256": "f2a43f86ab47d94b854052825b8079b7e1278fadad0c8e9bc60bc3c73b53ca61",
+      "file": "evidence/context-construction-review/garment_planning-sandy_circle_skirt-f2a43f86ab47d94b.md",
+      "characters": 3488
+    },
+    {
+      "path": "garment_planning/tina_faux_wrap_top",
+      "sha256": "575e6d96add2248b464a175a911f8a961f995bcff7876fa80121e6c1f085fdc5",
+      "file": "evidence/context-construction-review/garment_planning-tina_faux_wrap_top-575e6d96add2248b.md",
+      "characters": 3073
+    },
+    {
+      "path": "seam_quality",
+      "sha256": "03b505a14c6144d333b6a0916370845dd0c3febcc02ac79da196ebae565fc1ea",
+      "file": "evidence/context-construction-review/seam_quality-03b505a14c6144d3.md",
+      "characters": 3253
+    }
+  ],
+  "editorialQualityNotYetQualified": true,
+  "providerRequests": 0,
+  "sanityWrites": 0
+}
