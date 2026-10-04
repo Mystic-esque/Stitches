@@ -26,7 +26,7 @@ The product story and required Sanity project ID are drafted. `l4eeamth` / `deve
 
 Before posting:
 
-1. Push the reviewed release commit to the owner-supplied repository `https://github.com/Mystic-esque/Stitches.git`; confirm the default branch and public files after push.
+1. The current release commit is available at `https://github.com/Mystic-esque/Stitches` on `master`; confirm repository visibility and inspect the public files after push.
 2. Decide whether to authorize a public demo deployment. None is authorized. The current local guest SQLite store is not proven safe or durable for a public multi-instance service.
 3. If no demo URL or video will be supplied, retain the README operating guide in the Demo section and confirm the challenge form accepts that local-review fallback.
 4. Confirm the live submission form is accepting entries. The public challenge page has displayed a status/date inconsistency; the owner's authenticated form status is the current operational signal.
