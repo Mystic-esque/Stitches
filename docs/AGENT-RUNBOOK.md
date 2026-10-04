@@ -1,5 +1,7 @@
 # Local project assistant
 
+Current October 4 state supersedes the historical KB paragraph below: 15/15 actual Content Lake/Context checks pass, including diagnostic test/remedy IDs. Agent troubleshooting is still disabled pending runtime integration. `PRODUCT-RELEASE-PLAN.md` specifies the next bounded natural-language/selection/artifact and diagnostic work; it is not implemented by this documentation update. Keep existing free-tier caps, private request reservations and recovery until each extension is verified.
+
 Current KB note (October 2): the owner rebuilt the KB into seven grouped entries. The adapter resolves observed planning paths from the actual outline and rejects numeric body citations with unreliable attribution. Page-specific rewrites repaired the two planning pages and construction order/eligibility; actual two-project preparation read tools pass with zero inference. Full editorial verification is 14/15: diagnostic test/remedy IDs remain absent. Earlier actual Gemini receipts remain dated evidence. Making/scrap actions use exact records; diagnostic agent retrieval is not qualified. See KB-CONSTRUCTION-REVIEW.md and KB-PAGE-CORRECTIONS.md.
 
 This is read-only preparation assistance, not qualified making, diagnosis, drafting, cutting or an autonomous save. The project's manual preparation table remains available without Gemini. Production publication is not authorized.

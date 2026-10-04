@@ -1,5 +1,9 @@
 # Build plan — Stitches Companion 2.0
 
+## Next delivery order: one product release
+
+Execute `PRODUCT-RELEASE-PLAN.md` R1-R4 over the existing W01-W10 ledger: R1 compact workspace + selected-context conversation/artifact; R2 existing deterministic Sandy study through language + save/reload; R3 preparation/step artifacts + actual diagnostic test flow; R4 entry/visual finish + evidence and submission package. This prioritizes a complete useful journey for makers and both events. It does not close source/cutting/physical gates or authorize publication. Keep broader capabilities on the roadmap. Next concrete task is R1; the verified state below is unchanged.
+
 The October 4 workspace batch verifies five focus views, responsive Make and Pattern surfaces, a current production build, 137 passing tests, actual screenshots and 15/15 live Content Lake/Context editorial checks. The October 2 construction batch added two exact pending Sanity learning graphs, the making notebook and private continuity. The runtime diagnostic agent path, source/rights/physical review, fair benchmark and cut-ready qualification remain open. Follow the newest STATUS evidence before reusing historical live-provider results. RELEASE-REVIEW and MAKER-REVIEW prepare the remaining local/human checks.
 
 The executable task ledger is ../devpost/checklist.md W01–W10. The technical contracts are ../devpost/spec.md and PATTERN-ENGINE-DECISION.md; the current visual contract is DESIGN.md. This file explains dependency order; STATUS.md records actual state.

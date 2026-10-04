@@ -1,6 +1,8 @@
 # Stitches Companion 2.0 — visual and interaction standard
 
-This supersedes the September 29 Studio 1.0 reference. See ../design/stitches-companion.html for the current visual target and DIRECTION-REVIEW.md for why. The old ../design/stitches-studio.html and earlier screenshots remain historical explorations, not implementation contracts. Design does not establish garment/pattern validity.
+Next release composition: follow `PRODUCT-RELEASE-PLAN.md` section 3 and `WORKSPACE-AGENT-DIRECTION.md`. A compact project header and navigation replace the marketing/profile stack inside an open project; the initial viewport must show the actual task and companion input. Use warm paper as the default working canvas, with dark technical view optional. Preserve the meaningful piece/fold/edge teaching below, not its older mandatory dark three-column composition. These contracts supersede conflicting composition in `../design/stitches-companion.html`; that static reference still illustrates useful teaching semantics. This is a target awaiting actual screenshots.
+
+The workspace and release contracts above are the current visual target. See ../design/stitches-companion.html and DIRECTION-REVIEW.md for the earlier Companion 2.0 teaching reference and rationale. The old ../design/stitches-studio.html and earlier screenshots remain historical explorations, not implementation contracts. Design does not establish garment/pattern validity.
 
 ## Creative direction
 Stitches should feel like a knowledgeable maker beside the cutting table: warm editorial invitation outside the workbench, precise dark technical canvas within it, tactile fabric photography, disciplined typography, and calm next actions. The older “pattern connected” screen correctly showed why the tool matters—flat technical pieces, fold/cut notes, grain direction and changed-edge consequences. Preserve and improve that literacy. Do not replace it with a mannequin and a list of named parts.

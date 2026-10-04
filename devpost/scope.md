@@ -5,6 +5,10 @@ revision: companion-2.0
 ---
 # Stitches — project-aware sewing companion
 
+## Next release emphasis
+
+`../docs/PRODUCT-RELEASE-PLAN.md` consolidates the next product delivery: a compact workspace with natural-language tasks, selected-object explanations, a real supported Sandy length comparison, saved studies and contextual preparation/making/recovery. Sanity and Devpost receive truthful snapshots of this same product, not separate competition modes. R1-R4 prioritize the existing ambition; photo/CAD/fit/layout/3D remain later scope with their original gates. No new capability is claimed by this plan.
+
 ## One-line scope
 Stitches helps a maker carry a garment from idea or pattern through preparation, cutting where qualified, sewing, checking and recovery. It understands how pieces become clothing through Sanity-authored relationships and bounded deterministic tools.
 

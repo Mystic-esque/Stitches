@@ -1,5 +1,7 @@
 # Architecture — Stitches Companion 2.0
 
+Next integration: `PRODUCT-RELEASE-PLAN.md` R1-R4 keeps this architecture and adds a shared selection resolver, private project conversation and typed result artifacts to the existing durable agent. Language and direct controls must call the same deterministic study/preparation/diagnostic functions. The compact shell changes composition, not ownership boundaries. Do not add a second agent framework or duplicate the pattern engine.
+
 Target architecture. See ../devpost/spec.md C01–C10 for enforceable contracts and STATUS.md for actual implementation/evidence.
 
 ## Project is the durable unit

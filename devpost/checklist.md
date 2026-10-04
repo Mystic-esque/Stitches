@@ -5,6 +5,18 @@ revision: companion-2.0
 ---
 # Stitches Companion 2.0 — executable build checklist
 
+## Product release sequence (latest October 4 direction)
+
+The next execution order is `../docs/PRODUCT-RELEASE-PLAN.md` R1-R4. These are connected delivery batches across W01-W10, not a replacement set of completed gates.
+
+- [x] Consolidate the product-first release plan and align product/design/scope/PRD/spec/handoff references; no runtime capability added by this item.
+- [ ] **R1:** Compact working shell, server-validated selected context, bounded natural-language conversation, task-specific sharing and first sourced artifact; verify real provider/Context, persistence and desktop/phone use.
+- [ ] **R2:** Expose the existing Sandy deterministic length study through language and direct controls, show measured effects, save/reopen the private study; no cut-ready or physical-history promotion.
+- [ ] **R3:** Link preparation and step artifacts to the same project; integrate verified diagnostic KB with applicable scrap checks, maker-reported outcomes and prior attempts; verify both projects and failure recovery.
+- [ ] **R4:** Complete first-minute experience, imagery/provenance, useful outputs and accessibility; capture actual final journeys and shared-content impact; prepare Sanity/Devpost snapshots with truthful claims and reviewer instructions.
+
+Broader photo/CAD/layout/print/3D and physical-validation gates stay below. Existing checkbox evidence remains dated and scoped; R1-R4 are not passed by the earlier 137-test shell milestone.
+
 ## Approved workspace-agent migration (October 4)
 
 - [x] Approve the persistent project workspace and review both concept images/video against current behavior (`../docs/WORKSPACE-AGENT-DIRECTION.md`).
@@ -132,7 +144,7 @@ Exit: measured results with provenance and failures. No superiority claim withou
 Exit: STATUS separates working, digitally checked, maker reviewed and blocked capabilities. If physical evidence is unavailable, useful planning/making assistance may ship in local preview but cut-ready claim stays blocked.
 
 ## First next task
-Next: bind selected piece/edge/step context to a server-validated agent run, then use the now-verified diagnostic KB leaf for a stateful, scrap-only test flow in both project contexts. The current production/browser and 15/15 KB editorial gates pass; source/physical qualification still gates actual-garment actions. The authored learning graphs and measured board do not approve notch mates, complete pattern geometry, source/output rights or cutting. Keep the curved count conflict and Tina engine qualification separate. The original first-three cards below remain full qualification gates.
+Next: execute R1 in `../docs/PRODUCT-RELEASE-PLAN.md`: selected piece/edge/step context, bounded natural-language conversation and a sourced artifact inside the compact workspace. Continue through R2's measured saved study, R3's preparation/step/diagnostic flow and R4's product finish. The current production/browser and 15/15 KB editorial gates pass; source/physical qualification still gates actual-garment actions. The authored learning graphs and measured board do not approve notch mates, complete pattern geometry, source/output rights or cutting. Keep the curved count conflict and Tina engine qualification separate. The original first-three cards below remain full qualification gates.
 
 ### Atomic task cards — first three and final handoff
 

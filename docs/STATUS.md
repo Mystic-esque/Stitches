@@ -1,5 +1,11 @@
 # Status
 
+## Latest planning update — product release, October 4
+
+Created `PRODUCT-RELEASE-PLAN.md` and aligned the active product, visual, experience, architecture/content, scope/PRD/spec, agent runbook, checklist and implementation handoff. The owner's direction is one useful sewing workspace beyond either competition, with a visible supported change, saved decisions, preparation and contextual recovery. R1-R4 are planned, not implemented. This documentation update makes no runtime changes, provider calls, Sanity writes or deployment. Existing verification below remains the current baseline.
+
+Next executable task: R1 selected-context natural-language conversation and first sourced artifact in the compact workspace, then proceed through the connected R2-R4 release. Do not interpret the new roadmap as new proof or drop future geometry/physical/photo/3D work.
+
 Updated: October 4, 2026.
 
 ## Current October 4 gate update

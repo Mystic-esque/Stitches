@@ -1,5 +1,7 @@
 # Companion 2.0 — screen and state contracts
 
+Next release acceptance is consolidated in `PRODUCT-RELEASE-PLAN.md`: compact first viewport; free-text request pinned to a selected object; visible sourced artifact; actual supported before/after study; save/reload; preparation/step/diagnostic continuity. Saving a study preserves a private exploration and does not accept a cutting pattern or physical progress. Use the R1-R4 order alongside the detailed contracts below.
+
 ## Approved workspace contract, staged
 
 One private project remains open while the maker switches Overview, Pattern, Materials, Make and Check. The initial migration uses `/?project=<opaque-id>&view=<view>`; the URL contains no measurements or private prose and browser back/refresh restore the view. A collapsible companion remains available beside the work on desktop and as a help sheet on narrow screens. Merely changing a view does not mutate the saved project or claim a new sewing result.

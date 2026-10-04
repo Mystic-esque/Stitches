@@ -1,5 +1,9 @@
 # Stitches Companion 2.0 — implementation handoff for Sol
 
+## Latest assignment: product-led release
+
+Read `PRODUCT-RELEASE-PLAN.md` before the older assignment below. The owner wants an impressive useful product beyond either competition. Deliver its R1-R4 sequence: compact workspace and selected-context conversation, actual supported measured change, saved-study/preparation continuity, source-bound step troubleshooting, then product finish and review package. Keep the existing app, guest store, deterministic engine and Sanity/Context infrastructure. The new plan is documentation only so far; preserve the verified baseline and do not mark targets implemented. Read WORKSPACE-AGENT-DIRECTION for interaction detail and STATUS for actual evidence. Do not end the release at a cosmetic shell or another prose-only assistant.
+
 ## Resume here — October 4, verified workspace batch
 
 Read the newest STATUS section first. The five-view project workspace, collapsible companion, production build, 137 passing tests, five-width local Chrome making and measured Pattern rehearsals, actual screenshots, and current 15/15 Content Lake/served Context checks are verified. The owner ran the successful production build in their terminal after Codex's sandbox build hit a Windows spawn denial. The diagnostic source identities are present in the served KB, but agent troubleshooting remains paused until the runtime retrieves and validates the diagnostic leaf and binds a maker observation. Next implement selected piece/edge/step context at send time and the stateful diagnostic agent path. Source rights, cut-ready output, fair answer benchmark and maker trials remain open. The older October 2 paragraphs below are retained as dated history.

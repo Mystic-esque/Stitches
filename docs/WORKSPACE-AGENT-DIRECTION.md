@@ -1,5 +1,7 @@
 # Stitches: the agentic sewing workspace
 
+Latest execution order: `PRODUCT-RELEASE-PLAN.md` turns this direction into one product-led R1-R4 release. Use its supported Sandy study -> saved decision -> preparation/Make -> diagnostic journey and compact-screen acceptance. The interaction and later capability contracts below remain applicable; older references to the diagnostic editorial gate are historical (15/15 now passes, runtime integration remains open).
+
 Date: October 4, 2026. Status: owner-approved target direction; first workspace migration in progress, not a completion claim. See `STATUS.md` for actual verification.
 
 Prepared from both supplied UI images, visual frames across the complete supplied ten-second video, the current code and Companion 2.0 contracts. The owner's later instruction explicitly retains advanced capabilities in the future roadmap.

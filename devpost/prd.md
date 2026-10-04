@@ -5,6 +5,10 @@ revision: companion-2.0
 ---
 # Product requirements — Stitches Companion 2.0
 
+## Next release outcomes
+
+Follow `../docs/PRODUCT-RELEASE-PLAN.md` R1-R4. The maker must be able to ask about a selected object, see a source-bound result beside it, request a supported measured comparison, save/reopen that study, and continue to relevant preparation/step help. A test observation must affect the diagnostic next action. The first project viewport must show actual work and a usable companion rather than marketing/setup panels. A study is design exploration, not a qualified cutting pattern. Validate these outcomes with actual journeys and user observations; this paragraph is a requirement, not proof.
+
 The source of truth for intent is docs/PRODUCT.md. This PRD defines observable user outcomes, not proof that they are implemented.
 
 ## Core user stories and acceptance

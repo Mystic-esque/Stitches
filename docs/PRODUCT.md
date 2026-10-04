@@ -1,5 +1,9 @@
 # Stitches — project-aware sewing companion
 
+## Next product release
+
+The owner's latest direction is a product that makes sense and feels useful without a Sanity explanation. `PRODUCT-RELEASE-PLAN.md` consolidates the next delivery into ask -> see -> decide -> continue: a compact project workspace, natural-language tool use, a real supported design comparison, saved artifacts, preparation and contextual recovery. Execute R1-R4 as one connected release; keep the broader workspace/geometry/photo/3D ambition below. This plan is not implemented capability; see STATUS.
+
 ## Approved workspace direction (October 4, 2026)
 
 Stitches is a persistent **sewing workspace**, not a long report with an assistant appended. A maker opens a project, works in Overview, Pattern, Materials, Make or Check, and keeps a context-aware companion nearby. The agent's signature outcome is a reviewable object tied to the current garment, piece, step or observation, with Sanity exact records governing applicability and the scoped Context KB supplying maintained explanation. Selection, proposed change, deterministic check and maker-confirmed keep/progress are distinct states. The complete target and staged delivery contracts are in `WORKSPACE-AGENT-DIRECTION.md`; `STATUS.md` distinguishes this target from the currently implemented slice.

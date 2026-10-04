@@ -1,5 +1,12 @@
 # Build log
 
+## October 4, 2026 — product-led release plan
+
+- Reviewed the existing workspace direction, product/design/experience contracts, handoff, scope/PRD/spec/checklist and current pattern/agent boundaries against the owner's request for a real product beyond the Sanity entry.
+- Added `docs/PRODUCT-RELEASE-PLAN.md`: complete first-minute and return-later journey, compact workspace layout, natural-language selection/tool/artifact contracts, supported measured study and persistence, contextual recovery, limited Sanity content audit, R1-R4 implementation order and explicit acceptance.
+- Aligned active document entry points and the executable checklist; retained historical evidence and future photo/CAD/layout/fit/3D/physical ambitions. Updated runbook's current KB note to 15/15 while retaining the runtime diagnostic gap.
+- Documentation only: no new model/live-content calls, Sanity mutations, application code, runtime test pass, external publication or submission. The earlier build/137-test/browser/15-check receipts are unchanged. Verified referenced plan and implementation paths exist; reviewed document entry points and execution-order consistency. `git diff --check` passed (Windows line-ending notices only). No runtime tests rerun for these documentation changes.
+
 ## October 4, 2026 — current production and browser gates
 
 - Codex sandbox `pnpm run build` compiled in 15.0 minutes, then failed to spawn the TypeScript subprocess (`spawn EPERM`). The owner ran `corepack pnpm run build` in their terminal; their pasted output completed compilation (4.0 minutes), TypeScript (67 seconds), page collection, 7/7 static generation and optimization, with all routes listed. Counted as an owner-reported production build pass, not an observed Codex command exit.

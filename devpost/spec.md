@@ -5,6 +5,10 @@ revision: companion-2.0
 ---
 # Technical specification — Stitches Companion 2.0
 
+## Next release contract
+
+`../docs/PRODUCT-RELEASE-PLAN.md` sections 4-7 specialize the next R1-R4 delivery: bounded natural-language input, pinned and server-resolved selection, private conversation memory, eligible tool choice, typed sourced artifacts and the existing deterministic Sandy study exposed through the agent. Reuse the durable controller, request budget, guest store, knowledge readers and pattern adapter. Additive migrations must preserve old runs; version and validate backups before advertising new conversation/artifact recovery. Saving a study cannot promote capability or rewrite physical history. This supersedes the initial fixed read-only envelope only when implemented and verified; STATUS records actual behavior.
+
 This is a target contract. The current illustrative runtime and proofs are listed in docs/STATUS.md, not silently promoted to this spec. Use installed library and official provider documentation for API details before code changes. No invented Sanity endpoint or model capability.
 
 ## Outcome-to-contract map

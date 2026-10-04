@@ -1,5 +1,7 @@
 # Stitches shared content model — Companion 2.0
 
+Next release audit: `PRODUCT-RELEASE-PLAN.md` section 6. Reuse current records and add only source-backed diagram bindings, operation impacts, prerequisite or diagnostic facts required by a working feature. Keep project conversations, measurements, observations and generated studies private. No public schema change, dataset write or KB rebuild is performed by the release-plan update.
+
 Target authoring contract plus implemented slices described below. The original 13 records remain illustrative. The current distinct-candidate catalog reads 19 exact planning/diagnostic records; the construction batch adds 15 separate pending learning records. Actual read-back is recorded independently from the seven-entry rebuilt KB. Schema source is local; no Studio/schema deployment is claimed.
 
 ## Implemented construction-learning records

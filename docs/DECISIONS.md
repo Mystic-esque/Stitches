@@ -1,5 +1,13 @@
 # Implementation decisions
 
+## October 4, 2026 — one product-led release
+
+- Consolidate the owner's broader product direction into `PRODUCT-RELEASE-PLAN.md`, building on the existing workspace direction rather than restarting it. The next release must be understandable without a spoken Sanity pitch.
+- Make ask -> see -> decide -> continue visible through selected-context artifacts, actual supported Sandy length comparisons, private saved studies, source-dependent preparation and step/diagnostic continuity. Tina retains its distinct source capabilities; do not borrow Sandy drafting authority.
+- Saving a study is a reversible design exploration, separate from accepting a qualified cutting pattern or reporting physical progress. Preserve source/readiness and later layout/print/maker gates.
+- Reuse the durable run controller with bounded natural-language input and eligible tool choice. Avoid a parallel agent framework or duplicate manual/agent calculations. Protect existing private runs and backups through additive migrations.
+- Implement R1-R4 as the next connected delivery order; evidence and submission are snapshots of the same product. No runtime code or shared Sanity content changed in this planning pass.
+
 ## October 4, 2026 — verified migration boundaries
 
 - Treat the owner terminal build as current production-build evidence, labeled as owner-reported. The current full serial suite passes 137 tests with 3 opt-in skips. Actual local Chrome checks establish five-view navigation, URL Back/Forward, responsive Make/Pattern behavior and recoverable local failures; these do not establish maker approval.
