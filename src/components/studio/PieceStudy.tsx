@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { selectPlanningPieces, type PieceStudyOptions } from "@/domain/planning-piece-study";
 import type { CompanionCatalogCard, CompanionPlanningPiece } from "@/server/knowledge/companion-catalog";
 
@@ -13,9 +13,13 @@ function FoldDiagram({ piece }: { piece: CompanionPlanningPiece }) {
   </div>;
 }
 
-export function PieceStudy({ card }: { card: CompanionCatalogCard }) {
+export function PieceStudy({ card, selectedPieceKey, onSelectPiece }: { card: CompanionCatalogCard;
+  selectedPieceKey?: string | null; onSelectPiece?: (pieceKey: string | null) => void }) {
   const [options, setOptions] = useState<PieceStudyOptions>(initial);
   const shown = selectPlanningPieces(card.pieceStudy, options);
+  useEffect(() => {
+    if (selectedPieceKey && !shown.some((piece) => piece.pieceKey === selectedPieceKey)) onSelectPiece?.(null);
+  }, [selectedPieceKey, shown, onSelectPiece]);
   const mainCount = shown.filter((piece) => piece.material === "main").reduce((total, piece) => total + piece.cutCount, 0);
   return <section className="piece-study" aria-labelledby="piece-study-title">
     <div className="piece-study-intro"><div><p className="companion-kicker">02 / UNDERSTAND THE PIECES</p><h2 id="piece-study-title">The cut list, connected.</h2><p>Try documented options to see how the list changes. Fold and mirrored markings matter before a piece ever reaches the machine.</p></div><span className="piece-study-state">Source-linked study · not a pattern</span></div>
@@ -27,7 +31,7 @@ export function PieceStudy({ card }: { card: CompanionCatalogCard }) {
       <fieldset><legend>Optional pieces</legend><label><input type="checkbox" checked={options.frontBottom} onChange={(event) => setOptions((current) => ({ ...current, frontBottom: event.target.checked }))} /> Front bottom present</label><label><input type="checkbox" checked={options.sleeves} onChange={(event) => setOptions((current) => ({ ...current, sleeves: event.target.checked }))} /> Sleeves enabled</label></fieldset>
       <p className="piece-study-caution">Ribbing or finishing strips may also be needed. Their count depends on the chosen finish and is not represented in this list.</p>
     </>}</div>
-      <div className="piece-study-list"><div className="piece-study-list-head"><div><span>DOCUMENTED PIECES</span><strong>{shown.length} part types · {mainCount} main-fabric cuts</strong></div><small>Not to scale</small></div><ol aria-live="polite">{shown.map((piece, index) => <li key={piece.pieceKey}><span className="piece-study-index">0{index + 1}</span><FoldDiagram piece={piece} /><div className="piece-study-piece"><strong>{piece.title}</strong><span>{piece.material === "interfacing" ? "Interfacing" : "Main fabric"} · cut {piece.cutCount}{piece.mirrored ? " mirrored" : ""}</span><small>{piece.fold === "none" ? "No fold specified" : piece.fold === "single" ? "Place on one fabric fold" : "Place on a double fold"}</small></div><span className="piece-study-review">{piece.reviewStatus} review</span></li>)}</ol></div></div>
+      <div className="piece-study-list"><div className="piece-study-list-head"><div><span>DOCUMENTED PIECES</span><strong>{shown.length} part types · {mainCount} main-fabric cuts</strong></div><small>Not to scale</small></div><ol aria-live="polite">{shown.map((piece, index) => <li key={piece.pieceKey} className={selectedPieceKey === piece.pieceKey ? "selected" : ""}><button type="button" className="piece-study-select" aria-pressed={selectedPieceKey === piece.pieceKey} onClick={() => onSelectPiece?.(selectedPieceKey === piece.pieceKey ? null : piece.pieceKey)}><span className="piece-study-index">0{index + 1}</span><FoldDiagram piece={piece} /><span className="piece-study-piece"><strong>{piece.title}</strong><span>{piece.material === "interfacing" ? "Interfacing" : "Main fabric"} · cut {piece.cutCount}{piece.mirrored ? " mirrored" : ""}</span><small>{piece.fold === "none" ? "No fold specified" : piece.fold === "single" ? "Place on one fabric fold" : "Place on a double fold"}</small></span><span className="piece-study-review">{selectedPieceKey === piece.pieceKey ? "Selected for companion" : `${piece.reviewStatus} review`}</span></button></li>)}</ol></div></div>
     <div className="piece-study-footer"><p>These are source-derived cutting instructions, not pattern geometry, fabric placement, grainlines, seam allowance, or approval to cut. Generate and check the actual pattern for your measurements before using fabric.</p><a href={card.sourceUrl} target="_blank" rel="noreferrer">Check the original cutting instructions ↗</a></div>
   </section>;
 }

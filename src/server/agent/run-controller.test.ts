@@ -4,10 +4,10 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, expect, it, vi } from "vitest";
 import type { GenerateContentParameters, GenerateContentResponse } from "@google/genai";
-import { startAgentRunSchema, type AgentTask } from "../../domain/agent-run";
+import { startAgentRunSchema, type AgentTask, type AgentSelection } from "../../domain/agent-run";
 import { GuestStore } from "../projects/guest-store";
 import { resolveCompanionCatalog } from "../knowledge/companion-catalog";
-import { companionBasis, STITCHES_KB_ID } from "./companion-tools";
+import { companionBasis, resolveAgentSelection, STITCHES_KB_ID } from "./companion-tools";
 import { advanceCompanionRun } from "./run-controller";
 import { createGeminiSession } from "./gemini-session";
 import { publicAgentRun } from "./run-state";
@@ -25,13 +25,16 @@ function makingPlanFor(card: typeof cards[number]) {
     .map((entry, index) => ({ ...entry, _rev: `fixture-construction-${index}` }));
   return resolveMakingPlan(docs, card);
 }
-function setup(databasePath = ":memory:", task: AgentTask = "next_preparation", includeMakingPlan?: boolean) {
+function setup(databasePath = ":memory:", task: AgentTask = "next_preparation", includeMakingPlan?: boolean,
+  request?: string, selection?: AgentSelection) {
   const store = new GuestStore(databasePath), source = cards[0], ownerId = "synthetic-owner";
   const project = store.createProject(ownerId, { title: "PRIVATE TITLE", brief: "PRIVATE BRIEF", source: { kind: "candidate", designId: source.designKey }, idempotencyKey: randomUUID() }, source.fingerprint);
   const isMaking = task === "step_guidance" || task === "troubleshoot_step";
   const makingPlan = (includeMakingPlan ?? isMaking) ? makingPlanFor(source) : null;
   let snapshot = { project, source, history: store.listDiagnostics(ownerId, project.id), makingPlan, makingHistory: [] as MakingRecord[] };
-  const start = { idempotencyKey: randomUUID(), task, expectedBasis: companionBasis(snapshot), consent: { version: "preparation-v1" as const, sharePreparationSummary: true as const } };
+  const start = { idempotencyKey: randomUUID(), task, expectedBasis: companionBasis(snapshot),
+    ...(request ? { request } : {}), ...(selection ? { selection } : {}),
+    consent: { version: "preparation-v1" as const, sharePreparationSummary: true as const } };
   const run = store.startAgentRun(ownerId, project.id, start);
   const requests: GenerateContentParameters[] = [];
   const expectedTools = task === "step_guidance" || task === "troubleshoot_step"
@@ -54,11 +57,30 @@ function setup(databasePath = ":memory:", task: AgentTask = "next_preparation", 
 }
 
 describe("durable private agent — synthetic deterministic proof", () => {
+  it("pins a requested piece, rejects an unrelated ID, and saves source facts with the response", async () => {
+    const source = cards[0], key = source.pieceStudy[0].pieceKey;
+    const s = setup(":memory:", "understand_pieces", false, "Why does this piece use a fold?", { kind: "piece", pieceKey: key });
+    try {
+      expect(() => resolveAgentSelection({ project: s.project, source: s.source, history: [] }, "understand_pieces", { kind: "piece", pieceKey: "unrelated" })).toThrow(/does not belong/);
+      expect(() => resolveAgentSelection({ project: s.project, source: s.source, history: [] }, "step_guidance", { kind: "piece", pieceKey: key })).toThrow(/Select a piece/);
+      for (let i = 0; i < 4; i++) await s.advance();
+      const run = s.store.getAgentRun(s.ownerId, s.project.id, s.run.id);
+      expect(run.status).toBe("completed");
+      expect(run.request).toBe("Why does this piece use a fold?");
+      expect(run.artifact).toMatchObject({ kind: "piece_explanation", subjectId: key,
+        sourceFingerprint: source.fingerprint, knowledgeHash: expect.stringMatching(/^[a-f0-9]{64}$/) });
+      expect(run.artifact?.facts).toContain(source.pieceStudy[0].fold === "none" ? "No fold specified" :
+        source.pieceStudy[0].fold === "single" ? "Place on one fabric fold" : "Place on a double fold");
+      expect((s.requests[0].contents as { parts: { text?: string }[] }[])[0].parts[0].text).toContain("Why does this piece use a fold?");
+      expect(JSON.stringify(publicAgentRun(run))).not.toContain("SYNTHETIC maintained explanation");
+    } finally { s.store.close(); }
+  });
   it("requires an exact consent/task envelope; rejects private text and arbitrary tools", () => {
     const s = setup();
     try {
       expect(startAgentRunSchema.safeParse({ ...s.start, consent: { ...s.start.consent, sharePreparationSummary: false } }).success).toBe(false);
-      expect(startAgentRunSchema.safeParse({ ...s.start, request: "private note" }).success).toBe(false);
+      expect(startAgentRunSchema.safeParse({ ...s.start, request: "x".repeat(401) }).success).toBe(false);
+      expect(startAgentRunSchema.safeParse({ ...s.start, selection: { kind: "piece", pieceKey: "BAD/ID" } }).success).toBe(false);
       expect(startAgentRunSchema.safeParse({ ...s.start, task: "keep_pattern" }).success).toBe(false);
     } finally { s.store.close(); }
   });
@@ -91,12 +113,12 @@ describe("durable private agent — synthetic deterministic proof", () => {
         .toEqual([["inspect_project"], ["inspect_making"], ["retrieve_context"]]);
     } finally { s.store.close(); }
   });
-  it("holds agent diagnosis before a Gemini request while served diagnostic identities are unresolved", async () => {
+  it("holds agent diagnosis before a Gemini request without a current saved seam question", async () => {
     const s = setup(":memory:", "troubleshoot_step");
     try {
       const saved = await s.advance();
       expect(saved.status).toBe("missing_knowledge");
-      expect(saved.message).toMatch(/diagnostic entry.*source identities/i);
+      expect(saved.message).toMatch(/Save an eligible seam-puckering question/i);
       expect(s.generate).not.toHaveBeenCalled();
       expect(saved.text).toBeUndefined();
     } finally { s.store.close(); }

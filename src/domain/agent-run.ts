@@ -4,9 +4,17 @@ const fingerprint = z.string().regex(/^[a-f0-9]{64}$/);
 export const agentBasisSchema = z.object({ projectId: z.uuid(), projectSequence: z.number().int().positive(), projectHash: fingerprint,
   catalogFingerprint: fingerprint, diagnosticFingerprint: fingerprint, historySequence: z.number().int().min(0), historyHash: fingerprint,
   makingSequence: z.number().int().min(0), makingHash: fingerprint, planFingerprint: fingerprint.nullable() }).strict();
-// No free text: the initial consent envelope cannot accidentally send private notes.
+// The maker's bounded request is explicit; private notes are never added implicitly.
 export const agentTasks = ["next_preparation", "understand_pieces", "review_gaps", "step_guidance", "troubleshoot_step"] as const;
 export type AgentTask = typeof agentTasks[number];
+export const agentSelectionSchema = z.discriminatedUnion("kind", [
+  z.object({ kind: z.literal("piece"), pieceKey: z.string().regex(/^[a-z0-9_-]{1,80}$/) }).strict(),
+  z.object({ kind: z.literal("step"), stepId: z.string().regex(/^[a-z0-9_-]{1,100}$/) }).strict(),
+]);
+export type AgentSelection = z.infer<typeof agentSelectionSchema>;
+export type AgentArtifact = { kind: "piece_explanation" | "step_card" | "diagnostic_check"; subjectId: string; title: string;
+  sourceTitle: string; sourceUrl: string; sourceFingerprint: string; knowledgeHash: string;
+  facts: string[]; capability: "plan_only"; };
 export const agentTaskText: Record<AgentTask, string> = {
   next_preparation: "What should I prepare next for this saved project, and why?",
   understand_pieces: "Explain the source-listed pieces and one useful thing to check before cutting.",
@@ -15,7 +23,8 @@ export const agentTaskText: Record<AgentTask, string> = {
   troubleshoot_step: "Review the question or symptom at the next unreviewed construction step and explain safe, source-backed checks.",
 };
 export const startAgentRunSchema = z.object({ idempotencyKey: z.uuid(), expectedBasis: agentBasisSchema,
-  task: z.enum(agentTasks), consent: z.object({ version: z.literal("preparation-v1"), sharePreparationSummary: z.literal(true) }).strict() }).strict();
+  task: z.enum(agentTasks), request: z.string().trim().min(3).max(400).optional(), selection: agentSelectionSchema.optional(),
+  consent: z.object({ version: z.literal("preparation-v1"), sharePreparationSummary: z.literal(true) }).strict() }).strict();
 export const agentActionSchema = z.object({ action: z.enum(["advance", "resume", "cancel"]) }).strict();
 export type AgentBasis = z.infer<typeof agentBasisSchema>;
 export type StartAgentRunInput = z.infer<typeof startAgentRunSchema>;
@@ -23,7 +32,8 @@ export type AgentRunStatus = "ready" | "requesting" | "response_ready" | "proces
   "missing_knowledge" | "unknown_outcome" | "cancelled" | "stale" | "failed" | "limit" | "budget";
 export type AgentCheckpoint = { sequence: number; event: "request_reserved" | "response_saved" | "tool_completed" | "completed" | "stopped" | "resumed";
   at: string; request: number; tool?: string };
-export type AgentRun = { id: string; projectId: string; basis: AgentBasis; task: AgentTask; consentVersion: "preparation-v1";
+export type AgentRun = { id: string; projectId: string; basis: AgentBasis; task: AgentTask; request?: string; selection?: AgentSelection;
+  artifact?: AgentArtifact; consentVersion: "preparation-v1";
   model: "gemini-3.5-flash-lite"; status: AgentRunStatus; requests: number; activeMs: number; checkpoints: AgentCheckpoint[];
   tools: string[]; knowledgeHash?: string; text?: string; message?: string; createdAt: string; updatedAt: string;
   modelTextVerified: false; projectChanged: false; capability: "plan_only" };

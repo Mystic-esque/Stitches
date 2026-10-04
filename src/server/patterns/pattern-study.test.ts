@@ -1,8 +1,10 @@
 import { readFileSync } from "node:fs";
+import { randomUUID } from "node:crypto";
 import { describe, expect, it } from "vitest";
 import { emptyProjectPlan, type GuestProject } from "../../domain/guest-project";
 import { resolveCompanionCatalog } from "../knowledge/companion-catalog";
 import { createPatternStudy, PatternStudyError } from "./pattern-study";
+import { GuestStore } from "../projects/guest-store";
 const docs = ["companion-candidates", "companion-piece-studies", "companion-diagnostic"].flatMap(name => JSON.parse(readFileSync(new URL(`../../../fixtures/${name}.json`, import.meta.url), "utf8")).documents).map((item: object, index: number) => ({ ...item, _rev: `study-${index}` }));
 const [source, tina] = resolveCompanionCatalog(docs);
 const project: GuestProject = { id: "a3663796-4a7c-4b73-84d5-39910901c643", title: "Synthetic study", brief: "Not a maker trial", source: { kind: "candidate", designId: "sandy" }, plan: { ...emptyProjectPlan(), measurementsMm: { waist: 720, hips: 960, waistToFloor: 1000, waistToHips: 200 } }, capability: "plan_only", sequence: 1, basisHash: "a".repeat(64), knowledgeFingerprint: source.fingerprint, createdAt: "2026-10-02T00:00:00Z", updatedAt: "2026-10-02T00:00:00Z" };
@@ -47,4 +49,30 @@ describe("actual pinned measured study, not cutting qualification", () => {
     expect(study.before.mapping.artifactHash).toBe(study.after.mapping.artifactHash); expect(study.impact.changedEdgeIds).toEqual([]);
     expect(study.after.draft.parts.every(p => p.paths.sa === undefined)).toBe(true);
   });
+  it("saves a source-bound study privately, exports it, and restores it as historical intent", () => {
+    const store = new GuestStore(":memory:");
+    try {
+      const owner = randomUUID(), outsider = randomUUID();
+      const current = store.createProject(owner, { title: "Sandy study", brief: "A private comparison", source: { kind: "candidate", designId: "sandy" },
+        plan: project.plan, idempotencyKey: randomUUID() }, source.fingerprint);
+      const request = { ...command, expectedBasisHash: current.basisHash };
+      const study = createPatternStudy(current, source, request), key = randomUUID();
+      const saved = store.savePatternStudy(owner, current.id, study, key);
+      expect(store.savePatternStudy(owner, current.id, study, key)).toEqual(saved);
+      expect(store.listPatternStudies(owner, current.id)).toEqual([saved]);
+      expect(() => store.listPatternStudies(outsider, current.id)).toThrow(/not found/i);
+      expect(() => store.savePatternStudy(owner, current.id, { ...study, command: { ...study.command, deltaLengthMm: 60 } }, key)).toThrow(/different study/);
+      const backup = store.exportBackup(owner, current.id);
+      expect(backup.version).toBe(5);
+      if (backup.version !== 5) throw new Error("Expected v5 backup");
+      expect(backup.studies).toEqual([saved]);
+      const restored = store.importBackup(owner, { backup, idempotencyKey: randomUUID() });
+      const imported = store.listPatternStudies(owner, restored.id)[0];
+      expect(imported.imported).toBe(true);
+      expect(imported.projectId).toBe(restored.id);
+      expect(imported.basis.projectId).toBe(current.id);
+      expect(imported.cutReady).toBe(false);
+      expect(() => store.savePatternStudy(owner, current.id, { ...study, basis: { ...study.basis, basisHash: "f".repeat(64) } }, randomUUID())).toThrow(/changed/);
+    } finally { store.close(); }
+  }, 30_000);
 });

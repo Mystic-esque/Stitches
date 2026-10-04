@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import "../../app/pattern-board.css";
-import { operationsPath, studyBounds, type PatternStudy, type StudyDraft } from "@/domain/pattern-study";
+import { operationsPath, studyBounds, type PatternStudy, type SavedStudy, type StudyDraft } from "@/domain/pattern-study";
 import type { GuestProject } from "@/domain/guest-project";
 import type { CompanionCatalogCard } from "@/server/knowledge/companion-catalog";
 
@@ -12,23 +12,53 @@ const measurementNames: Record<string, string> = { waist: "Waist circumference",
 type Piece = StudyDraft["parts"][number];
 export function PatternBoard({ project, source, dirty }: { project: GuestProject; source: CompanionCatalogCard; dirty: boolean }) {
   const [study, setStudy] = useState<PatternStudy>(), [busy, setBusy] = useState(false), [error, setError] = useState("");
+  const [savedStudies, setSavedStudies] = useState<SavedStudy[]>([]), [saveBusy, setSaveBusy] = useState(false);
   const [confirmed, setConfirmed] = useState(false), [ratio, setRatio] = useState(50), [delta, setDelta] = useState(5), [allowance, setAllowance] = useState(10);
   const [pieceId, setPieceId] = useState("sandy.skirt"), [selection, setSelection] = useState("sandy.skirt/waist"), [zoom, setZoom] = useState(1), [overlay, setOverlay] = useState(true);
   const requestSequence = useRef(0), mounted = useRef(true);
   useEffect(() => { mounted.current = true; return () => { mounted.current = false; ++requestSequence.current; }; }, []);
   useEffect(() => { ++requestSequence.current; setStudy(undefined); setConfirmed(false); setError(""); setBusy(false); }, [project.sequence, project.basisHash, source.fingerprint]);
+  useEffect(() => {
+    let active = true;
+    fetch(`/api/projects/${project.id}/pattern-study/saved`, { cache: "no-store" }).then(response => response.ok ? response.json() : Promise.reject())
+      .then(data => { if (active) setSavedStudies(data.studies ?? []); }).catch(() => { if (active) setSavedStudies([]); });
+    return () => { active = false; };
+  }, [project.id]);
   const missing = Object.keys(measurementNames).filter(key => project.plan.measurementsMm[key] === undefined);
   const current = source.fingerprint === project.knowledgeFingerprint;
-  async function generate() {
+  async function generate(command = { lengthRatio: ratio / 100, deltaLengthMm: delta * 10, seamAllowanceMm: allowance }, expected?: SavedStudy) {
     const sequence = ++requestSequence.current; setBusy(true); setError(""); setStudy(undefined);
     try {
       const response = await fetch(`/api/projects/${project.id}/pattern-study`, { method: "POST", headers: { "Content-Type": "application/json" }, signal: AbortSignal.timeout(30000),
         body: JSON.stringify({ expectedSequence: project.sequence, expectedBasisHash: project.basisHash, expectedSourceFingerprint: source.fingerprint, useSavedMeasurements: true,
-          command: "study_hem_length", lengthRatio: ratio / 100, deltaLengthMm: delta * 10, seamAllowanceMm: allowance }) });
+          command: "study_hem_length", ...command }) });
       const data = await response.json(); if (!response.ok) throw new Error(data.error?.message ?? "The measured study could not be checked.");
+      if (expected && (data.study.before.mapping.artifactHash !== expected.beforeHash || data.study.after.mapping.artifactHash !== expected.afterHash))
+        throw new Error("The engine result changed since this study was saved. The historical intent is preserved; review a new comparison.");
       if (mounted.current && sequence === requestSequence.current) { setStudy(data.study); setPieceId("sandy.skirt"); setSelection("sandy.skirt/waist"); }
     } catch (cause) { if (mounted.current && sequence === requestSequence.current) setError(cause instanceof Error && cause.name !== "TimeoutError" ? cause.message : "The study timed out. No project was changed; you can continue your manual plan."); }
     finally { if (mounted.current && sequence === requestSequence.current) setBusy(false); }
+  }
+  async function saveStudy() {
+    if (!study || saveBusy) return;
+    setSaveBusy(true); setError("");
+    try {
+      const response = await fetch(`/api/projects/${project.id}/pattern-study/saved`, { method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ study: { basis: study.basis, command: study.command, beforeHash: study.before.mapping.artifactHash,
+          afterHash: study.after.mapping.artifactHash }, idempotencyKey: crypto.randomUUID() }) });
+      const data = await response.json(); if (!response.ok) throw new Error(data.error?.message ?? "The study was not saved.");
+      setSavedStudies(current => [data.saved, ...current]);
+    } catch (cause) { setError(cause instanceof Error ? cause.message : "The study was not saved."); }
+    finally { setSaveBusy(false); }
+  }
+  function reopen(saved: SavedStudy) {
+    if (saved.imported || saved.basis.projectId !== project.id || saved.basis.sequence !== project.sequence || saved.basis.basisHash !== project.basisHash || saved.basis.sourceFingerprint !== source.fingerprint) {
+      setError("This study belongs to a historical or imported basis. Its design intent remains visible, but it cannot be reopened as the current pattern."); return;
+    }
+    setRatio(Math.round(saved.command.lengthRatio * 100)); setDelta(saved.command.deltaLengthMm / 10);
+    setAllowance(saved.command.seamAllowanceMm); setConfirmed(true);
+    void generate({ lengthRatio: saved.command.lengthRatio, deltaLengthMm: saved.command.deltaLengthMm,
+      seamAllowanceMm: saved.command.seamAllowanceMm }, saved);
   }
   const piece = study?.after.draft.parts.find(part => part.id === pieceId);
   const original = study?.before.draft.parts.find(part => part.id === pieceId);
@@ -64,9 +94,10 @@ export function PatternBoard({ project, source, dirty }: { project: GuestProject
       <label>Engine allowance <span>mm · not method approval</span><input aria-label="Engine allowance in millimetres" type="number" min="0" max="30" step="1" value={allowance} disabled={busy} onChange={event => { setAllowance(Number(event.target.value)); setStudy(undefined); }} /></label></div>
     {missing.length > 0 && <p className="pattern-input-notice">Save body notes first: {missing.map(key => measurementNames[key]).join(", ")}. <a href="#measurement-heading">Open measurements ↓</a> No sample values are inserted.</p>}
     {dirty && <p className="pattern-input-notice">Save or discard your edits before studying the saved revision.</p>}
-    <div className="pattern-consent"><label><input type="checkbox" checked={confirmed} disabled={busy || dirty} onChange={event => setConfirmed(event.target.checked)} />Use my saved measurements for this local, non-cuttable study. No measurements go to Gemini or shared Sanity.</label><button type="button" disabled={busy || dirty || !confirmed || !current || missing.length > 0} onClick={generate}>{busy ? "Drafting and checking…" : "Generate measured study ↗"}</button></div>
+    <div className="pattern-consent"><label><input type="checkbox" checked={confirmed} disabled={busy || dirty} onChange={event => setConfirmed(event.target.checked)} />Use my saved measurements for this local, non-cuttable study. No measurements go to Gemini or shared Sanity.</label><button type="button" disabled={busy || dirty || !confirmed || !current || missing.length > 0} onClick={() => { void generate(); }}>{busy ? "Drafting and checking…" : "Generate measured study ↗"}</button></div>
     {error && <p role="alert" className="pattern-input-notice">{error}</p>}
-    {study && piece && original && <><div className="pattern-workbench">
+    {savedStudies.length > 0 && <section className="pattern-saved"><h3>Saved design studies</h3><p>Private explorations. None are accepted cutting patterns.</p><ul>{savedStudies.map(saved => <li key={saved.id}><span>{saved.command.deltaLengthMm > 0 ? "+" : ""}{saved.command.deltaLengthMm / 10} cm hem · {new Date(saved.createdAt).toLocaleDateString()} {saved.imported || saved.basis.basisHash !== project.basisHash || saved.basis.sourceFingerprint !== source.fingerprint ? "· historical" : "· current basis"}</span><button type="button" onClick={() => reopen(saved)}>Review study</button></li>)}</ul></section>}
+    {study && piece && original && <><div className="pattern-study-save"><span>Checked comparison · study only · pattern unchanged</span><button type="button" disabled={saveBusy || dirty || !current} onClick={saveStudy}>{saveBusy ? "Saving…" : "Save this study"}</button></div><div className="pattern-workbench">
       <div className="pattern-canvas"><div className="pattern-toolbar"><div role="group" aria-label="Pattern pieces">{study.after.draft.parts.map(part => <button key={part.id} type="button" aria-pressed={pieceId === part.id} onClick={() => selectPiece(part.id)}>{names[part.id]}</button>)}</div><div role="group" aria-label="Pattern zoom"><button type="button" aria-label="Zoom out" disabled={zoom <= 1} onClick={() => setZoom(Math.max(1, zoom - .5))}>−</button><output>{zoom * 100}%</output><button type="button" aria-label="Zoom in" disabled={zoom >= 3} onClick={() => setZoom(Math.min(3, zoom + .5))}>+</button></div></div>
         {renderPiece(piece, original)}<div className="pattern-legend"><span>Solid sage / stitch outline</span><span>Dashed grey / engine allowance</span><span>Yellow / fold & grain</span><span>Coral / changed edge</span><span>Blue / selected edge</span><span>Dotted original / before</span></div>
         <label className="pattern-overlay"><input type="checkbox" checked={overlay} onChange={event => setOverlay(event.target.checked)} />Show original stitch outline</label>

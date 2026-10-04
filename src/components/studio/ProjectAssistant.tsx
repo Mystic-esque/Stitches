@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { agentRunCanResume, agentRunIsActive, agentTaskText, type AgentBasis, type AgentRun, type AgentTask } from "@/domain/agent-run";
+import { agentRunCanResume, agentRunIsActive, agentTaskText, type AgentBasis, type AgentRun, type AgentTask, type AgentSelection } from "@/domain/agent-run";
 import type { GuestProject } from "@/domain/guest-project";
 import type { CompanionCatalogCard } from "@/server/knowledge/companion-catalog";
 
@@ -52,12 +52,13 @@ async function result(response: Response) {
   return data;
 }
 
-export function ProjectAssistant({ project, source, historySequence, makingSequence = 0, dirty, focus = "overview" }: {
+export function ProjectAssistant({ project, source, historySequence, makingSequence = 0, dirty, focus = "overview", selectedPieceKey }: {
   project: GuestProject; source?: CompanionCatalogCard; historySequence: number; makingSequence?: number; dirty: boolean;
-  focus?: "overview" | "pattern" | "materials" | "make" | "check";
+  focus?: "overview" | "pattern" | "materials" | "make" | "check"; selectedPieceKey?: string | null;
 }) {
   const [runs, setRuns] = useState<AgentRun[]>([]), [preview, setPreview] = useState<Preview>(), [enabled, setEnabled] = useState(false);
   const [consent, setConsent] = useState(false), [task, setTask] = useState<AgentTask>("next_preparation");
+  const [request, setRequest] = useState("");
   useEffect(() => {
     setTask(focus === "pattern" ? "understand_pieces" : focus === "make" ? "step_guidance" : focus === "check" ? "review_gaps" : "next_preparation");
     setConsent(false);
@@ -99,6 +100,9 @@ export function ProjectAssistant({ project, source, historySequence, makingSeque
     }
   }
   const isMaking = task === "step_guidance" || task === "troubleshoot_step";
+  const selectedPiece = task === "understand_pieces" ? source?.pieceStudy.find((piece) => piece.pieceKey === selectedPieceKey) : undefined;
+  const selection: AgentSelection | undefined = selectedPiece ? { kind: "piece", pieceKey: selectedPiece.pieceKey } :
+    task === "step_guidance" && preview?.makingSummary?.activeStep ? { kind: "step", stepId: preview.makingSummary.activeStep.id } : undefined;
   const makingNotConfigured = isMaking && preview?.makingSummary?.configured === false;
   async function start() {
     if (!preview || !consent || dirty || !enabled || makingNotConfigured) return;
@@ -106,7 +110,9 @@ export function ProjectAssistant({ project, source, historySequence, makingSeque
     try {
       startKey.current ??= crypto.randomUUID();
       const data = await result(await fetch(base, { method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ idempotencyKey: startKey.current, expectedBasis: preview.basis, task, consent: { version: "preparation-v1", sharePreparationSummary: true } }) }));
+        body: JSON.stringify({ idempotencyKey: startKey.current, expectedBasis: preview.basis, task,
+          ...(request.trim() ? { request: request.trim() } : {}), ...(selection ? { selection } : {}),
+          consent: { version: "preparation-v1", sharePreparationSummary: true } }) }));
       put(data.run); startKey.current = undefined; await continueRun(data.run);
     } catch (cause) { if (alive.current) { setError(`${cause instanceof Error ? cause.message : "Connection interrupted."} Refresh saved status before continuing; no inference retry was sent.`); await refresh(); } }
     finally { continuing.current = false; if (alive.current) setBusy(false); }
@@ -128,21 +134,21 @@ export function ProjectAssistant({ project, source, historySequence, makingSeque
     run.basis.historySequence !== historySequence || !sourceCurrent || run.basis.catalogFingerprint !== source?.fingerprint ||
     (preview && (run.basis.makingSequence !== preview.basis.makingSequence || run.basis.makingHash !== preview.basis.makingHash || run.basis.planFingerprint !== preview.basis.planFingerprint));
   return <section className="project-assistant" aria-labelledby="assistant-heading">
-    <div className="assistant-intro"><p className="companion-kicker">CONTEXT-AWARE COMPANION · {focus.toUpperCase()}</p><h2 id="assistant-heading">Understand your next move.</h2>
-      <p>A read-only companion checks this saved plan, its exact Sanity pieces and the maintained Knowledge Base. You stay in charge of every making decision.</p>
-      <span className="assistant-privacy">Private notebook · no automatic saves or sewing actions</span>
-      <a href="#preparation-plan-heading">Continue with the manual preparation plan ↓</a>
+    <div className="assistant-intro"><p className="companion-kicker">STITCHES · {focus.toUpperCase()}</p><h2 id="assistant-heading">Ask about this project.</h2>
+      <p>Ask about the selected piece, your next preparation check or the step in front of you.</p>
     </div>
     <div className="assistant-work">
+      <label className="assistant-prompt">What would you like help with?<textarea rows={3} maxLength={400} value={request} placeholder={selectedPiece ? `Why does ${selectedPiece.title} need this fold?` : "What should I check next?"} onChange={(event) => { setRequest(event.target.value); setConsent(false); startKey.current = undefined; }} /></label>
+      {selection && <p className="assistant-selection" role="status">In focus: {selection.kind === "piece" ? selectedPiece?.title : preview?.makingSummary?.activeStep?.title} · pinned when sent</p>}
       <label className="assistant-task">What would help now?<select value={task} disabled={busy || !!active} onChange={(event) => { setTask(event.target.value as AgentTask); setConsent(false); startKey.current = undefined; }}>
-        <option value="next_preparation">Find my next preparation action</option><option value="understand_pieces">Help me understand these pieces</option><option value="review_gaps">Review the gaps before I make</option><option value="step_guidance">Guide next unreviewed construction step</option></select></label>
-      {focus === "check" && <p className="assistant-notice" role="status">Agent diagnosis is paused until the served diagnostic test and remedy sources pass identity review. The manual scrap-only Check flow remains available.</p>}
-      <div className="assistant-consent"><strong>Before anything goes to Gemini</strong><p>{agentTaskText[task]}</p>
+        <option value="next_preparation">Find my next preparation action</option><option value="understand_pieces">Help me understand these pieces</option><option value="review_gaps">Review the gaps before I make</option><option value="step_guidance">Guide next unreviewed construction step</option><option value="troubleshoot_step">Check a saved seam question</option></select></label>
+      {focus === "check" && <p className="assistant-notice" role="status">For step-specific scrap guidance, first save a seam-puckering question in Make. Record what the sample shows here; the companion reads that saved result.</p>}
+      <div className="assistant-consent"><strong>What the companion will use</strong><p>{request.trim() || agentTaskText[task]}</p>
         {isMaking && preview?.makingSummary?.activeStep && <p style={{ margin: "6px 0", fontSize: "12px", color: "#344f3b" }}><strong>Step in focus:</strong> Next unreviewed checkpoint — Step #{preview.makingSummary.activeStep.ordinal}: {preview.makingSummary.activeStep.title}</p>}
         {isMaking && preview?.makingSummary?.allStepsReviewed && <p style={{ margin: "6px 0", fontSize: "12px", color: "#74401f" }}>All study checkpoints for this confirmed configuration are reviewed.</p>}
         <p>{isMaking
           ? "Shared: this question, confirmed construction options, checkpoint progress, next unreviewed step title/orientation/pieces (with mirrored flags), and saved symptom category (if help requested). Not shared: freeform notes, private questions, body measurements or photos."
-          : "Shared: this question, required/missing note labels, preparation states and counts, source/piece records, version IDs and public KB excerpts. Not shared: body values, your name or brief, tool names, fabric description, observation text or photos."}</p>
+          : "Shared: your question, selected public piece when present, required/missing note labels, preparation states and counts, source/piece records, version IDs and public KB excerpts. Not shared: body values, your name or brief, tool names, fabric description, observation text or photos."}</p>
         {preview && <details><summary>Inspect the exact {isMaking ? "construction study" : "preparation"} summary</summary><pre>{JSON.stringify(isMaking && preview.makingSummary ? preview.makingSummary : preview.sharedSummary, null, 2)}</pre></details>}
         {makingNotConfigured && <p className="assistant-notice" role="status">The construction study version has not been confirmed yet. Confirm your version choices in the making notebook above before asking for step guidance.</p>}
         <label><input type="checkbox" checked={consent} onChange={(event) => setConsent(event.target.checked)} disabled={busy || !!active || dirty || makingNotConfigured} />I agree to send this minimized summary and public source context to Gemini for this run.</label>
@@ -156,6 +162,8 @@ export function ProjectAssistant({ project, source, historySequence, makingSeque
       {error && <p role="alert" className="assistant-notice">{error}</p>}
       {latest && <article className="assistant-run" aria-label="Latest assistant run"><div className="assistant-run-title"><strong>{basisChanged(latest) ? "Historical insight · review new basis" : statusLabel[latest.status]}</strong><span>{latest.requests}/4 requests · revision {latest.basis.projectSequence}</span></div>
         <ol className="assistant-trace">{latest.tools.map((tool) => <li key={tool}>{toolLabels[tool] ?? tool}</li>)}{busy && <li aria-live="polite">Waiting for the next acknowledged checkpoint…</li>}</ol>
+        {latest.request && <p className="assistant-question">You asked: {latest.request}</p>}
+        {latest.artifact && <section className="assistant-result-object" aria-label="Selected source object"><span>{latest.artifact.kind === "piece_explanation" ? "SELECTED PIECE" : latest.artifact.kind === "diagnostic_check" ? "SCRAP TEST" : "CURRENT STEP"} · {basisChanged(latest) ? "HISTORICAL" : "SOURCE BOUND"}</span><h3>{latest.artifact.title}</h3><ul>{latest.artifact.facts.map((fact, index) => <li key={index}>{fact}</li>)}</ul><a href={latest.artifact.sourceUrl} target="_blank" rel="noreferrer">{latest.artifact.sourceTitle} ↗</a><small>Saved against this source and Knowledge Base response. Planning study only.</small></section>}
         {latest.text && <div className="assistant-insight">{insight(latest.text)}</div>}
         {latest.status === "completed" && latest.task === "step_guidance" && !basisChanged(latest) && preview?.makingSummary?.activeStep && <section className="assistant-result-object" aria-label="Source-bound step card">
           <span>RESULT OBJECT / CURRENT CONSTRUCTION STUDY</span>

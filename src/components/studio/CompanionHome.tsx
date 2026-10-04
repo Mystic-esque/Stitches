@@ -62,6 +62,8 @@ export function CompanionHome() {
   const [diagnostics, setDiagnostics] = useState<DiagnosticRecord[]>([]);
   const [scrapStep, setScrapStep] = useState<ScrapStepContext | null>(null);
   const [makingSequence, setMakingSequence] = useState(0);
+  const [selectedPieceKey, setSelectedPieceKey] = useState<string | null>(null);
+  useEffect(() => { setSelectedPieceKey(null); }, [active?.id]);
   useEffect(() => { setScrapStep(null); setMakingSequence(0); }, [active?.id, active?.sequence]);
   const [noteText, setNoteText] = useState("");
   const [noteKind, setNoteKind] = useState<"journal" | "question">("journal");
@@ -194,10 +196,11 @@ export function CompanionHome() {
         `Angles (degrees): ${JSON.stringify(backup.plan.measurementsDegrees ?? {})}`,
         `Open questions: ${backup.plan.openQuestions.join("; ") || "none recorded"}`,
         "MAKING HISTORY / original source and project bindings retained",
-        ...(backup.version === 4 ? backup.making.map((entry) => `Revision ${entry.basisSequence} | ${entry.createdAt} | ${entry.planFingerprint.slice(0, 12)} | ${entry.imported ? "imported history" : "private report"} | ${JSON.stringify(entry.event)}`) : []),
+        ...(backup.version === 4 || backup.version === 5 ? backup.making.map((entry) => `Revision ${entry.basisSequence} | ${entry.createdAt} | ${entry.planFingerprint.slice(0, 12)} | ${entry.imported ? "imported history" : "private report"} | ${JSON.stringify(entry.event)}`) : []),
         "JOURNAL", ...(backup.version !== 1 ? backup.notes.map((note) => `${note.stage}: ${note.text}`) : []),
         "SCRAP CHECKS / sample observations are not confirmed garment diagnoses",
-        ...((backup.version === 3 || backup.version === 4) ? backup.diagnostics.map((entry) => JSON.stringify(entry.event)) : []),
+        ...((backup.version === 3 || backup.version === 4 || backup.version === 5) ? backup.diagnostics.map((entry) => JSON.stringify(entry.event)) : []),
+        ...(backup.version === 5 ? [`SAVED PATTERN STUDIES / ${backup.studies.length} private design intent receipt(s); imported studies stay historical`] : []),
       ].join("\n\n") : JSON.stringify(backup, null, 2);
       const href = URL.createObjectURL(new Blob([text], { type: asBrief ? "text/plain" : "application/json" }));
       const link = document.createElement("a"); link.href = href; link.download = `stitches-${active.id.slice(0, 8)}.${asBrief ? "txt" : "json"}`; link.click();
@@ -261,13 +264,13 @@ export function CompanionHome() {
     active.knowledgeFingerprint === sourceCard.fingerprint ? "current" : "stale";
   return <div className="companion-app">
     <header className="companion-nav"><a href="/" className="companion-logo" aria-label="Stitches home">stitches<span>.</span></a><nav aria-label="Main navigation"><a href="/#how-it-works">How it works</a><a href="/#collection">Explore starts</a><a href="/demo">Pattern study ↗</a></nav><button type="button" onClick={() => active ? back() : document.getElementById("collection")?.scrollIntoView({ behavior: "smooth" })} className="nav-action">{active ? "All projects" : "Start making"} ↗</button></header>
-    {!loading && <MakerProfilePanel project={active} projectBusy={busy} projectDirty={unsavedChanges} onCopied={(project) => {
+    {!loading && <details className={active ? "studio-profile-drawer" : "studio-profile-open"} open={!active}>{active && <summary>Maker profile · measurements and tools</summary>}<MakerProfilePanel project={active} projectBusy={busy} projectDirty={unsavedChanges} onCopied={(project) => {
       // A response must not erase edits made while its transaction was in flight.
       setDraft((current) => current && active && JSON.stringify(current) !== JSON.stringify(draftFor(active)) ? current : draftFor(project));
       setActive(project); setRevisions((current) => [...current, project]);
       setProjects((current) => current.map((item) => item.id === project.id ? project : item));
       setNotice("Profile copy saved. Any edits made while copying remain unsaved; review your working brief before saving.");
-    }} />}
+    }} /></details>}
     {active && draft ? <main className={`companion-project studio-shell ${agentOpen ? "agent-is-open" : ""}`}>
       <div className="project-topline"><button type="button" onClick={back}>← All projects</button><span>Private guest project · revision {active.sequence}</span><button type="button" disabled={busy} onClick={() => downloadBackup()}>Download latest-state backup ↓</button><button type="button" disabled={busy} onClick={() => downloadBackup(true)}>Take a making brief ↓</button></div>
       <div className="project-head"><div><p className="companion-kicker">YOUR MAKING COMPANION / 01</p><h1>{active.title}</h1><p>Carry your idea, materials and decisions in one place. Every save becomes a reviewable revision.</p></div><span className="capability-chip">Planning only · no cutting yet</span></div>
@@ -277,7 +280,7 @@ export function CompanionHome() {
       <div className="studio-main-pane">
       {view === "pattern" && <div className="studio-view-intro"><p className="companion-kicker">PATTERN STUDY</p><h2>See what each piece does.</h2><p>Authored pieces and folds are visible where available. Editorial drawings are not cutting templates.</p></div>}
       {view === "pattern" && <>
-      {sourceBinding === "current" && sourceCard && <PieceStudy key={`piece-${sourceCard.designKey}`} card={sourceCard} />}
+      {sourceBinding === "current" && sourceCard && <PieceStudy key={`piece-${sourceCard.designKey}`} card={sourceCard} selectedPieceKey={selectedPieceKey} onSelectPiece={(key) => { setSelectedPieceKey(key); if (key) setAgentOpen(true); }} />}
       {sourceBinding === "current" && sourceCard?.designKey === "sandy" && <PatternBoard key={`pattern-${active.id}`} project={active} source={sourceCard} dirty={unsavedChanges} />}
       {sourceBinding !== "current" && <p className="studio-view-empty" role="status">Pattern study waits for the current Sanity source binding. Your saved project is unchanged.</p>}
       </>}
@@ -313,7 +316,7 @@ export function CompanionHome() {
         </form><aside className="project-notes"><div className="note-card"><p className="companion-kicker">SOURCE</p><h3>{startFor(active.source)?.name ?? "Your own idea"}</h3><p>{active.source.kind === "candidate" ? "A distinct design candidate, not an approved printable pattern. We are testing geometry, instructions and rights before enabling cutting." : "Record your concept now. Photo analysis and drafting are not yet enabled."}</p></div><div className="note-card dark"><p className="companion-kicker">HONEST CAPABILITY</p><h3>Not a pattern file. Yet.</h3><p>Measurements and fabric notes are planning inputs. Do not cut fabric from the editorial images or illustrative demo.</p></div><div className="note-card"><p className="companion-kicker">REVISION TRAIL</p><strong>{active.plan.features.length} features · {active.plan.openQuestions.length} open questions</strong><ol className="revision-list">{revisions.slice().reverse().map((item) => <li key={item.sequence}><b>#{item.sequence}</b><span>{new Date(item.updatedAt).toLocaleString()}</span></li>)}</ol><p>Earlier snapshots are preserved on this server. Download exports the latest state only.</p></div></aside></div>
       </>}
       </div>
-      <aside id="studio-agent-dock" className="studio-agent-dock" hidden={!agentOpen} aria-label="Sewing companion"><button type="button" className="studio-agent-close" onClick={() => setAgentOpen(false)}>Close companion ×</button><ProjectAssistant key={`assistant-${active.id}`} project={active} source={sourceCard} historySequence={diagnostics.length} makingSequence={makingSequence} dirty={unsavedChanges} focus={view} /></aside>
+      <aside id="studio-agent-dock" className="studio-agent-dock" hidden={!agentOpen} aria-label="Sewing companion"><button type="button" className="studio-agent-close" onClick={() => setAgentOpen(false)}>Close companion ×</button><ProjectAssistant key={`assistant-${active.id}`} project={active} source={sourceCard} historySequence={diagnostics.length} makingSequence={makingSequence} dirty={unsavedChanges} focus={view} selectedPieceKey={view === "pattern" ? selectedPieceKey : null} /></aside>
     </main> : <main><section className="companion-hero"><Image src="/images/atelier-hero.png" fill priority sizes="100vw" alt="Sewing workroom with a garment on a dress form and paper pattern pieces on a table" /><div className="hero-shade" /><div className="hero-content"><p className="companion-kicker">THE SEWING COMPANION</p><h1>From “I could make that”<br />to <em>“I made it.”</em></h1><p>Stitches connects the garment you imagine to the pieces, decisions and steps needed to make it — beginning with a project that remembers your plan.</p><button type="button" onClick={() => document.getElementById("collection")?.scrollIntoView({ behavior: "smooth" })}>Explore your starting point ↗</button><small>For curious beginners, hobby makers and designers.</small></div><div className="hero-foot"><span>01 / IMAGINE</span><span>02 / UNDERSTAND</span><span>03 / MAKE</span><span>↓ EXPLORE</span></div></section>
       <section className="companion-intro" id="how-it-works"><p className="companion-kicker">WHY STITCHES EXISTS</p><div><h2>Clothing is a collection of decisions.<br /><em>Let’s make them visible.</em></h2><p>A finished garment is only the beginning. The pieces, fabric, fit and order of construction determine what you can actually make. Stitches is being built to keep those relationships connected — and help you learn as you go.</p></div></section>
       <section className="companion-collection" id="collection"><div className="collection-heading"><div><p className="companion-kicker">START A PROJECT</p><h2>Where will you begin?</h2><p>Choose a distinct garment direction or bring your own idea. These are planning starts while the pattern engines are qualified.</p></div><span>01—03 / PROJECT STARTS</span></div><div className="collection-grid">{starts.map((item, index) => <article className="collection-card" key={item.id}><div className="collection-image"><Image src={item.image} fill sizes="(max-width: 800px) 100vw, 33vw" alt={`Editorial concept of ${item.name}`} /><span>0{index + 1} / {item.kind}</span></div><div className="collection-copy"><h3>{item.name}</h3><p>{item.caption}</p><small>{item.question}</small><button type="button" onClick={() => begin({ kind: "candidate", designId: item.id })}>Start this project ↗</button></div></article>)}<article className="collection-card own"><div className="own-art"><span>✳</span><p>What do you<br />want to make?</p></div><div className="collection-copy"><h3>Your own idea</h3><p>A photo, a sketch, or something you pictured.</p><small>Record your brief now. Image analysis is a future verified capability.</small><button type="button" onClick={() => begin({ kind: "own_idea" })}>Begin with an idea ↗</button></div></article></div><p className="collection-caption">Editorial concept images only. No card represents a verified cut-ready pattern or fit preview.</p></section>

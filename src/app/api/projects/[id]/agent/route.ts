@@ -2,7 +2,7 @@ import { NextRequest } from "next/server";
 import { startAgentRunSchema, sameAgentBasis } from "@/domain/agent-run";
 import { getLocalGuestStore } from "@/server/projects/guest-store";
 import { assertSameOriginJson, guestForRequest, guestResponse } from "@/server/projects/guest-http";
-import { companionBasis, createCompanionTools, createStitchesCompanionReader, STITCHES_KB_ID, CompanionAgentError } from "@/server/agent/companion-tools";
+import { companionBasis, createCompanionTools, createStitchesCompanionReader, resolveAgentSelection, STITCHES_KB_ID, CompanionAgentError } from "@/server/agent/companion-tools";
 import { companionFreeAuthorized } from "@/server/agent/run-controller";
 import { publicAgentRun } from "@/server/agent/run-state";
 import { agentErrorResponse, boundedAgentJson, loadOwnedAgentSnapshot } from "@/server/agent/run-http";
@@ -40,6 +40,7 @@ export async function POST(request: NextRequest, context: Context) {
     if (isMakingTask && !snapshot.makingPlan) {
       throw new CompanionAgentError("missing_knowledge", "The construction study plan is unavailable for this candidate. Manual making remains available.");
     }
+    resolveAgentSelection(snapshot, input.task, input.selection);
     const run = store.startAgentRun(identity.ownerId, id, input);
     return guestResponse(request, identity, { run: publicAgentRun(run), replayed: false }, 201);
   } catch (error) { return agentErrorResponse(error); }

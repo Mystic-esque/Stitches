@@ -1,6 +1,6 @@
 import { agentTaskText, sameAgentBasis } from "../../domain/agent-run";
 import type { GuestStore } from "../projects/guest-store";
-import { CompanionAgentError, companionBasis, createCompanionTools, STITCHES_KB_ID, type CompanionSnapshot } from "./companion-tools";
+import { CompanionAgentError, companionBasis, createCompanionTools, diagnosticAgentContext, resolveAgentSelection, selectedAgentArtifact, STITCHES_KB_ID, type CompanionSnapshot } from "./companion-tools";
 import { GeminiAdapterError, createGeminiSession, type DurableGeminiSession, type GeminiSessionOptions } from "./gemini-session";
 import type { PrivateAgentRun } from "./run-state";
 import type { ContextResult } from "../knowledge/context-mcp";
@@ -40,21 +40,22 @@ export async function advanceCompanionRun(input: {
     return snapshot;
   }
   try {
-    if (run.task === "troubleshoot_step")
-      throw new CompanionAgentError("missing_knowledge", "Agent diagnosis is paused until the served Stitches diagnostic entry exposes verified test and remedy source identities. Use the manual scrap-only Check flow; no Gemini request was sent.");
     const isMakingTask = run.task === "step_guidance";
     const snapshot = await current();
+    if (run.task === "troubleshoot_step" && !diagnosticAgentContext(snapshot))
+      throw new CompanionAgentError("missing_knowledge", "Save an eligible seam-puckering question at the current making step before asking for this scrap check.");
+    resolveAgentSelection(snapshot, run.task, run.selection);
     if (isMakingTask && !snapshot.makingPlan) {
       throw new CompanionAgentError("missing_knowledge", "The construction study plan is unavailable for this candidate. Manual making remains available.");
     }
     const tools = createCompanionTools({ snapshot, loadCurrent: current, reader: input.reader,
       knowledgeBaseId: STITCHES_KB_ID, consent: { sharePreparationSummary: true },
-      topic: isMakingTask ? "construction" : "planning", signal });
+      selection: run.selection, topic: run.task === "troubleshoot_step" ? "diagnostic" : isMakingTask ? "construction" : "planning", signal });
     if (!run.pendingResponse) {
       const session = (input.createSession ?? ((options) => createGeminiSession({ ...options, purpose: "companion",
         task: run.task,
         model: "gemini-3.5-flash-lite", apiKey: (input.env ?? process.env).GEMINI_API_KEY ?? "" })))(
-        { request: agentTaskText[run.task], state: run.session });
+        { request: run.request ? `${agentTaskText[run.task]} Maker asks: ${run.request}` : agentTaskText[run.task], state: run.session });
       const response = await session.next(run.feedback, signal);
       const state = session.exportState();
       if (JSON.stringify(state).length > 128_000 || JSON.stringify(response).length > 16_000)
@@ -66,7 +67,7 @@ export async function advanceCompanionRun(input: {
     await tools.assertCurrent();
     const response = run.pendingResponse!;
     if (!Array.isArray(response.calls) || response.calls.length > 1) throw new CompanionAgentError("unsafe_tool", "Only one registered read tool is allowed per request.");
-    const expectedSequence = isMakingTask
+    const expectedSequence = isMakingTask || run.task === "troubleshoot_step"
       ? ["inspect_project", "inspect_making", "retrieve_context"]
       : ["inspect_project", "resolve_exact_graph", "retrieve_context"];
     if (response.calls.length) {
@@ -89,7 +90,8 @@ export async function advanceCompanionRun(input: {
     if (refreshedKnowledge.knowledgeHash !== run.knowledgeHash)
       throw new CompanionAgentError("stale", "The served Knowledge Base changed after the model read it. Review the new evidence before another run.");
     await tools.assertCurrent();
-    run.text = text; run.status = "completed"; delete run.pendingResponse; delete run.feedback;
+    run.text = text; run.artifact = selectedAgentArtifact(snapshot, run.task, run.selection, run.knowledgeHash);
+    run.status = "completed"; delete run.pendingResponse; delete run.feedback;
     return input.store.checkpointAgentRun(input.ownerId, run, "completed", true, now());
   } catch (error) {
     const latest = input.store.getAgentRun(input.ownerId, input.projectId, input.runId, now());

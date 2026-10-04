@@ -6,6 +6,7 @@ import type { PrivateAgentRun } from "../agent/run-state";
 import { diagnosticBindingSchema, recordDiagnosticSchema, diagnosticTransitionError,
   type DiagnosticRecord, type DiagnosticBinding, type RecordDiagnosticInput } from "../../domain/diagnostic-history";
 import { DatabaseSync } from "node:sqlite";
+import { savedStudySchema, type PatternStudy, type SavedStudy } from "../../domain/pattern-study";
 import { recordMakingSchema, makingTransitionError, currentMakingSession,
   type MakingRecord, type MakingPlan, type RecordMakingInput } from "../../domain/making-plan";
 import { copyMakerProfileSchema, importMakerProfileSchema, profileValuesSchema, saveMakerProfileSchema, profileCopyPreview,
@@ -135,10 +136,47 @@ export class GuestStore {
         UNIQUE (owner_id, idempotency_key),
         FOREIGN KEY (owner_id, project_id) REFERENCES projects(owner_id, id) ON DELETE CASCADE
       ) STRICT;
+      CREATE TABLE IF NOT EXISTS pattern_studies (
+        owner_id TEXT NOT NULL, project_id TEXT NOT NULL, id TEXT NOT NULL,
+        idempotency_key TEXT NOT NULL, request_hash TEXT NOT NULL, data_json TEXT NOT NULL,
+        created_at TEXT NOT NULL, PRIMARY KEY (owner_id, id), UNIQUE (owner_id, idempotency_key),
+        FOREIGN KEY (owner_id, project_id) REFERENCES projects(owner_id, id) ON DELETE CASCADE
+      ) STRICT;
     `);
   }
 
   close(): void { this.db.close(); }
+
+  listPatternStudies(ownerId: string, projectId: string): SavedStudy[] {
+    if (!this.getProject(ownerId, projectId)) throw new GuestStoreError("not_found", "Project not found.");
+    const rows = this.db.prepare("SELECT data_json FROM pattern_studies WHERE owner_id = ? AND project_id = ? ORDER BY created_at DESC, id DESC")
+      .all(ownerId, projectId) as unknown as StoredRow[];
+    return rows.map(row => savedStudySchema.parse(JSON.parse(row.data_json)));
+  }
+
+  savePatternStudy(ownerId: string, projectId: string, study: PatternStudy, idempotencyKey: string): SavedStudy {
+    const requestHash = hash({ projectId, basis: study.basis, command: study.command, before: study.before.mapping.artifactHash, after: study.after.mapping.artifactHash });
+    return this.transaction(() => {
+      const prior = this.db.prepare("SELECT data_json, request_hash, project_id FROM pattern_studies WHERE owner_id = ? AND idempotency_key = ?")
+        .get(ownerId, idempotencyKey) as NoteRow | undefined;
+      if (prior) {
+        if (prior.request_hash !== requestHash || prior.project_id !== projectId) throw new GuestStoreError("idempotency_conflict", "This save key belongs to a different study.");
+        return savedStudySchema.parse(JSON.parse(prior.data_json));
+      }
+      const project = this.getProject(ownerId, projectId);
+      if (!project) throw new GuestStoreError("not_found", "Project not found.");
+      if (project.sequence !== study.basis.sequence || project.basisHash !== study.basis.basisHash || project.knowledgeFingerprint !== study.basis.sourceFingerprint)
+        throw new GuestStoreError("stale", "The saved project or source changed. Rebuild the study before saving it.");
+      if (this.listPatternStudies(ownerId, projectId).length >= 200)
+        throw new GuestStoreError("invalid", "This project has reached its 200-study backup limit. Export it before starting another project.");
+      const saved = savedStudySchema.parse({ id: randomUUID(), projectId, createdAt: new Date().toISOString(), basis: study.basis,
+        command: study.command, beforeHash: study.before.mapping.artifactHash, afterHash: study.after.mapping.artifactHash,
+        impact: study.impact, capability: "plan_only", cutReady: false });
+      this.db.prepare("INSERT INTO pattern_studies (owner_id, project_id, id, idempotency_key, request_hash, data_json, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)")
+        .run(ownerId, projectId, saved.id, idempotencyKey, requestHash, JSON.stringify(saved), saved.createdAt);
+      return saved;
+    });
+  }
 
   private writeRun(ownerId: string, run: PrivateAgentRun): PrivateAgentRun {
     const json = JSON.stringify(run);
@@ -199,7 +237,8 @@ export class GuestStore {
       if (duplicate) return duplicate;
       if (!this.getProject(ownerId, projectId)) throw new GuestStoreError("not_found", "Project not found.");
       const timestamp = new Date(now).toISOString();
-      const run: PrivateAgentRun = { id: randomUUID(), projectId, basis: input.expectedBasis, task: input.task, consentVersion: input.consent.version,
+      const run: PrivateAgentRun = { id: randomUUID(), projectId, basis: input.expectedBasis, task: input.task,
+        ...(input.request ? { request: input.request } : {}), ...(input.selection ? { selection: input.selection } : {}), consentVersion: input.consent.version,
         model: "gemini-3.5-flash-lite", status: "ready", requests: 0, activeMs: 0, checkpoints: [], tools: [], callIds: [],
         createdAt: timestamp, updatedAt: timestamp, modelTextVerified: false, projectChanged: false, capability: "plan_only" };
       if (run.basis.projectId !== projectId || !this.runBasisCurrent(ownerId, run)) throw new GuestStoreError("stale", "Review the current saved project and history before consenting.");
@@ -545,11 +584,12 @@ export class GuestStore {
     return this.transaction(() => {
       const project = this.getProject(ownerId, projectId);
       if (!project) throw new GuestStoreError("not_found", "Project not found.");
-      return projectBackupSchema.parse({ format: "stitches-project-backup", version: 4,
+      return projectBackupSchema.parse({ format: "stitches-project-backup", version: 5,
         title: project.title, brief: project.brief, source: project.source, plan: project.plan, knowledgeFingerprint: project.knowledgeFingerprint,
         notes: this.listNotes(ownerId, projectId).map(({ kind, stage, text, basisSequence, basisHash, createdAt, importedFromSequence }) =>
           ({ kind, stage, text, basisSequence: importedFromSequence ?? basisSequence, basisHash, createdAt })),
-        diagnostics: this.listDiagnostics(ownerId, projectId), making: this.listMaking(ownerId, projectId) });
+        diagnostics: this.listDiagnostics(ownerId, projectId), making: this.listMaking(ownerId, projectId),
+        studies: this.listPatternStudies(ownerId, projectId) });
     });
   }
 
@@ -586,7 +626,7 @@ export class GuestStore {
             .run(ownerId, project.id, note.id, key, hash({ importKey: input.idempotencyKey, noteId: note.id }), JSON.stringify(note), note.createdAt);
         }
       }
-      if (input.backup.version === 3 || input.backup.version === 4) {
+      if (input.backup.version === 3 || input.backup.version === 4 || input.backup.version === 5) {
         const originals = input.backup.diagnostics;
         if (new Set(originals.map((item) => item.id)).size !== originals.length || originals.some((item, index) => item.sequence !== index + 1))
           throw new GuestStoreError("invalid", "The imported diagnostic history is not a unique ordered sequence.");
@@ -597,7 +637,7 @@ export class GuestStore {
             .run(ownerId, project.id, record.sequence, JSON.stringify(record));
         }
       }
-      if (input.backup.version === 4) {
+      if (input.backup.version === 4 || input.backup.version === 5) {
         const originals = input.backup.making;
         if (new Set(originals.map((entry) => entry.id)).size !== originals.length ||
           originals.some((entry, index) => entry.sequence !== index + 1))
@@ -606,6 +646,18 @@ export class GuestStore {
           const record: MakingRecord = { ...original, projectId: project.id, imported: true };
           this.db.prepare("INSERT INTO making_events (owner_id, project_id, sequence, data_json) VALUES (?, ?, ?, ?)")
             .run(ownerId, project.id, record.sequence, JSON.stringify(record));
+        }
+      }
+      if (input.backup.version === 5) {
+        if (new Set(input.backup.studies.map(study => study.id)).size !== input.backup.studies.length)
+          throw new GuestStoreError("invalid", "Imported studies must have unique IDs.");
+        for (const original of input.backup.studies) {
+          if (original.projectId !== original.basis.projectId || original.command.expectedBasisHash !== original.basis.basisHash ||
+            original.command.expectedSequence !== original.basis.sequence || original.command.expectedSourceFingerprint !== original.basis.sourceFingerprint)
+            throw new GuestStoreError("invalid", "Imported study basis does not match its command.");
+          const saved = savedStudySchema.parse({ ...original, id: randomUUID(), projectId: project.id, imported: true });
+          this.db.prepare("INSERT INTO pattern_studies (owner_id, project_id, id, idempotency_key, request_hash, data_json, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)")
+            .run(ownerId, project.id, saved.id, randomUUID(), hash({ importedStudy: saved.id }), JSON.stringify(saved), saved.createdAt);
         }
       }
       this.db.prepare("INSERT INTO mutation_receipts (owner_id, idempotency_key, operation, target_id, request_hash, result_json) VALUES (?, ?, ?, ?, ?, ?)")

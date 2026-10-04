@@ -1,6 +1,6 @@
 {
   "kind": "actual-production-measured-board-api-and-browser",
-  "checkedAt": "2026-10-04T18:36:00.843Z",
+  "checkedAt": "2026-10-04T21:03:06.606Z",
   "passed": true,
   "providerRequests": 0,
   "sanityWrites": 0,
@@ -19,6 +19,8 @@
     "staleCurrentBasis": true,
     "missingAndUnsupported": true,
     "privateProjectUnchanged": true,
+    "savedStudyId": "6752eeeb-7015-4fcf-b8cc-efe5d8faa02c",
+    "v5BackupWithStudy": true,
     "beforeHash": "1965350a67d7595aa795a5ea1d5bd56ba80d02d4c30a4dd44145dcc6b789bf1a",
     "afterHash": "1f051bed5ecb6eeae1877bd80a69c4cdebbd73981c47015d641ac422cd4b2986"
   },

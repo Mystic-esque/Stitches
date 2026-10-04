@@ -1,9 +1,13 @@
 // Observed outline versions only. A model never supplies paths, aliases or a search query.
-export function companionKbPaths(outline: string, design: "sandy" | "tina", topic: "planning" | "construction" = "planning"): string[] {
+export function companionKbPaths(outline: string, design: "sandy" | "tina", topic: "planning" | "construction" | "diagnostic" = "planning"): string[] {
   const entries = new Set(outline.split(/\r?\n/).flatMap((line) => {
     const match = line.match(/^([a-z0-9_]+(?:\/[a-z0-9_]+)*)(?:\s+\[[^\]]+\])?\s*$/);
     return match ? [match[1]] : [];
   }));
+  if (topic === "diagnostic") {
+    if (entries.has("seam_quality")) return ["seam_quality"];
+    throw new Error("The current KB outline has no recognized diagnostic entry.");
+  }
   if (topic === "construction") {
     const construction = design === "sandy" ? "construction/sandy_circle_skirt" : "construction/tina_faux_wrap_top";
     if (entries.has(construction)) return [construction];

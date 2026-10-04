@@ -68,7 +68,7 @@ describe("making HTTP boundary — explicitly mocked exact sources", () => {
       expect((await POST(f.request(f.making({ kind: "reviewed", stepId: "fixture-step-one", checkpointConfirmed: true })), f.context)).status).toBe(503);
       expect((await POST(f.request(f.making({ kind: "paused", reason: "Stopped while sources are unavailable" })), f.context)).status).toBe(200);
       const backup = (await (await backupGet(f.request(undefined, "backup"), f.context)).json()).backup;
-      expect(backup.version).toBe(4); expect(backup.making).toHaveLength(2);
+      expect(backup.version).toBe(5); expect(backup.making).toHaveLength(2); expect(backup.studies).toEqual([]);
       expect((await backupGet(f.request(undefined, "backup", f.other.token), f.context)).status).toBe(404);
     } finally { f.store.close(); }
   });

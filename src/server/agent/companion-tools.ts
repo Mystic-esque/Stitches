@@ -9,6 +9,8 @@ import { contextConfiguration, SanityContextKnowledgeBase, type ContextResult } 
 import { companionKbPaths, kbAttributionNeedsReview } from "../knowledge/companion-kb-paths";
 
 import { selectMakingStepPieces } from "../../domain/planning-piece-study";
+import type { AgentSelection, AgentTask, AgentArtifact } from "../../domain/agent-run";
+import { pausedScrapAdvice, resolveScrapObservation } from "../../domain/scrap-diagnostic";
 
 export const COMPANION_TOOLS = ["inspect_project", "inspect_preparation", "resolve_exact_graph", "retrieve_context", "inspect_making"] as const;
 export type CompanionTool = typeof COMPANION_TOOLS[number];
@@ -52,6 +54,75 @@ export function companionBasis(snapshot: CompanionSnapshot): CompanionBasis {
     planFingerprint: makingPlan?.fingerprint ?? null };
 }
 
+export function resolveAgentSelection(snapshot: CompanionSnapshot, task: AgentTask, selection?: AgentSelection) {
+  if (!selection) return null;
+  if (selection.kind === "piece") {
+    if (task !== "understand_pieces") throw new CompanionAgentError("invalid", "Select a piece for a piece explanation.");
+    const piece = snapshot.source.pieceStudy.find((item) => item.pieceKey === selection.pieceKey);
+    if (!piece) throw new CompanionAgentError("invalid", "This piece does not belong to the current source.");
+    return { kind: "piece" as const, piece };
+  }
+  if (task !== "step_guidance" || !snapshot.makingPlan)
+    throw new CompanionAgentError("invalid", "Select a step for construction guidance.");
+  const session = currentMakingSession(snapshot.makingHistory ?? [], snapshot.project, snapshot.makingPlan);
+  const step = session?.next ?? session?.steps.at(-1);
+  if (!step || step.id !== selection.stepId)
+    throw new CompanionAgentError("stale", "The selected construction step is no longer in focus.");
+  return { kind: "step" as const, step };
+}
+
+export function selectedAgentArtifact(snapshot: CompanionSnapshot, task: AgentTask, selection: AgentSelection | undefined, knowledgeHash: string): AgentArtifact | undefined {
+  if (task === "troubleshoot_step") {
+    const diagnostic = diagnosticAgentContext(snapshot);
+    if (!diagnostic) return undefined;
+    const study = snapshot.source.diagnosticStudy;
+    return { kind: "diagnostic_check", subjectId: diagnostic.stepId, title: study.title,
+      sourceTitle: study.sourceTitle, sourceUrl: study.sourceUrl,
+      sourceFingerprint: study.fingerprint, knowledgeHash,
+      facts: [study.makerQuestion, diagnostic.advice.nextAction,
+        diagnostic.advice.state === "possible-tension" ? "Possible cause only; confirm on a scrap sample." : "Cause unresolved; do not change the garment."], capability: "plan_only" };
+  }
+  const resolved = resolveAgentSelection(snapshot, task, selection);
+  if (!resolved) return undefined;
+  if (resolved.kind === "piece") {
+    const { piece } = resolved;
+    return { kind: "piece_explanation", subjectId: piece.pieceKey, title: piece.title,
+      sourceTitle: snapshot.source.sourceTitle, sourceUrl: snapshot.source.sourceUrl,
+      sourceFingerprint: snapshot.source.fingerprint, knowledgeHash,
+      facts: [`${piece.material === "interfacing" ? "Interfacing" : "Main fabric"} · cut ${piece.cutCount}${piece.mirrored ? " mirrored" : ""}`,
+        piece.fold === "none" ? "No fold specified" : piece.fold === "single" ? "Place on one fabric fold" : "Place on a double fold",
+        `${piece.reviewStatus} source review`], capability: "plan_only" };
+  }
+  const { step } = resolved;
+  return { kind: "step_card", subjectId: step.id, title: step.title,
+    sourceTitle: snapshot.makingPlan!.sourceTitle, sourceUrl: snapshot.makingPlan!.sourceUrl,
+    sourceFingerprint: snapshot.makingPlan!.fingerprint, knowledgeHash,
+    facts: [step.orientation, step.action, step.checkpoint], capability: "plan_only" };
+}
+
+export function diagnosticAgentContext(snapshot: CompanionSnapshot) {
+  const plan = snapshot.makingPlan;
+  if (!plan) return null;
+  const session = currentMakingSession(snapshot.makingHistory ?? [], snapshot.project, plan);
+  const step = session?.next;
+  if (!session || !step?.diagnostic) return null;
+  const help = session.records.findLast((entry) => entry.event.kind === "help_requested" &&
+    entry.event.stepId === step.id && entry.event.symptom === "seam_puckering");
+  if (!help) return null;
+  const eligible = snapshot.history.filter((entry) => !entry.imported && entry.basisHash === snapshot.project.basisHash &&
+    entry.basisSequence === snapshot.project.sequence && entry.binding.catalogFingerprint === snapshot.source.fingerprint &&
+    entry.binding.diagnosticFingerprint === snapshot.source.diagnosticStudy.fingerprint &&
+    entry.binding.makingContext?.eventId === help.id && entry.binding.makingContext.stepId === step.id &&
+    entry.binding.makingContext.planFingerprint === plan.fingerprint);
+  const observed = eligible.findLast((entry) => entry.event.kind === "observation");
+  const observation = observed?.event.kind === "observation" ? observed.event.observation : "not-tested";
+  const stopped = eligible.some((entry) => entry.event.kind === "comparison_result" || entry.event.kind === "paused");
+  return { stepId: step.id, helpId: help.id, testId: snapshot.source.diagnosticStudy.testId,
+    remedyId: snapshot.source.diagnosticStudy.remedyId, observation,
+    previousAttempts: eligible.filter((entry) => entry.event.kind === "comparison_result").length,
+    advice: stopped ? pausedScrapAdvice() : resolveScrapObservation(snapshot.source.diagnosticStudy, observation) };
+}
+
 /** No repository writer. Body values, private notes and photos are not provider input. */
 export function createCompanionTools(input: {
   snapshot: CompanionSnapshot;
@@ -59,12 +130,14 @@ export function createCompanionTools(input: {
   reader: { initialContext?: () => Promise<ContextResult>; readPaths: (paths: string[]) => Promise<ContextResult> };
   knowledgeBaseId: string;
   consent: { sharePreparationSummary: boolean };
-  topic?: "planning" | "construction";
+  selection?: AgentSelection;
+  topic?: "planning" | "construction" | "diagnostic";
   signal?: AbortSignal;
 }) {
   if (input.consent.sharePreparationSummary !== true) throw new CompanionAgentError("consent", "Review and consent to the minimized preparation summary first.");
   if (input.knowledgeBaseId !== STITCHES_KB_ID) throw new CompanionAgentError("missing_knowledge", "Only the dedicated Stitches Knowledge Base is supported.");
   const snapshot = structuredClone(input.snapshot), basis = companionBasis(snapshot);
+  const selection = input.selection ? resolveAgentSelection(snapshot, input.selection.kind === "piece" ? "understand_pieces" : "step_guidance", input.selection) : null;
   let paths = [snapshot.source.designKey === "sandy" ? "sandy_skirt" : "tina_top", "fabric_constraints"];
   let knowledgeHash: string | undefined;
   const checks = preparationPlan(snapshot.project, snapshot.source);
@@ -89,6 +162,8 @@ export function createCompanionTools(input: {
       let result: Record<string, unknown>;
       if (name === "inspect_project") {
         result = { basis, source: snapshot.source.designKey, capability: "plan_only", preparation: preparation(),
+          selection: selection?.kind === "piece" ? { kind: "piece", pieceKey: selection.piece.pieceKey, title: selection.piece.title } :
+            selection?.kind === "step" ? { kind: "step", stepId: selection.step.id, title: selection.step.title } : null,
           history: { totalEvents: snapshot.history.length, importedEvents: snapshot.history.filter((item) => item.imported).length, physicalObservationsWithheld: true },
           withheld: ["body measurement values", "project title and brief", "private questions", "fabric description", "equipment names", "profile identity", "scrap observation text", "photos"] };
       } else if (name === "inspect_preparation") {
@@ -97,7 +172,8 @@ export function createCompanionTools(input: {
         result = { basis, sourceTitle: snapshot.source.sourceTitle, sourceUrl: snapshot.source.sourceUrl,
           reviewStatus: snapshot.source.reviewStatus, capability: snapshot.source.capability,
           requiredMeasurements: snapshot.source.requiredMeasurements, materialStructure: snapshot.source.materialStructure,
-          pieces: snapshot.source.pieceStudy, cuttingCaveat: snapshot.source.cuttingCaveat,
+          pieces: snapshot.source.pieceStudy, selectedPiece: selection?.kind === "piece" ? selection.piece : null,
+          cuttingCaveat: snapshot.source.cuttingCaveat,
           unsupported: ["checked geometry", "layout", "fit", "yardage", "qualified making steps", "garment remedies"] };
       } else if (name === "inspect_making") {
         const plan = snapshot.makingPlan;
@@ -136,6 +212,7 @@ export function createCompanionTools(input: {
                 activeHelpSymptom: lastHelp && lastHelp.event.kind === "help_requested" ? lastHelp.event.symptom : null,
               } : null,
               allStepsReviewed: !session.next, capability: "plan_only",
+              diagnostic: input.topic === "diagnostic" ? diagnosticAgentContext(snapshot) : null,
               withheld: ["personal notes", "freeform question text", "body measurements", "photos"],
               disclaimer: "Learning plan only. This inspects authored construction relationships; it is not proof of physical sewing, pattern geometry, or cutting readiness.",
             };
@@ -165,6 +242,10 @@ export function createCompanionTools(input: {
           throw new CompanionAgentError("missing_knowledge", "Context returned missing, oversized or mismatched evidence.");
         if (kbAttributionNeedsReview(knowledge.text))
           throw new CompanionAgentError("missing_knowledge", "The served KB attribution needs editorial review. Exact-source manual planning remains available; no generated answer is accepted.");
+        if (input.topic === "diagnostic" &&
+          (![snapshot.source.diagnosticStudy.testId, snapshot.source.diagnosticStudy.remedyId].every((id) => knowledge.text.includes(id)) ||
+            !/scrap|sample/i.test(knowledge.text)))
+          throw new CompanionAgentError("missing_knowledge", "The served diagnostic does not identify the exact test, remedy and sample scope.");
         knowledgeHash = createHash("sha256").update(knowledge.text).digest("hex");
         result = { knowledgeBaseId: input.knowledgeBaseId, paths: [...paths], knowledgeHash,
           text: knowledge.text.slice(0, 8_000), excerptTruncated: knowledge.text.length > 8_000,

@@ -1,6 +1,6 @@
 {
   "kind": "actual-production-construction-api-and-browser",
-  "checkedAt": "2026-10-04T18:40:29.295Z",
+  "checkedAt": "2026-10-04T22:16:49.785Z",
   "passed": true,
   "syntheticPrivateGuests": true,
   "source": "actual-Stitches-development-Content-Lake",
@@ -19,7 +19,7 @@
     "privateIdempotency": true,
     "currentStepDiagnosticBinding": true,
     "staleStepContextDenied": true,
-    "v4ImportedFactsNeverAuthority": true,
+    "v5ImportedFactsNeverAuthority": true,
     "privateProjectUnchanged": true
   },
   "browser": {

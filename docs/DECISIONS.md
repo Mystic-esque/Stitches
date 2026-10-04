@@ -189,3 +189,9 @@
 - A separate adapter calls Sanity's documented read-only Context MCP Knowledge Base tools. The project read/write tokens and organization Context Viewer token are distinct; a project token cannot stand in for the Context credential. A mock transport test is not a live KB result.
 - The local Studio points only at `l4eeamth/development`. A dry-run-only-by-default seeder refuses any other project/dataset and uses a dedicated write token only with `--apply`. Illustrative records must not become reviewed or cut-ready merely because they are stored in Sanity.
 - No public Studio/app deployment, final submission, billing enablement, or production dataset write has been authorized.
+# October 4, 2026 — first-submission release choices
+
+- Persist Sandy length comparisons as *private design studies*, not mutations of a cutting pattern. Store the command, source/project basis, before/after engine hashes and impact; recompute on current-basis reopen. Imported studies remain historical and cannot silently become the current pattern.
+- Keep exact structured Content Lake records authoritative for applicability and diagnostic branches. The Context KB supplies maintained prose; selected-object cards are deterministic and model prose remains explicitly unverified. A served mismatch fails closed.
+- Preserve the four-request/$0 Gemini envelope for this release. The current task-specific three-read sequence is demonstrably tool-using but not yet flexible planning; document that limitation rather than describing it as an autonomous multi-tool designer.
+- Do not promote current source-backed educational steps or FreeSewing geometry to printable/cut-ready status without missing closure, layout, print, source-rights and physical checks. The separate Devpost product ambitions remain on the roadmap.

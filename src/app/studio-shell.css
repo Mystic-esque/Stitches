@@ -43,3 +43,31 @@
 .studio-shell .project-notes .note-card.dark{margin:0;padding:20px}
 @media(max-width:1100px){.studio-shell.agent-is-open{grid-template-columns:minmax(0,1fr)}.studio-agent-dock{position:fixed;top:56px;right:0;bottom:0;z-index:25;width:min(420px,100vw);max-height:none;box-shadow:-12px 0 42px #1e342b30}.studio-view-nav{top:0}}
 @media(max-width:700px){.studio-shell .project-workspace{display:block}.studio-shell .project-rail{display:none}.studio-shell .project-notes{grid-template-columns:1fr}.studio-view-nav>span{display:none}.studio-view-nav{padding:8px 12px}.studio-view-nav button{padding:9px 10px}.studio-view-nav .studio-agent-toggle{position:sticky;right:0}.studio-agent-dock{top:55px}.studio-shell .project-head{padding-top:24px;padding-bottom:24px}}
+
+/* The project opens onto work; the full maker profile remains available on demand. */
+.companion-app:has(.studio-shell)>.companion-nav{height:54px;padding-inline:clamp(16px,2.5vw,36px)}
+.companion-app:has(.studio-shell)>.companion-nav nav{display:none}
+.companion-app:has(.studio-shell)>.companion-nav .companion-logo{font-size:29px}
+.companion-app:has(.studio-shell)>.companion-nav .nav-action{margin-left:auto}
+.studio-profile-drawer{border-bottom:1px solid #d4d5ca;background:#f2f0e8}
+.studio-profile-drawer>summary{min-height:38px;padding:10px clamp(18px,3vw,45px);font-size:11px;font-weight:700;color:#31513b;cursor:pointer}
+.studio-profile-drawer>summary:focus-visible{outline:3px solid #b9694a;outline-offset:-3px}
+.studio-shell .project-topline{min-height:40px;padding:7px clamp(18px,3vw,45px);font-size:10px}
+.studio-shell .project-head{padding:13px clamp(18px,3vw,45px) 12px;align-items:center}
+.studio-shell .project-head .companion-kicker,.studio-shell .project-head p:not(.companion-kicker){display:none}
+.studio-shell .project-head h1{font-size:clamp(25px,2.5vw,36px);margin:0}
+.studio-shell .project-source-strip{padding-block:8px;min-height:0}
+.studio-shell .source-binding.current{padding-block:6px}
+.studio-shell .studio-view-intro{padding:16px clamp(18px,3vw,45px) 12px}
+.studio-shell .studio-view-intro h2{font-size:clamp(24px,2.5vw,35px);margin:5px 0}
+.studio-shell .studio-view-intro>p:last-child{margin:0}
+.studio-agent-dock .assistant-intro{margin-bottom:10px}
+.studio-agent-dock .assistant-intro h2{font-size:23px}
+.studio-agent-dock .assistant-intro>p:not(.companion-kicker){margin-bottom:0}
+.assistant-prompt{display:grid;gap:8px;font-size:12px;font-weight:700;color:#31513b}
+.assistant-prompt textarea{width:100%;min-height:80px;resize:vertical;padding:12px;border:1px solid #aeb9a9;background:#fffdf7;color:#282d27;line-height:1.5}
+.assistant-selection{border:1px solid #aeb9a9;background:#f6f4e9;padding:9px 11px;font-size:11px;color:#31513b}
+.assistant-question{font-size:12px;font-weight:700;color:#31513b}
+.assistant-result-object a{display:inline-block;margin:9px 0;color:#31513b;font-size:11px;text-decoration:underline}
+.assistant-result-object small{display:block}
+@media(max-width:700px){.studio-shell .project-topline button:nth-of-type(2),.studio-shell .project-topline button:nth-of-type(3){display:none}.studio-shell .project-head{padding:13px 18px}.studio-shell .project-head h1{font-size:25px}.studio-shell .project-source-strip{padding:8px 18px}.studio-shell .studio-view-intro{padding:13px 18px}.studio-shell .studio-view-intro h2{font-size:26px}}

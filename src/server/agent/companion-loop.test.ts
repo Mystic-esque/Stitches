@@ -8,6 +8,10 @@ import { createCompanionTools, createStitchesCompanionReader, STITCHES_KB_ID, ty
 import { runCompanionLoop, type CompanionCheckpoint } from "./companion-loop";
 import { constructionRecords } from "../../../scripts/content/construction-records.mjs";
 import { resolveMakingPlan } from "../knowledge/making-plan";
+import { randomUUID } from "node:crypto";
+import type { MakingRecord } from "../../domain/making-plan";
+import type { DiagnosticRecord } from "../../domain/diagnostic-history";
+import { diagnosticAgentContext } from "./companion-tools";
 
 const documents = ["companion-candidates", "companion-piece-studies", "companion-diagnostic"].flatMap((name) =>
   JSON.parse(readFileSync(new URL(`../../../fixtures/${name}.json`, import.meta.url), "utf8")).documents)
@@ -45,6 +49,53 @@ function runner(state: ReturnType<typeof setup>, turns: ModelTurn[]) {
 }
 
 describe("read-only companion tools and bounded loop — synthetic protocol proof, not live inference", () => {
+  it("uses the diagnostic KB leaf only when exact test and remedy identities are served", async () => {
+    const state = setup();
+    const study = state.initial.source.diagnosticStudy;
+    const reader = { initialContext: vi.fn(async (): Promise<ContextResult> => ({ tool: "initial_context", knowledgeBaseId: STITCHES_KB_ID,
+      paths: [], text: "seam_quality [core]" })),
+      readPaths: vi.fn(async (paths: string[]): Promise<ContextResult> => ({ tool: "knowledge_base_read", knowledgeBaseId: STITCHES_KB_ID,
+        paths, text: `Scrap sample. Exact test ${study.testId}; possible later remedy ${study.remedyId}.` })) };
+    const tools = createCompanionTools({ ...state.options, topic: "diagnostic", reader });
+    await tools.execute("retrieve_context", {});
+    expect(reader.readPaths).toHaveBeenCalledWith(["seam_quality"]);
+    reader.readPaths.mockResolvedValueOnce({ tool: "knowledge_base_read", knowledgeBaseId: STITCHES_KB_ID,
+      paths: ["seam_quality"], text: `Scrap sample. Exact test ${study.testId}; remedy identity is missing.` });
+    await expect(tools.execute("retrieve_context", {})).rejects.toMatchObject({ code: "missing_knowledge" });
+  });
+  it("changes the step diagnostic branch only from saved maker observations and attempts", () => {
+    const state = setup();
+    const snapshot = state.initial;
+    const plan = resolveMakingPlan(constructionRecords.filter((entry) => String(entry._id).includes("-sandy-"))
+      .map((entry, index) => ({ ...entry, _rev: `fixture-${index}` })), snapshot.source);
+    const step = plan.steps.find((item) => item.diagnostic)!;
+    const configuredId = randomUUID(), helpId = randomUUID();
+    const base = { projectId: snapshot.project.id, basisSequence: snapshot.project.sequence,
+      basisHash: snapshot.project.basisHash, catalogFingerprint: snapshot.source.fingerprint,
+      planFingerprint: plan.fingerprint, sessionId: configuredId, createdAt: new Date().toISOString(), imported: false };
+    snapshot.makingPlan = plan;
+    snapshot.makingHistory = [
+      { ...base, id: configuredId, sequence: 1, event: { kind: "configured", options: { sleeves: false, frontBottom: false, dart: false } } },
+      { ...base, id: helpId, sequence: 2, event: { kind: "help_requested", stepId: step.id, symptom: "seam_puckering", detail: "Puckered sample" } },
+    ] as MakingRecord[];
+    expect(diagnosticAgentContext(snapshot)?.advice.state).toBe("not-tested");
+    const study = snapshot.source.diagnosticStudy;
+    const binding = { catalogFingerprint: snapshot.source.fingerprint, diagnosticFingerprint: study.fingerprint,
+      sourceId: study.sourceId, testId: study.testId, remedyId: study.remedyId,
+      makingContext: { eventId: helpId, planFingerprint: plan.fingerprint, stepId: step.id, historySequence: 2 } };
+    const observationId = randomUUID();
+    snapshot.history = [{ id: observationId, projectId: snapshot.project.id, sequence: 1,
+      basisSequence: snapshot.project.sequence, basisHash: snapshot.project.basisHash, binding,
+      event: { kind: "observation", observation: "relaxes", detail: "Scrap relaxed" },
+      createdAt: new Date().toISOString(), imported: false }] as DiagnosticRecord[];
+    expect(diagnosticAgentContext(snapshot)?.advice.state).toBe("possible-tension");
+    snapshot.history[0].event = { kind: "observation", observation: "unchanged", detail: "No visible change" };
+    expect(diagnosticAgentContext(snapshot)?.advice.state).toBe("unresolved");
+    snapshot.history[0].event = { kind: "observation", observation: "relaxes", detail: "Scrap relaxed" };
+    snapshot.history.push({ ...snapshot.history[0], id: randomUUID(), sequence: 2,
+      event: { kind: "comparison_result", attemptId: randomUUID(), outcome: "no_change", detail: "It did not help" } });
+    expect(diagnosticAgentContext(snapshot)?.advice.state).toBe("unresolved");
+  });
   it("resolves an observed rebuilt outline and fails closed on lost attribution or outline access", async () => {
     const state = setup();
     const groupedReader = { ...state.reader, initialContext: vi.fn(async (): Promise<ContextResult> => ({

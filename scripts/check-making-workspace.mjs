@@ -55,7 +55,7 @@ try {
   assert.equal((await api(path, { cookie: guest.cookie, method: 'POST', body: input({ kind: 'reviewed', stepId: step('shoulders'), checkpointConfirmed: true }, 3) })).status, 200);
   assert.equal((await api(`/api/projects/${tina.id}/diagnostics`, { cookie: guest.cookie, method: 'POST', body: { ...diagnosticInput, expectedHistorySequence: 1, idempotencyKey: randomUUID() } })).status, 409);
   const backup = (await api(`/api/projects/${tina.id}/backup`, { cookie: guest.cookie })).data.backup;
-  assert.equal(backup.version, 4); assert.equal(backup.making.length, 4); assert.equal(backup.diagnostics.length, 1);
+  assert.equal(backup.version, 5); assert.deepEqual(backup.studies, []); assert.equal(backup.making.length, 4); assert.equal(backup.diagnostics.length, 1);
   const imported = await api('/api/projects/import', { cookie: guest.cookie, method: 'POST', body: { backup, idempotencyKey: randomUUID() } }); assert.equal(imported.status, 201);
   const restored = await api(`/api/projects/${imported.data.project.id}/making`, { cookie: guest.cookie });
   assert.ok(restored.data.history.every(entry => entry.imported));
@@ -63,7 +63,7 @@ try {
   assert.deepEqual((await api(`/api/projects/${tina.id}`, { cookie: guest.cookie })).data.project, tina);
   report.api = { distinctStepCounts: [5, 8], exactPendingSourceGraph: true, conditionalPrerequisites: true,
     ownerOriginStrictBounds: true, privateIdempotency: true, currentStepDiagnosticBinding: true,
-    staleStepContextDenied: true, v4ImportedFactsNeverAuthority: true, privateProjectUnchanged: true };
+    staleStepContextDenied: true, v5ImportedFactsNeverAuthority: true, privateProjectUnchanged: true };
 
   const profile = await mkdtemp(join(tmpdir(), 'stitches-making-browser-'));
   chrome = spawn(process.env.CHROME_EXE ?? 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',

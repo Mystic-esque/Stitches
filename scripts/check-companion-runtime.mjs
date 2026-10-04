@@ -256,7 +256,7 @@ try {
   await evaluate("(()=>{const previous=URL.createObjectURL;URL.createObjectURL=function(blob){window.__stitchesBackupBlob=blob;return previous.call(URL,blob)};[...document.querySelectorAll('.project-topline button')].find(b=>b.textContent.includes('latest-state backup')).click();return true})()");
   await waitFor("!!window.__stitchesBackupBlob", 'Latest saved-state backup was not returned');
   const backup = await evaluate("(async()=>JSON.parse(await window.__stitchesBackupBlob.text()))()");
-  if (backup.version !== 4 || !Array.isArray(backup.making) || backup.notes?.length !== 1 || backup.diagnostics?.length !== 4 || !backup.knowledgeFingerprint) throw new Error('Downloaded backup omitted the journal, making/scrap history or source binding');
+  if (backup.version !== 5 || !Array.isArray(backup.making) || !Array.isArray(backup.studies) || backup.notes?.length !== 1 || backup.diagnostics?.length !== 4 || !backup.knowledgeFingerprint) throw new Error('Downloaded backup omitted the journal, making/scrap/study history or source binding');
   if (!Object.entries({ waist: 720, hips: 960, waistToFloor: 1000, waistToHips: 200 }).every(([key, value]) => backup.plan.measurementsMm[key] === value)) throw new Error('Source-listed body notes did not survive save/reload/export with mm units');
   backup.knowledgeFingerprint = '0'.repeat(64); // Disposable import rehearsal of a prior Sanity source revision.
   await evaluate("document.querySelector('.project-topline button:first-child').click()");

@@ -18,6 +18,14 @@ try{
  const drafted=await api(path,{cookie:guest.cookie,method:'POST',body:command});assert.equal(drafted.status,200);const study=drafted.data.study;
  assert.equal(study.cutReady,false);assert.equal(study.projectChanged,false);assert.deepEqual(study.impact.changedEdgeIds.slice().sort(),['sandy.skirt/hem','sandy.skirt/opening','sandy.skirt/fold'].sort());
  const repeat=await api(path,{cookie:guest.cookie,method:'POST',body:command});assert.equal(repeat.status,200);assert.equal(repeat.data.study.after.mapping.artifactHash,study.after.mapping.artifactHash);
+ const saveBody={study:{basis:study.basis,command:study.command,beforeHash:study.before.mapping.artifactHash,afterHash:study.after.mapping.artifactHash},idempotencyKey:randomUUID()};
+ const savedResponse=await api(`${path}/saved`,{cookie:guest.cookie,method:'POST',body:saveBody});assert.equal(savedResponse.status,201);const saved=savedResponse.data.saved;
+ assert.equal(saved.cutReady,false);assert.equal(saved.afterHash,study.after.mapping.artifactHash);
+ assert.equal((await api(`${path}/saved`,{cookie:guest.cookie,method:'POST',body:saveBody})).data.saved.id,saved.id);
+ assert.equal((await api(`${path}/saved`,{cookie:stranger.cookie})).status,404);
+ assert.equal((await api(`${path}/saved`,{cookie:guest.cookie,method:'POST',body:{...saveBody,study:{...saveBody.study,afterHash:'f'.repeat(64)},idempotencyKey:randomUUID()}})).status,409);
+ const studyBackup=(await api(`/api/projects/${project.id}/backup`,{cookie:guest.cookie})).data.backup;
+ assert.equal(studyBackup.version,5);assert.equal(studyBackup.studies.length,1);
  const second=await api('/api/projects',{cookie:guest.cookie,method:'POST',body:{title:'Synthetic second measurement input',brief:'No physical validation',source:{kind:'candidate',designId:'sandy'},plan:{...plan,measurementsMm:{waist:880,hips:1100,waistToFloor:1080,waistToHips:220}},idempotencyKey:randomUUID()}});assert.equal(second.status,201);
  const secondDraft=await api(`/api/projects/${second.data.project.id}/pattern-study`,{cookie:guest.cookie,method:'POST',body:{...command,expectedBasisHash:second.data.project.basisHash}});assert.equal(secondDraft.status,200);assert.notEqual(secondDraft.data.study.after.mapping.artifactHash,study.after.mapping.artifactHash);assert.deepEqual(secondDraft.data.study.impact.changedEdgeIds,study.impact.changedEdgeIds);
  assert.equal((await api(path,{cookie:stranger.cookie,method:'POST',body:command})).status,404);
@@ -30,7 +38,7 @@ try{
  const tina=await api('/api/projects',{cookie:guest.cookie,method:'POST',body:{title:'Synthetic unsupported top',brief:'No substitute',source:{kind:'candidate',designId:'tina'},plan,idempotencyKey:randomUUID()}});
  assert.equal((await api(`/api/projects/${tina.data.project.id}/pattern-study`,{cookie:guest.cookie,method:'POST',body:{...command,expectedBasisHash:tina.data.project.basisHash,expectedSourceFingerprint:tina.data.project.knowledgeFingerprint}})).data.error.code,'unsupported');
  assert.deepEqual((await api(`/api/projects/${project.id}`,{cookie:guest.cookie})).data.project,project);
- report.api={deterministicFullRedraft:true,twoDistinctMeasurementInputs:true,changedEdges:study.impact.changedEdgeIds,guestOriginStrictInputBounds:true,staleCurrentBasis:true,missingAndUnsupported:true,privateProjectUnchanged:true,beforeHash:study.before.mapping.artifactHash,afterHash:study.after.mapping.artifactHash};
+ report.api={deterministicFullRedraft:true,twoDistinctMeasurementInputs:true,changedEdges:study.impact.changedEdgeIds,guestOriginStrictInputBounds:true,staleCurrentBasis:true,missingAndUnsupported:true,privateProjectUnchanged:true,savedStudyId:saved.id,v5BackupWithStudy:true,beforeHash:study.before.mapping.artifactHash,afterHash:study.after.mapping.artifactHash};
  const profile=await mkdtemp(join(tmpdir(),'stitches-pattern-board-'));chrome=spawn(process.env.CHROME_EXE??'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',['--headless=new','--disable-gpu','--disable-background-networking','--no-first-run','--no-default-browser-check','--remote-debugging-port=0',`--user-data-dir=${profile}`,'about:blank'],{windowsHide:true,stdio:['ignore','ignore','pipe']});
  const pause=ms=>new Promise(done=>setTimeout(done,ms));let port;for(let i=0;i<600;i++){try{port=Number((await readFile(join(profile,'DevToolsActivePort'),'utf8')).split(/\r?\n/)[0]);break;}catch{await pause(100)}}assert.ok(port,'Chrome did not start');
  const targets=await(await fetch(`http://127.0.0.1:${port}/json/list`)).json();socket=new WebSocket(targets.find(item=>item.type==='page').webSocketDebuggerUrl);await new Promise((done,reject)=>{socket.addEventListener('open',done,{once:true});socket.addEventListener('error',reject,{once:true})});
@@ -41,7 +49,10 @@ try{
  await call('Page.enable');await call('Runtime.enable');await call('Network.enable');await call('Network.setCookie',{name:guest.cookie.split('=')[0],value:guest.cookie.split('=').slice(1).join('='),url:base,httpOnly:true,sameSite:'Lax'});
  await call('Emulation.setDeviceMetricsOverride',{width:1440,height:1000,deviceScaleFactor:1,mobile:false});await call('Page.navigate',{url:`${base}/?project=${project.id}&view=pattern`});
  await wait("document.querySelector('.pattern-board')&&document.querySelector('.pattern-consent button').disabled");
+ await wait("document.querySelector('.pattern-saved li')");assert.ok(await evaluate("document.querySelector('.pattern-saved').textContent.includes('current basis')"));
  await evaluate("document.querySelector('.pattern-consent input').click()");await wait("!document.querySelector('.pattern-consent button').disabled");await evaluate("document.querySelector('.pattern-consent button').click()");await wait("document.querySelector('.pattern-workbench')&&document.querySelector('.pattern-impact')");
+ await call('Page.reload',{ignoreCache:true});await wait("document.querySelector('.pattern-saved li')&&!document.querySelector('.pattern-workbench')");
+ await evaluate("document.querySelector('.pattern-saved button').click()");await wait("document.querySelector('.pattern-workbench')&&document.querySelector('.pattern-impact')");
  assert.equal(await evaluate("document.querySelectorAll('.pattern-changed').length"),3);
  assert.ok(await evaluate("document.querySelector('.pattern-inspector').textContent.includes('folded half')"));
  await evaluate("document.querySelector('[aria-label=\"Inspect Hem stitch edge, changed\"]').focus()");await call('Input.dispatchKeyEvent',{type:'keyDown',key:'Enter',code:'Enter',windowsVirtualKeyCode:13});await call('Input.dispatchKeyEvent',{type:'keyUp',key:'Enter',code:'Enter',windowsVirtualKeyCode:13});

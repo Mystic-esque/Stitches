@@ -24,6 +24,7 @@ it.skipIf(process.env.STITCHES_LIVE_AGENT_RUN !== "true")("qualifies one actual 
     const project = store.createProject(ownerId, { title: "Synthetic local qualification project", brief: "No personal data", source: { kind: "candidate", designId: design }, idempotencyKey: randomUUID() }, source.fingerprint);
     if (task === "step_guidance" || task === "troubleshoot_step") {
       const { loadMakingPlan } = await import("../knowledge/making-plan");
+      const { currentMakingSession } = await import("../../domain/making-plan");
       const makingPlan = await loadMakingPlan(catalogClient, source);
       const options = design === "tina" ? { sleeves: true, frontBottom: true, dart: true } : { sleeves: false, frontBottom: false, dart: false };
       store.recordMaking(ownerId, project.id, {
@@ -34,9 +35,24 @@ it.skipIf(process.env.STITCHES_LIVE_AGENT_RUN !== "true")("qualifies one actual 
         idempotencyKey: randomUUID(),
         event: { kind: "configured", options },
       }, makingPlan, source.fingerprint);
+      if (task === "troubleshoot_step") {
+        for (let index = 0; index < 20; index++) {
+          const history = store.listMaking(ownerId, project.id), next = currentMakingSession(history, project, makingPlan)?.next;
+          if (!next) throw new Error("No eligible source-backed diagnostic step was found.");
+          const event = next.diagnostic
+            ? { kind: "help_requested" as const, stepId: next.id, symptom: "seam_puckering" as const, detail: "Synthetic scrap-only question; no physical garment claim." }
+            : { kind: "reviewed" as const, stepId: next.id, checkpointConfirmed: true as const };
+          store.recordMaking(ownerId, project.id, { expectedProjectSequence: project.sequence, expectedBasisHash: project.basisHash,
+            expectedHistorySequence: history.length, planFingerprint: makingPlan.fingerprint, idempotencyKey: randomUUID(), event }, makingPlan, source.fingerprint);
+          if (next.diagnostic) break;
+        }
+      }
     }
     const loadSnapshot = () => loadOwnedAgentSnapshot(store, ownerId, project.id);
+    const selection = task === "understand_pieces" ? { kind: "piece" as const, pieceKey: source.pieceStudy[0].pieceKey } : undefined;
     const initial = await loadSnapshot(), run = store.startAgentRun(ownerId, project.id, { idempotencyKey: randomUUID(), task,
+      ...(selection ? { selection, request: `Explain the selected ${source.pieceStudy[0].title} and its source-backed preparation limits.` } : {}),
+      ...(task === "troubleshoot_step" ? { request: "A seam may be puckering. What safe scrap test should I do before changing my actual garment?" } : {}),
       expectedBasis: companionBasis(initial), consent: { version: "preparation-v1", sharePreparationSummary: true } });
     let current = run;
     const actualReader = createStitchesCompanionReader(); let interrupted = false, recovered = false;
@@ -58,10 +74,16 @@ it.skipIf(process.env.STITCHES_LIVE_AGENT_RUN !== "true")("qualifies one actual 
       passed: current.status === "completed", distinction: "Actual provider and knowledge retrieval; not a benchmark, maker trial or verified pattern." };
     expect(current.status).toBe("completed"); expect(current.requests).toBeLessThanOrEqual(4); expect(current.activeMs).toBeLessThanOrEqual(120_000);
     expect(current.knowledgeHash).toMatch(/^[a-f0-9]{64}$/); expect(store.getProject(ownerId, project.id)).toEqual(project);
+    if (selection) expect(current.artifact?.subjectId).toBe(selection.pieceKey);
+    if (task === "troubleshoot_step") expect(current.artifact?.kind).toBe("diagnostic_check");
     if (injectInterruption) expect(recovered).toBe(true);
   } finally {
-    const evidenceName = (task === "step_guidance" || task === "troubleshoot_step")
+    const evidenceName = task === "troubleshoot_step"
+      ? `companion-live-diagnostic-${design}-verification.json`
+      : task === "step_guidance"
       ? `companion-live-making-${design}-verification.json`
+      : design === "tina" && task === "understand_pieces"
+      ? "companion-live-selected-tina-verification.json"
       : design === "tina"
       ? "companion-live-tina-recovery-verification.json"
       : "companion-live-run-verification.json";

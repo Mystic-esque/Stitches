@@ -37,6 +37,21 @@ export type PatternStudy = {
   impact: z.infer<typeof studyImpactSchema>; capability: "plan_only"; projectChanged: false; cutReady: false;
   sourceUrl: string; missingReceipts: string[];
 };
+// A saved study is design intent and a reproducible receipt, never a cutting pattern.
+export const savedStudySchema = z.object({
+  id: z.uuid(), projectId: z.uuid(), createdAt: z.iso.datetime(),
+  basis: z.object({ projectId: z.uuid(), sequence: z.number().int().positive(), basisHash: z.string().regex(/^[a-f0-9]{64}$/), sourceFingerprint: z.string().regex(/^[a-f0-9]{64}$/) }).strict(),
+  command: patternStudyRequestSchema,
+  beforeHash: z.string().regex(/^[a-f0-9]{64}$/), afterHash: z.string().regex(/^[a-f0-9]{64}$/),
+  impact: studyImpactSchema, capability: z.literal("plan_only"), cutReady: z.literal(false),
+  imported: z.boolean().optional(),
+}).strict();
+export type SavedStudy = z.infer<typeof savedStudySchema>;
+export const saveStudyRequestSchema = z.object({
+  study: z.object({ basis: savedStudySchema.shape.basis, command: patternStudyRequestSchema,
+    beforeHash: savedStudySchema.shape.beforeHash, afterHash: savedStudySchema.shape.afterHash }).strict(),
+  idempotencyKey: z.uuid(),
+}).strict();
 export function operationsPath(operations: PathOperations): string {
   return operations.map(op => op.type === "close" ? "Z" : op.type === "curve"
     ? `C ${op.cp1.x} ${op.cp1.y} ${op.cp2.x} ${op.cp2.y} ${op.to.x} ${op.to.y}`

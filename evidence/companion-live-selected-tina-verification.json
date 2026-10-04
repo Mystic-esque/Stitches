@@ -1,0 +1,147 @@
+{
+  "kind": "actual-gemini-content-lake-context",
+  "checkedAt": "2026-10-04T20:10:59.503Z",
+  "paidBudgetUsd": 0,
+  "syntheticPrivateProject": true,
+  "sharedSanityWrites": 0,
+  "model": "gemini-3.5-flash-lite",
+  "design": "tina",
+  "task": "understand_pieces",
+  "injectedContextInterruption": false,
+  "passed": true,
+  "elapsedMs": 24560,
+  "run": {
+    "id": "d5d1aaa7-aed4-4efa-bf6c-3b152f1291f8",
+    "projectId": "27a594d3-a671-4e86-9e36-fd6f0dafaf90",
+    "basis": {
+      "projectId": "27a594d3-a671-4e86-9e36-fd6f0dafaf90",
+      "projectSequence": 1,
+      "projectHash": "c198a041c24eef6f9cb827f75e5d1b68d4b938e419bfd666b4a89c0a29264a7c",
+      "catalogFingerprint": "68d6026c7f508a70de2255916003d91e3607f23eb3f3afefb3a05ea82e1f215f",
+      "diagnosticFingerprint": "0f087c6b048811f6b3dcc780f9584ad191b9a7a2a638e9545053f95cce3b1161",
+      "historySequence": 0,
+      "historyHash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "makingSequence": 0,
+      "makingHash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "planFingerprint": "06acf488bef4042b1aa26e51e68a84a5f4c077949931e28551fd7853be8a9034"
+    },
+    "task": "understand_pieces",
+    "request": "Explain the selected Overlapping front and its source-backed preparation limits.",
+    "selection": {
+      "kind": "piece",
+      "pieceKey": "front"
+    },
+    "consentVersion": "preparation-v1",
+    "model": "gemini-3.5-flash-lite",
+    "status": "completed",
+    "requests": 4,
+    "activeMs": 17237,
+    "checkpoints": [
+      {
+        "sequence": 1,
+        "event": "request_reserved",
+        "at": "2026-10-04T20:11:05.839Z",
+        "request": 1
+      },
+      {
+        "sequence": 2,
+        "event": "response_saved",
+        "at": "2026-10-04T20:11:08.688Z",
+        "request": 1
+      },
+      {
+        "sequence": 3,
+        "event": "tool_completed",
+        "at": "2026-10-04T20:11:10.354Z",
+        "request": 1,
+        "tool": "inspect_project"
+      },
+      {
+        "sequence": 4,
+        "event": "request_reserved",
+        "at": "2026-10-04T20:11:10.598Z",
+        "request": 2
+      },
+      {
+        "sequence": 5,
+        "event": "response_saved",
+        "at": "2026-10-04T20:11:11.957Z",
+        "request": 2
+      },
+      {
+        "sequence": 6,
+        "event": "tool_completed",
+        "at": "2026-10-04T20:11:13.555Z",
+        "request": 2,
+        "tool": "resolve_exact_graph"
+      },
+      {
+        "sequence": 7,
+        "event": "request_reserved",
+        "at": "2026-10-04T20:11:14.006Z",
+        "request": 3
+      },
+      {
+        "sequence": 8,
+        "event": "response_saved",
+        "at": "2026-10-04T20:11:15.568Z",
+        "request": 3
+      },
+      {
+        "sequence": 9,
+        "event": "tool_completed",
+        "at": "2026-10-04T20:11:18.248Z",
+        "request": 3,
+        "tool": "retrieve_context"
+      },
+      {
+        "sequence": 10,
+        "event": "request_reserved",
+        "at": "2026-10-04T20:11:18.461Z",
+        "request": 4
+      },
+      {
+        "sequence": 11,
+        "event": "response_saved",
+        "at": "2026-10-04T20:11:21.048Z",
+        "request": 4
+      },
+      {
+        "sequence": 12,
+        "event": "completed",
+        "at": "2026-10-04T20:11:23.984Z",
+        "request": 4
+      }
+    ],
+    "tools": [
+      "inspect_project",
+      "resolve_exact_graph",
+      "retrieve_context"
+    ],
+    "createdAt": "2026-10-04T20:11:05.516Z",
+    "updatedAt": "2026-10-04T20:11:23.984Z",
+    "modelTextVerified": false,
+    "projectChanged": false,
+    "capability": "plan_only",
+    "knowledgeHash": "110ea03c88600fe3d9e17fd0ddfaff00b074fc27dfb05af09d2453bff1e87187",
+    "text": "Per **FreeSewing Tina top documentation** (`companion-source-tina-20261001`), the source-listed pieces for the Tina faux-wrap top are:\n\n* **Overlapping front** (`companion-piece-tina-front-20261001`): Cut count 2, no fold, mirrored (`true`), condition: `always`, material: `main`. Pending review.\n* **Back** (`companion-piece-tina-back-20261001`): Cut count 1, single fold (`single`), not mirrored (`false`), condition: `always`, material: `main`. Pending review.\n* **Front bottom** (`companion-piece-tina-front-bottom-20261001`): Cut count 1, no fold, not mirrored (`false`), condition: `front-bottom` (optional), material: `main`. Pending review.\n* **Sleeve** (`companion-piece-tina-sleeve-20261001`): Cut count 2, no fold, mirrored (`true`), condition: `sleeves` (optional), material: `main`. Pending review.\n\n### Selected Piece Preparation Limits: Overlapping Front\n* **Source-backed limits:** Per **Overlapping front** (`companion-piece-tina-front-20261001`) and **Tina faux-wrap top** (`companion-candidate-tina-20261001`), this piece requires 2 cut mirrored copies from the main knit material (`materialStructure: knit`). All preparation and review gates are currently in `review` or `blocked` status. Exact geometry, grainline placement, and scale verification remain unverified.\n\n###",
+    "artifact": {
+      "kind": "piece_explanation",
+      "subjectId": "front",
+      "title": "Overlapping front",
+      "sourceTitle": "FreeSewing Tina top documentation",
+      "sourceUrl": "https://freesewing.eu/docs/designs/tina/",
+      "sourceFingerprint": "68d6026c7f508a70de2255916003d91e3607f23eb3f3afefb3a05ea82e1f215f",
+      "knowledgeHash": "110ea03c88600fe3d9e17fd0ddfaff00b074fc27dfb05af09d2453bff1e87187",
+      "facts": [
+        "Main fabric · cut 2 mirrored",
+        "No fold specified",
+        "pending source review"
+      ],
+      "capability": "plan_only"
+    }
+  },
+  "acknowledgedResponseRecoveryWithoutExtraRequest": false,
+  "projectUnchanged": true,
+  "distinction": "Actual provider and knowledge retrieval; not a benchmark, maker trial or verified pattern."
+}

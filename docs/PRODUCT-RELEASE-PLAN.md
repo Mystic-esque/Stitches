@@ -1,6 +1,6 @@
 # Stitches — the next product release
 
-Date: October 4, 2026. Status: execution plan prepared in response to the owner's product-first direction; implementation remains pending. This is a release plan, not new proof or a claim that its acceptance checks pass.
+Date: October 4, 2026. Status: active execution. R1 has selected-object input, bounded text, source-bound artifacts and one actual selected Tina Gemini/Context run; it does not yet have open-ended tool choice or a confirmed-facts conversation summary. R2 has private Sandy study save/reopen and v5 backup in code; final browser verification is running. The owner reports a successful local production build. R3's diagnostic KB guard is implemented but its new agent path lacks live proof. R4's reviewer draft is prepared; final screenshots, judge access and publication authorization remain open. See `STATUS.md` for real results. This plan is not an assertion that its exit gates all pass.
 
 Read this for the next delivery order, `WORKSPACE-AGENT-DIRECTION.md` for the durable interaction design, and `STATUS.md` for actual capability. This consolidates the existing Companion 2.0/workspace direction. It does not restart the project or replace the later cutting, photo, fit and 3D ambitions.
 
