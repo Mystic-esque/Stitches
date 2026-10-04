@@ -19,7 +19,11 @@ export async function GET(request: NextRequest, context: Context) {
       const snapshot = await loadOwnedAgentSnapshot(store, identity.ownerId, id);
       const tools = createCompanionTools({ snapshot, loadCurrent: async () => snapshot,
         reader: createStitchesCompanionReader(), knowledgeBaseId: STITCHES_KB_ID, consent: { sharePreparationSummary: true } });
-      preparation = { basis: companionBasis(snapshot), sharedSummary: await tools.execute("inspect_project", {}) };
+      preparation = {
+        basis: companionBasis(snapshot),
+        sharedSummary: await tools.execute("inspect_project", {}),
+        makingSummary: snapshot.makingPlan ? await tools.execute("inspect_making", {}) : null,
+      };
     } catch { /* Historical runs stay readable during source outages. No model call or fixture fallback. */ }
     return guestResponse(request, identity, { runs, preparation, enabled: companionFreeAuthorized() });
   } catch (error) { return agentErrorResponse(error); }
@@ -32,6 +36,10 @@ export async function POST(request: NextRequest, context: Context) {
     if (replay) return guestResponse(request, identity, { run: publicAgentRun(replay), replayed: true });
     const snapshot = await loadOwnedAgentSnapshot(store, identity.ownerId, id);
     if (!sameAgentBasis(input.expectedBasis, companionBasis(snapshot))) throw new CompanionAgentError("stale", "The saved project, exact source or history changed. Refresh the consent preview.");
+    const isMakingTask = input.task === "step_guidance" || input.task === "troubleshoot_step";
+    if (isMakingTask && !snapshot.makingPlan) {
+      throw new CompanionAgentError("missing_knowledge", "The construction study plan is unavailable for this candidate. Manual making remains available.");
+    }
     const run = store.startAgentRun(identity.ownerId, id, input);
     return guestResponse(request, identity, { run: publicAgentRun(run), replayed: false }, 201);
   } catch (error) { return agentErrorResponse(error); }

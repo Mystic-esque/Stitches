@@ -3,15 +3,25 @@ import { z } from "zod";
 import type { GuestProject } from "../../domain/guest-project";
 import type { DiagnosticRecord } from "../../domain/diagnostic-history";
 import { preparationPlan } from "../../domain/preparation-plan";
+import { currentMakingSession, makingPrerequisites, type MakingPlan, type MakingRecord } from "../../domain/making-plan";
 import type { CompanionCatalogCard } from "../knowledge/companion-catalog";
 import { contextConfiguration, SanityContextKnowledgeBase, type ContextResult } from "../knowledge/context-mcp";
 import { companionKbPaths, kbAttributionNeedsReview } from "../knowledge/companion-kb-paths";
 
-export const COMPANION_TOOLS = ["inspect_project", "inspect_preparation", "resolve_exact_graph", "retrieve_context"] as const;
+import { selectMakingStepPieces } from "../../domain/planning-piece-study";
+
+export const COMPANION_TOOLS = ["inspect_project", "inspect_preparation", "resolve_exact_graph", "retrieve_context", "inspect_making"] as const;
 export type CompanionTool = typeof COMPANION_TOOLS[number];
-export type CompanionSnapshot = { project: GuestProject; source: CompanionCatalogCard; history: DiagnosticRecord[] };
+export type CompanionSnapshot = {
+  project: GuestProject;
+  source: CompanionCatalogCard;
+  history: DiagnosticRecord[];
+  makingHistory?: MakingRecord[];
+  makingPlan?: MakingPlan | null;
+};
 export type CompanionBasis = { projectId: string; projectSequence: number; projectHash: string;
-  catalogFingerprint: string; diagnosticFingerprint: string; historySequence: number; historyHash: string };
+  catalogFingerprint: string; diagnosticFingerprint: string; historySequence: number; historyHash: string;
+  makingSequence: number; makingHash: string; planFingerprint: string | null };
 const emptyArguments = z.object({}).strict();
 export const STITCHES_KB_ID = "kbkvu1vrPsLG";
 
@@ -29,13 +39,17 @@ export class CompanionAgentError extends Error {
 }
 
 export function companionBasis(snapshot: CompanionSnapshot): CompanionBasis {
-  const { project, source, history } = snapshot;
+  const { project, source, history, makingHistory = [], makingPlan = null } = snapshot;
   if (project.source.kind !== "candidate" || project.source.designId !== source.designKey || project.knowledgeFingerprint !== source.fingerprint ||
     history.some((item, index) => item.projectId !== project.id || item.sequence !== index + 1))
     throw new CompanionAgentError("stale", "Review the saved project and its current applicable source before asking the agent.");
+  if (makingHistory.some((item, index) => item.projectId !== project.id || item.sequence !== index + 1))
+    throw new CompanionAgentError("stale", "Making history records are inconsistent with the project.");
   return { projectId: project.id, projectSequence: project.sequence, projectHash: project.basisHash,
     catalogFingerprint: source.fingerprint, diagnosticFingerprint: source.diagnosticStudy.fingerprint,
-    historySequence: history.length, historyHash: createHash("sha256").update(JSON.stringify(history)).digest("hex") };
+    historySequence: history.length, historyHash: createHash("sha256").update(JSON.stringify(history)).digest("hex"),
+    makingSequence: makingHistory.length, makingHash: createHash("sha256").update(JSON.stringify(makingHistory)).digest("hex"),
+    planFingerprint: makingPlan?.fingerprint ?? null };
 }
 
 /** No repository writer. Body values, private notes and photos are not provider input. */
@@ -45,6 +59,7 @@ export function createCompanionTools(input: {
   reader: { initialContext?: () => Promise<ContextResult>; readPaths: (paths: string[]) => Promise<ContextResult> };
   knowledgeBaseId: string;
   consent: { sharePreparationSummary: boolean };
+  topic?: "planning" | "construction";
   signal?: AbortSignal;
 }) {
   if (input.consent.sharePreparationSummary !== true) throw new CompanionAgentError("consent", "Review and consent to the minimized preparation summary first.");
@@ -60,7 +75,7 @@ export function createCompanionTools(input: {
     if (input.signal?.aborted) throw new CompanionAgentError("cancelled", "The read-only agent run was cancelled.");
     const current = companionBasis(await input.loadCurrent());
     if (input.signal?.aborted) throw new CompanionAgentError("cancelled", "The read-only agent run was cancelled.");
-    if (JSON.stringify(current) !== JSON.stringify(basis)) throw new CompanionAgentError("stale", "The project, source or scrap history changed. Inspect the new saved basis; no project was changed.");
+    if (JSON.stringify(current) !== JSON.stringify(basis)) throw new CompanionAgentError("stale", "The project, source, scrap history or construction study changed. Inspect the new saved basis; no project was changed.");
   }
 
   return {
@@ -84,6 +99,48 @@ export function createCompanionTools(input: {
           requiredMeasurements: snapshot.source.requiredMeasurements, materialStructure: snapshot.source.materialStructure,
           pieces: snapshot.source.pieceStudy, cuttingCaveat: snapshot.source.cuttingCaveat,
           unsupported: ["checked geometry", "layout", "fit", "yardage", "qualified making steps", "garment remedies"] };
+      } else if (name === "inspect_making") {
+        const plan = snapshot.makingPlan;
+        const history = snapshot.makingHistory ?? [];
+        if (!plan) {
+          result = { basis, source: snapshot.source.designKey, configured: false, status: "unavailable",
+            message: "Construction learning plan is not available for this project candidate.", capability: "plan_only" };
+        } else {
+          const session = currentMakingSession(history, snapshot.project, plan);
+          if (!session) {
+            result = { basis, source: snapshot.source.designKey, planTitle: plan.title, sourceUrl: plan.sourceUrl,
+              configured: false, status: "not_configured",
+              message: "The construction study version has not been confirmed yet. Confirm your version choices in the making notebook first.",
+              availableOptions: snapshot.source.designKey === "tina" ? ["sleeves", "frontBottom", "dart"] : [],
+              totalAuthoredSteps: plan.steps.length, envelope: plan.envelope, capability: "plan_only" };
+          } else {
+            const step = session.next ?? session.steps.at(-1);
+            const prereqs = step ? makingPrerequisites(plan, session.options, step.id) : [];
+            const prerequisitesMet = prereqs.every((id) => session.reviewed.has(id));
+            const stepPieces = step ? selectMakingStepPieces(snapshot.source.pieceStudy, session.options, step.pieceKeys) : [];
+            const lastHelp = history.findLast((entry) => entry.event.kind === "help_requested" &&
+              entry.sessionId === session.configured.id && entry.event.stepId === step?.id);
+
+            result = {
+              basis, source: snapshot.source.designKey, planTitle: plan.title,
+              configured: true, confirmedOptions: session.options,
+              stepFocus: session.next ? "next_unreviewed_checkpoint" : "all_checkpoints_reviewed",
+              progress: `${session.reviewed.size} of ${session.steps.length} study checkpoints reviewed`,
+              activeStep: step ? {
+                id: step.id, title: step.title, ordinal: step.ordinal, condition: step.condition,
+                focus: session.next ? "next_unreviewed_checkpoint" : "last_study_step_reviewed",
+                prerequisites: prereqs, prerequisitesMet, orientation: step.orientation,
+                action: step.action, checkpoint: step.checkpoint, diagnosticEligible: step.diagnostic,
+                pieces: stepPieces.map((p) => ({ title: p.title, pieceKey: p.pieceKey, cutCount: p.cutCount, fold: p.fold, mirrored: p.mirrored, material: p.material })),
+                edgeIds: step.edgeIds, reviewed: session.reviewed.has(step.id),
+                activeHelpSymptom: lastHelp && lastHelp.event.kind === "help_requested" ? lastHelp.event.symptom : null,
+              } : null,
+              allStepsReviewed: !session.next, capability: "plan_only",
+              withheld: ["personal notes", "freeform question text", "body measurements", "photos"],
+              disclaimer: "Learning plan only. This inspects authored construction relationships; it is not proof of physical sewing, pattern geometry, or cutting readiness.",
+            };
+          }
+        }
       } else {
         let knowledge: ContextResult;
         try {
@@ -93,11 +150,16 @@ export function createCompanionTools(input: {
             const outline = await input.reader.initialContext();
             if (outline.tool !== "initial_context" || outline.knowledgeBaseId !== input.knowledgeBaseId || outline.text.length > 100_000)
               throw new Error("Mismatched outline.");
-            paths = companionKbPaths(outline.text, snapshot.source.designKey);
+            paths = companionKbPaths(outline.text, snapshot.source.designKey, input.topic ?? "planning");
           }
           knowledge = await input.reader.readPaths(paths);
         }
-        catch { throw new CompanionAgentError("missing_knowledge", "Actual scoped Sanity Context retrieval failed. Manual preparation remains available."); }
+        catch {
+          throw new CompanionAgentError("missing_knowledge",
+            input.topic === "construction"
+              ? "Actual scoped Sanity Context construction retrieval failed. Manual making remains available."
+              : "Actual scoped Sanity Context retrieval failed. Manual preparation remains available.");
+        }
         if (knowledge.tool !== "knowledge_base_read" || knowledge.knowledgeBaseId !== input.knowledgeBaseId ||
           JSON.stringify(knowledge.paths) !== JSON.stringify(paths) || !knowledge.text.trim() || knowledge.text.length > 20_000)
           throw new CompanionAgentError("missing_knowledge", "Context returned missing, oversized or mismatched evidence.");

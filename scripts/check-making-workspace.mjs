@@ -94,7 +94,9 @@ try {
   await call('Input.dispatchKeyEvent', { type: 'keyDown', key: 'Enter', code: 'Enter', windowsVirtualKeyCode: 13, text: '\r', unmodifiedText: '\r' }); await call('Input.dispatchKeyEvent', { type: 'keyUp', key: 'Enter', code: 'Enter', windowsVirtualKeyCode: 13 });
   await wait("document.querySelector('.making-layout')"); assert.equal(await evaluate("document.querySelectorAll('.making-rail li').length"), 5);
   // An actual save commits, but this disposable browser deliberately loses its response.
-  await evaluate("window.stitchesMakingFetch=window.fetch;window.__lostMakingResponse=false;window.fetch=async(...a)=>{const response=await window.stitchesMakingFetch(...a);if(String(a[0]).endsWith('/making')&&a[1]?.method==='POST'&&!window.__lostMakingResponse){window.__lostMakingResponse=true;throw new TypeError('Injected lost save acknowledgement after actual local commit')}return response};document.querySelector('.making-checkpoint input').click();document.querySelector('.making-actions button').click()");
+  await evaluate("window.stitchesMakingFetch=window.fetch;window.__lostMakingResponse=false;window.fetch=async(...a)=>{const response=await window.stitchesMakingFetch(...a);if(String(a[0]).endsWith('/making')&&a[1]?.method==='POST'&&!window.__lostMakingResponse){window.__lostMakingResponse=true;throw new TypeError('Injected lost save acknowledgement after actual local commit')}return response};document.querySelector('.making-checkpoint input').click()");
+  await wait("document.querySelector('.making-actions button')&&!document.querySelector('.making-actions button').disabled");
+  await evaluate("document.querySelector('.making-actions button').click()");
   await wait("document.querySelector('.making-foot [role=status]')?.textContent.includes('Injected lost save')"); await screenshot('making-lost-save-1440.png');
   const beforeRetry = await api(`/api/projects/${projects[0].id}/making`, { cookie: guest.cookie }); assert.equal(beforeRetry.data.history.length, 2);
   await evaluate("document.querySelector('.making-actions button').click()"); await wait("document.querySelector('#making-step-title')?.textContent==='Plan the opening'");

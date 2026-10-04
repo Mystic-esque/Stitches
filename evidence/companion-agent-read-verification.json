@@ -1,19 +1,22 @@
 {
-  "capturedAt": "2026-10-02T18:24:54.793Z",
+  "capturedAt": "2026-10-04T02:58:21.551Z",
   "passed": true,
   "provenance": "Actual development Content Lake + actual dedicated Context KB; synthetic private projects; no model inference",
   "providerRequests": 0,
   "results": [
     {
       "design": "sandy",
-      "evidence": {
-        "projectId": "306769e0-e9e9-4360-968c-389ca98336ab",
+      "planningEvidence": {
+        "projectId": "c569b935-b8c1-4624-b250-853f4d5f0d57",
         "projectSequence": 2,
         "projectHash": "f48e4f8636d00b4e25b12cd05550e73f1cb251210f329dd24f8b7416b9abf6ee",
         "catalogFingerprint": "2da503f12b8f6007d4e1f6f46d4c70cf25fa33b229bf6b1aad01ec75d379abb0",
         "diagnosticFingerprint": "0f087c6b048811f6b3dcc780f9584ad191b9a7a2a638e9545053f95cce3b1161",
         "historySequence": 0,
         "historyHash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "makingSequence": 0,
+        "makingHash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "planFingerprint": null,
         "knowledgeBaseId": "kbkvu1vrPsLG",
         "paths": [
           "garment_planning/sandy_circle_skirt"
@@ -22,22 +25,52 @@
         "kbRole": "maintained_explanation_not_exact_authority",
         "capability": "plan_only"
       },
-      "toolSequence": [
-        "inspect_project",
-        "resolve_exact_graph",
-        "retrieve_context"
+      "makingEvidence": {
+        "projectId": "c569b935-b8c1-4624-b250-853f4d5f0d57",
+        "projectSequence": 2,
+        "projectHash": "f48e4f8636d00b4e25b12cd05550e73f1cb251210f329dd24f8b7416b9abf6ee",
+        "catalogFingerprint": "2da503f12b8f6007d4e1f6f46d4c70cf25fa33b229bf6b1aad01ec75d379abb0",
+        "diagnosticFingerprint": "0f087c6b048811f6b3dcc780f9584ad191b9a7a2a638e9545053f95cce3b1161",
+        "historySequence": 0,
+        "historyHash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "makingSequence": 1,
+        "makingHash": "f8db0a9f422dd385a7fb603776b463b2157131ad07e77215404608882727d217",
+        "planFingerprint": "12e12da85d49611fb489a9df037f9a9413795feb104f250e8fc082b339550a44",
+        "knowledgeBaseId": "kbkvu1vrPsLG",
+        "paths": [
+          "construction/sandy_circle_skirt"
+        ],
+        "knowledgeHash": "da2f5158e2ce1abc6b78d92c1d602e34f3ae49afa2c634d2a6f251f025dfa90b",
+        "kbRole": "maintained_explanation_not_exact_authority",
+        "capability": "plan_only"
+      },
+      "makingActiveStep": "Understand the closure seam",
+      "toolSequences": [
+        [
+          "inspect_project",
+          "resolve_exact_graph",
+          "retrieve_context"
+        ],
+        [
+          "inspect_project",
+          "inspect_making",
+          "retrieve_context"
+        ]
       ]
     },
     {
       "design": "tina",
-      "evidence": {
-        "projectId": "bf0d3cc3-1fec-434d-9c88-8a2206470a1c",
+      "planningEvidence": {
+        "projectId": "fb7f44c5-e013-4f8c-9d45-ff2a43bff32f",
         "projectSequence": 2,
         "projectHash": "776cec1699d808880392d7d9bf27e984714791474e9a656e8a3832c5160b0f3e",
         "catalogFingerprint": "68d6026c7f508a70de2255916003d91e3607f23eb3f3afefb3a05ea82e1f215f",
         "diagnosticFingerprint": "0f087c6b048811f6b3dcc780f9584ad191b9a7a2a638e9545053f95cce3b1161",
         "historySequence": 0,
         "historyHash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "makingSequence": 0,
+        "makingHash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "planFingerprint": null,
         "knowledgeBaseId": "kbkvu1vrPsLG",
         "paths": [
           "garment_planning/tina_faux_wrap_top"
@@ -46,10 +79,37 @@
         "kbRole": "maintained_explanation_not_exact_authority",
         "capability": "plan_only"
       },
-      "toolSequence": [
-        "inspect_project",
-        "resolve_exact_graph",
-        "retrieve_context"
+      "makingEvidence": {
+        "projectId": "fb7f44c5-e013-4f8c-9d45-ff2a43bff32f",
+        "projectSequence": 2,
+        "projectHash": "776cec1699d808880392d7d9bf27e984714791474e9a656e8a3832c5160b0f3e",
+        "catalogFingerprint": "68d6026c7f508a70de2255916003d91e3607f23eb3f3afefb3a05ea82e1f215f",
+        "diagnosticFingerprint": "0f087c6b048811f6b3dcc780f9584ad191b9a7a2a638e9545053f95cce3b1161",
+        "historySequence": 0,
+        "historyHash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "makingSequence": 1,
+        "makingHash": "f95fd0fc06f118d46911ace82fdacd1211c297aeb51dab96ab3f1e6fb3995e4a",
+        "planFingerprint": "06acf488bef4042b1aa26e51e68a84a5f4c077949931e28551fd7853be8a9034",
+        "knowledgeBaseId": "kbkvu1vrPsLG",
+        "paths": [
+          "construction/tina_faux_wrap_top"
+        ],
+        "knowledgeHash": "b096960d0594e0e467465010db90269599fe4a0d7fa2c9db7f10fe92783499a5",
+        "kbRole": "maintained_explanation_not_exact_authority",
+        "capability": "plan_only"
+      },
+      "makingActiveStep": "Read asymmetric markings",
+      "toolSequences": [
+        [
+          "inspect_project",
+          "resolve_exact_graph",
+          "retrieve_context"
+        ],
+        [
+          "inspect_project",
+          "inspect_making",
+          "retrieve_context"
+        ]
       ]
     }
   ]

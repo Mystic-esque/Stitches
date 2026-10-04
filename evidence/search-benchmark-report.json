@@ -1,0 +1,168 @@
+{
+  "benchmarkDate": "2026-10-04T03:08:23.387Z",
+  "provenance": "Deterministic evaluation of frozen task corpus against exact Stitches graph + Context KB vs. keyword-only search over identical records.",
+  "summary": {
+    "totalTasks": 5,
+    "keywordPassed": 1,
+    "keywordFailed": 4,
+    "companionPassed": 5,
+    "companionFailed": 0
+  },
+  "tasks": [
+    {
+      "taskId": "TASK-1",
+      "taskName": "Next-Step & Prerequisite Awareness",
+      "query": "What step should I sew next on Sandy circle skirt?",
+      "criteria": "Must identify the first unreviewed checkpoint based on DAG order, not arbitrary step with highest term match.",
+      "keywordSearch": {
+        "passed": false,
+        "topMatches": [
+          {
+            "id": "companion-candidate-sandy-20261001",
+            "title": "FreeSewing Sandy Circle Skirt",
+            "score": 7.58
+          },
+          {
+            "id": "companion-making-tina-v1-shoulders",
+            "title": "Join the shoulder relationship",
+            "score": 1.69
+          },
+          {
+            "id": "companion-candidate-tina-20261001",
+            "title": "FreeSewing Tina Faux-Wrap Top",
+            "score": 1.69
+          }
+        ],
+        "notes": "Keyword top result: \"FreeSewing Sandy Circle Skirt\" (companion-candidate-sandy-20261001). Ignores user progress and DAG prerequisites."
+      },
+      "stitchesCompanion": {
+        "passed": true,
+        "notes": "Server evaluates session.reviewed (empty) against prerequisite DAG; strictly returns closure seam as activeStep."
+      }
+    },
+    {
+      "taskId": "TASK-2",
+      "taskName": "Version-Bound Piece Applicability",
+      "query": "What pieces do I cut for Tina top without sleeves?",
+      "criteria": "Must exclude pieces for disabled options and enforce knit-only constraint.",
+      "keywordSearch": {
+        "passed": false,
+        "topMatches": [
+          {
+            "id": "companion-candidate-tina-20261001",
+            "title": "FreeSewing Tina Faux-Wrap Top",
+            "score": 4.79
+          },
+          {
+            "id": "companion-piece-tina-sleeve-20261001",
+            "title": "Tina Sleeve",
+            "score": 4.39
+          },
+          {
+            "id": "companion-piece-tina-front-20261001",
+            "title": "Tina Overlapping Front",
+            "score": 2.69
+          }
+        ],
+        "notes": "Keyword matches sleeve document because \"cut\" and \"pieces\" appear in sleeve record, despite user having sleeves disabled."
+      },
+      "stitchesCompanion": {
+        "passed": true,
+        "notes": "selectMakingStepPieces() and inspect_making filter pieces by confirmed options (sleeves: false excludes sleeve)."
+      }
+    },
+    {
+      "taskId": "TASK-3",
+      "taskName": "Diagnostic Safety & Non-Destructive Check",
+      "query": "My seam is puckering. Should I unpick the dress and lower thread tension?",
+      "criteria": "Must require preliminary scrap test first and explicitly forbid altering actual garment.",
+      "keywordSearch": {
+        "passed": false,
+        "topMatches": [
+          {
+            "id": "companion-test-scrap-stitch-release-20261001",
+            "title": "Does a test seam relax when the stitches are released?",
+            "score": 10.85
+          },
+          {
+            "id": "companion-remedy-sample-lower-tension-20261001",
+            "title": "Compare a lower-tension sample",
+            "score": 8.08
+          },
+          {
+            "id": "companion-procedure-scrap-seam-check-20261001",
+            "title": "Check a puckered seam on scrap fabric",
+            "score": 5.69
+          }
+        ],
+        "notes": "Keyword search ranks remedy \"Compare a lower-tension sample\" without gating on scrap-stitch-release test outcome."
+      },
+      "stitchesCompanion": {
+        "passed": true,
+        "notes": "Diagnostic pathway gates remedy behind Stage 1 scrap-stitch-release test; explicitly warns never to unpick actual garment."
+      }
+    },
+    {
+      "taskId": "TASK-4",
+      "taskName": "Dependency Chain Enforced over Term Matching",
+      "query": "Can I attach the waistband now on Sandy?",
+      "criteria": "Must refuse premature waistband attachment until closure seam prerequisite is reviewed.",
+      "keywordSearch": {
+        "passed": true,
+        "topMatches": [
+          {
+            "id": "companion-making-sandy-v1-band",
+            "title": "Connect skirt and straight band",
+            "score": 3.1
+          },
+          {
+            "id": "companion-test-scrap-stitch-release-20261001",
+            "title": "Does a test seam relax when the stitches are released?",
+            "score": 3.08
+          },
+          {
+            "id": "companion-making-sandy-v1-opening",
+            "title": "Plan the opening",
+            "score": 2.69
+          }
+        ],
+        "notes": "Keyword search confirms waistband content exists and ranks it #1, oblivious to unmet closure seam prerequisite."
+      },
+      "stitchesCompanion": {
+        "passed": true,
+        "notes": "makingPrerequisites() verifies closure seam is not in session.reviewed; marks waistband step as locked / prerequisites first."
+      }
+    },
+    {
+      "taskId": "TASK-5",
+      "taskName": "Refusal of Unsupported / Unqualified Requests",
+      "query": "Generate a cut-ready production pattern SVG for my custom measurements.",
+      "criteria": "Must refuse cut-ready pattern generation and disclose plan-only / pending-review status.",
+      "keywordSearch": {
+        "passed": false,
+        "topMatches": [
+          {
+            "id": "companion-procedure-scrap-seam-check-20261001",
+            "title": "Check a puckered seam on scrap fabric",
+            "score": 1
+          },
+          {
+            "id": "companion-test-scrap-stitch-release-20261001",
+            "title": "Does a test seam relax when the stitches are released?",
+            "score": 1
+          },
+          {
+            "id": "companion-making-tina-v1-dart",
+            "title": "Understand the optional dart",
+            "score": 1
+          }
+        ],
+        "notes": "Keyword search returns planning candidate with score > 0; cannot assert capability bounds or refuse cut-ready claims."
+      },
+      "stitchesCompanion": {
+        "passed": true,
+        "notes": "System strictly bounds capability to \"plan_only\"; inspect_project asserts no cut readiness and refuses pattern generation."
+      }
+    }
+  ]
+}

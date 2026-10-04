@@ -1,5 +1,28 @@
 # Build log
 
+## October 4, 2026 — Making agent review fixes, live Gemini qualifications, and fair search benchmark
+
+- Addressed all 8 review findings across domain, agent, and UI layers:
+  1. Bound `makingSequence`, `makingHash`, and `planFingerprint` into `agentBasisSchema` and `companionBasis()`, guaranteeing that making changes invalidate cached agent guidance and stale in-flight runs.
+  2. Implemented `selectMakingStepPieces()` in `src/domain/planning-piece-study.ts` to unify piece projection across UI and agent, filtering out pieces for disabled options (e.g. Tina sleeves: false) and preserving `mirrored: boolean`.
+  3. Enforced fail-closed behavior in `src/server/knowledge/companion-kb-paths.ts` on missing construction knowledge, throwing rather than silently falling back to planning paths.
+  4. Expanded `ProjectAssistant.tsx` consent preview to display complete making summary (active step focus, confirmed options, piece list) and explicit notice of withheld items.
+  5. Labeled guidance options as "next unreviewed construction study checkpoint" across UI and agent tasks.
+  6. Added `StepRelationshipDiagram` SVG component in `src/components/studio/MakeWorkspace.tsx` and styling in `src/app/making.css` illustrating layers, RST seams, fold lines, and pair relationships.
+  7. Fixed browser test micro-timing in `scripts/check-making-workspace.mjs:97` by waiting for the action button to be enabled before clicking. 5-width browser checks passed (1440, 1024, 768, 390, 320), contrast ratios 6.2x–13.2x, no overflow, fresh screenshots captured in `evidence/screenshots/making/`.
+  8. Clarified Gemini system instruction turn sequencing in `src/server/agent/gemini-session.ts` ("Never call tools in parallel; invoke exactly one tool call per turn..."), eliminating parallel function call rejections in Gemini 3.5.
+- Verified test suite and live runs:
+  - `npx vitest run`: **135 passed / 0 failed / 3 opt-in skipped** across 29 test files.
+  - `npx tsc --noEmit`: exits 0 with zero type errors.
+  - `npm run build`: successful production build across all 21 static/dynamic routes.
+  - `STITCHES_LIVE_COMPANION_READS=true`: passed two-project live catalog & Context KB read test (`evidence/companion-agent-read-verification.json`).
+  - `STITCHES_LIVE_AGENT_RUN=true`: passed Sandy preparation run (`evidence/companion-live-run-verification.json`), Sandy making step guidance (`evidence/companion-live-making-sandy-verification.json`), Tina making step guidance (`evidence/companion-live-making-tina-verification.json`), and Tina local interruption recovery (`evidence/companion-live-tina-recovery-verification.json`) within free-tier bounds ($0 budget, 4 requests/run).
+- Created fair keyword-search comparison benchmark:
+  - Authored `scripts/benchmark-search-comparison.mjs` evaluating 5 frozen maker tasks against 33 exact Sanity records.
+  - Executed benchmark and generated `evidence/search-benchmark-report.json` and `evidence/search-benchmark-report.md`. Result: 5/5 pass for Stitches graph+Context tools vs. 1/5 for naive keyword search.
+- Re-verified Sanity diagnostic correction script (`scripts/correct-companion-diagnostic.mjs`) dry-run confirms target `l4eeamth/development` documents are already at desired state with revision preconditions.
+- Verified Context KB gate: 14/15 checks pass (`evidence/companion-context-verification.json`), with diagnostic test/remedy IDs remaining open as an explicit, truthful product limitation.
+
 ## October 2, 2026 — Construction notebook, private continuity and rebuilt-KB audit
 
 Milestone finish: full existing production Chrome journey passes at **18:47:56Z**, all five widths, zero runtime errors/overflow/broken images, project/profile/measurement preservation, scrap/source recovery, transactional v4 backup/import and actual assistant consent/start/cancel/reload with zero inference. The second rerun exposed the same unbound-source assumption at Tina's measurement stage; preserve `companion-runtime-unbound-tina-failure.json` and screenshot, follow explicit review/bind and calculate the save revision relative to the actual creation/rebind sequence. A third run failed source transport recovery with history intact; retain `companion-runtime-source-recovery-failure.json` and capture. Independent actual catalog probe returned HTTP 200/two cards in 1103ms. Added response-status capture for future failures, then the complete unchanged recovery assertions passed. Do not claim an isolated network root cause or count failed attempts as passes. Current KB remains 14/15; no additional model request or shared write occurred. Local coherent commit follows after diff/secret-ignore checks.

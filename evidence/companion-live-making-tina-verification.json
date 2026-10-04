@@ -1,0 +1,127 @@
+{
+  "kind": "actual-gemini-content-lake-context",
+  "checkedAt": "2026-10-04T03:03:10.186Z",
+  "paidBudgetUsd": 0,
+  "syntheticPrivateProject": true,
+  "sharedSanityWrites": 0,
+  "model": "gemini-3.5-flash-lite",
+  "design": "tina",
+  "task": "step_guidance",
+  "injectedContextInterruption": false,
+  "passed": true,
+  "elapsedMs": 17225,
+  "run": {
+    "id": "fa9f4143-ecbf-4276-bbc1-4e647fdfa345",
+    "projectId": "44ddc4af-a2ac-4e67-8edb-fb4c0b8cf759",
+    "basis": {
+      "projectId": "44ddc4af-a2ac-4e67-8edb-fb4c0b8cf759",
+      "projectSequence": 1,
+      "projectHash": "c198a041c24eef6f9cb827f75e5d1b68d4b938e419bfd666b4a89c0a29264a7c",
+      "catalogFingerprint": "68d6026c7f508a70de2255916003d91e3607f23eb3f3afefb3a05ea82e1f215f",
+      "diagnosticFingerprint": "0f087c6b048811f6b3dcc780f9584ad191b9a7a2a638e9545053f95cce3b1161",
+      "historySequence": 0,
+      "historyHash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "makingSequence": 1,
+      "makingHash": "3d6975eb47237516ef76cba99d72b04f2a62c7754284d62e17ee1dc931e5a72e",
+      "planFingerprint": "06acf488bef4042b1aa26e51e68a84a5f4c077949931e28551fd7853be8a9034"
+    },
+    "task": "step_guidance",
+    "consentVersion": "preparation-v1",
+    "model": "gemini-3.5-flash-lite",
+    "status": "completed",
+    "requests": 4,
+    "activeMs": 13918,
+    "checkpoints": [
+      {
+        "sequence": 1,
+        "event": "request_reserved",
+        "at": "2026-10-04T03:03:12.938Z",
+        "request": 1
+      },
+      {
+        "sequence": 2,
+        "event": "response_saved",
+        "at": "2026-10-04T03:03:14.501Z",
+        "request": 1
+      },
+      {
+        "sequence": 3,
+        "event": "tool_completed",
+        "at": "2026-10-04T03:03:15.829Z",
+        "request": 1,
+        "tool": "inspect_project"
+      },
+      {
+        "sequence": 4,
+        "event": "request_reserved",
+        "at": "2026-10-04T03:03:16.171Z",
+        "request": 2
+      },
+      {
+        "sequence": 5,
+        "event": "response_saved",
+        "at": "2026-10-04T03:03:17.468Z",
+        "request": 2
+      },
+      {
+        "sequence": 6,
+        "event": "tool_completed",
+        "at": "2026-10-04T03:03:18.952Z",
+        "request": 2,
+        "tool": "inspect_making"
+      },
+      {
+        "sequence": 7,
+        "event": "request_reserved",
+        "at": "2026-10-04T03:03:19.011Z",
+        "request": 3
+      },
+      {
+        "sequence": 8,
+        "event": "response_saved",
+        "at": "2026-10-04T03:03:20.462Z",
+        "request": 3
+      },
+      {
+        "sequence": 9,
+        "event": "tool_completed",
+        "at": "2026-10-04T03:03:23.349Z",
+        "request": 3,
+        "tool": "retrieve_context"
+      },
+      {
+        "sequence": 10,
+        "event": "request_reserved",
+        "at": "2026-10-04T03:03:23.401Z",
+        "request": 4
+      },
+      {
+        "sequence": 11,
+        "event": "response_saved",
+        "at": "2026-10-04T03:03:24.859Z",
+        "request": 4
+      },
+      {
+        "sequence": 12,
+        "event": "completed",
+        "at": "2026-10-04T03:03:27.309Z",
+        "request": 4
+      }
+    ],
+    "tools": [
+      "inspect_project",
+      "inspect_making",
+      "retrieve_context"
+    ],
+    "createdAt": "2026-10-04T03:03:12.887Z",
+    "updatedAt": "2026-10-04T03:03:27.309Z",
+    "modelTextVerified": false,
+    "projectChanged": false,
+    "capability": "plan_only",
+    "knowledgeHash": "b096960d0594e0e467465010db90269599fe4a0d7fa2c9db7f10fe92783499a5",
+    "text": "**Active Step:** Read asymmetric markings (`companion-making-tina-v1-marks`), step 1 of 8 in *Tina: markings to finishes*. Source binding: `tina` (pending review).\n\n**Orientation:** Sleeve x-notch belongs at the back; round notch at the front.\n\n**What to verify before continuing:** Can you distinguish the sleeve front from its back?"
+  },
+  "acknowledgedResponseRecoveryWithoutExtraRequest": false,
+  "projectUnchanged": true,
+  "distinction": "Actual provider and knowledge retrieval; not a benchmark, maker trial or verified pattern."
+}

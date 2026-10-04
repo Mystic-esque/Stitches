@@ -1,6 +1,6 @@
 {
   "kind": "actual-production-construction-api-and-browser",
-  "checkedAt": "2026-10-02T18:15:42.967Z",
+  "checkedAt": "2026-10-04T02:51:57.574Z",
   "passed": true,
   "syntheticPrivateGuests": true,
   "source": "actual-Stitches-development-Content-Lake",
@@ -90,10 +90,6 @@
       {
         "selector": ".making-rail small",
         "ratio": 6.2378654287554
-      },
-      {
-        "selector": ".making-pieces li span",
-        "ratio": 6.6887123803036435
       },
       {
         "selector": ".making-primary",

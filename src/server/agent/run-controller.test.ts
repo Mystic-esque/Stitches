@@ -4,29 +4,43 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, expect, it, vi } from "vitest";
 import type { GenerateContentParameters, GenerateContentResponse } from "@google/genai";
-import { startAgentRunSchema } from "../../domain/agent-run";
+import { startAgentRunSchema, type AgentTask } from "../../domain/agent-run";
 import { GuestStore } from "../projects/guest-store";
 import { resolveCompanionCatalog } from "../knowledge/companion-catalog";
 import { companionBasis, STITCHES_KB_ID } from "./companion-tools";
 import { advanceCompanionRun } from "./run-controller";
 import { createGeminiSession } from "./gemini-session";
 import { publicAgentRun } from "./run-state";
+import { constructionRecords } from "../../../scripts/content/construction-records.mjs";
+import { resolveMakingPlan } from "../knowledge/making-plan";
+import type { MakingRecord } from "../../domain/making-plan";
 
 const documents = ["companion-candidates", "companion-piece-studies", "companion-diagnostic"].flatMap((name) =>
   JSON.parse(readFileSync(new URL(`../../../fixtures/${name}.json`, import.meta.url), "utf8")).documents)
   .map((item: object, index: number) => ({ ...item, _rev: `synthetic-${index}` }));
 const cards = resolveCompanionCatalog(documents);
-function setup(databasePath = ":memory:") {
+function makingPlanFor(card: typeof cards[number]) {
+  const docs = constructionRecords
+    .filter((entry) => String(entry._id).includes(`-${card.designKey}-`))
+    .map((entry, index) => ({ ...entry, _rev: `fixture-construction-${index}` }));
+  return resolveMakingPlan(docs, card);
+}
+function setup(databasePath = ":memory:", task: AgentTask = "next_preparation", includeMakingPlan?: boolean) {
   const store = new GuestStore(databasePath), source = cards[0], ownerId = "synthetic-owner";
   const project = store.createProject(ownerId, { title: "PRIVATE TITLE", brief: "PRIVATE BRIEF", source: { kind: "candidate", designId: source.designKey }, idempotencyKey: randomUUID() }, source.fingerprint);
-  let snapshot = { project, source, history: store.listDiagnostics(ownerId, project.id) };
-  const start = { idempotencyKey: randomUUID(), task: "next_preparation" as const, expectedBasis: companionBasis(snapshot), consent: { version: "preparation-v1" as const, sharePreparationSummary: true as const } };
+  const isMaking = task === "step_guidance" || task === "troubleshoot_step";
+  const makingPlan = (includeMakingPlan ?? isMaking) ? makingPlanFor(source) : null;
+  let snapshot = { project, source, history: store.listDiagnostics(ownerId, project.id), makingPlan, makingHistory: [] as MakingRecord[] };
+  const start = { idempotencyKey: randomUUID(), task, expectedBasis: companionBasis(snapshot), consent: { version: "preparation-v1" as const, sharePreparationSummary: true as const } };
   const run = store.startAgentRun(ownerId, project.id, start);
   const requests: GenerateContentParameters[] = [];
+  const expectedTools = task === "step_guidance" || task === "troubleshoot_step"
+    ? ["inspect_project", "inspect_making", "retrieve_context"]
+    : ["inspect_project", "resolve_exact_graph", "retrieve_context"];
   const generate = vi.fn(async (request: GenerateContentParameters) => {
     requests.push(request);
     const turn = (request.contents as unknown[]).length / 2 + 0.5;
-    const tool = ["inspect_project", "resolve_exact_graph", "retrieve_context"][turn - 1];
+    const tool = expectedTools[turn - 1];
     const call = tool ? { id: `call-${turn}`, name: tool, args: {} } : undefined;
     return { candidates: [{ content: { role: "model", parts: call ? [{ functionCall: call, thoughtSignature: `opaque-${turn}` }] : [{ text: "Record the missing source-listed notes. Pending review; do not cut from these studies." }] } }],
       functionCalls: call ? [call] : [], text: call ? undefined : "Record the missing source-listed notes. Pending review; do not cut from these studies." } as unknown as GenerateContentResponse;
@@ -64,6 +78,54 @@ describe("durable private agent — synthetic deterministic proof", () => {
       expect(saved.checkpoints.map((item) => item.sequence)).toEqual(saved.checkpoints.map((_, i) => i + 1));
       expect(s.store.getProject(s.ownerId, s.project.id)).toEqual(s.project);
       await s.advance(); expect(s.generate).toHaveBeenCalledTimes(4);
+    } finally { s.store.close(); }
+  });
+  it("enforces inspect_making tool sequence for construction study tasks", async () => {
+    const s = setup(":memory:", "step_guidance");
+    try {
+      for (let i = 0; i < 4; i++) await s.advance();
+      const saved = s.store.getAgentRun(s.ownerId, s.project.id, s.run.id);
+      expect(saved.status).toBe("completed");
+      expect(saved.tools).toEqual(["inspect_project", "inspect_making", "retrieve_context"]);
+      expect(s.requests.slice(0, 3).map((request) => request.config?.toolConfig?.functionCallingConfig?.allowedFunctionNames))
+        .toEqual([["inspect_project"], ["inspect_making"], ["retrieve_context"]]);
+    } finally { s.store.close(); }
+  });
+  it("stops a making task with missing_knowledge if the construction plan is absent", async () => {
+    const s = setup(":memory:", "step_guidance", false);
+    try {
+      await s.advance();
+      const saved = s.store.getAgentRun(s.ownerId, s.project.id, s.run.id);
+      expect(saved.status).toBe("missing_knowledge");
+      expect(saved.message).toMatch(/construction study plan is unavailable/i);
+    } finally { s.store.close(); }
+  });
+  it("invalidates an ongoing run as stale when making history or configuration changes", async () => {
+    const s = setup(":memory:", "step_guidance");
+    try {
+      await s.advance();
+      s.change({
+        project: s.project,
+        source: s.source,
+        history: [],
+        makingPlan: makingPlanFor(s.source),
+        makingHistory: [{
+          id: randomUUID(),
+          projectId: s.project.id,
+          sequence: 1,
+          basisSequence: 1,
+          basisHash: s.project.basisHash,
+          catalogFingerprint: s.source.fingerprint,
+          planFingerprint: makingPlanFor(s.source).fingerprint,
+          sessionId: randomUUID(),
+          event: { kind: "configured", options: { sleeves: false, frontBottom: false, dart: false } },
+          createdAt: new Date().toISOString(),
+          imported: false,
+        }],
+      });
+      await s.advance();
+      const saved = s.store.getAgentRun(s.ownerId, s.project.id, s.run.id);
+      expect(saved.status).toBe("stale");
     } finally { s.store.close(); }
   });
   it("isolates owners, replays a start before network work, and rejects key reuse", () => {
@@ -125,7 +187,7 @@ describe("durable private agent — synthetic deterministic proof", () => {
   it("refuses stale saved revisions and changed exact sources even during execution", async () => {
     const s = setup();
     try {
-      s.change({ project: s.project, source: { ...s.source, fingerprint: "f".repeat(64) }, history: [] });
+      s.change({ project: s.project, source: { ...s.source, fingerprint: "f".repeat(64) }, history: [], makingPlan: null, makingHistory: [] });
       expect((await s.advance()).status).toBe("stale"); expect(s.generate).not.toHaveBeenCalled();
       const other = setup();
       try {

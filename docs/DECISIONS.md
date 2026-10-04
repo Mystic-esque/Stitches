@@ -1,5 +1,14 @@
 # Implementation decisions
 
+## October 4, 2026 — Construction agent binding, single-turn tool sequencing, and search benchmark
+
+- **Bind making state to agent basis:** Added `makingSequence`, `makingHash`, and `planFingerprint` directly to `agentBasisSchema` and `companionBasis()`. Any checkpoint confirmation or reconfiguration invalidates active runs immediately, eliminating stale making guidance.
+- **Unified piece projection with options and mirroring:** Created `selectMakingStepPieces()` as the single shared source of truth for both `MakeWorkspace` and `inspect_making`. Pieces for disabled options (e.g., Tina sleeves) are excluded from agent inspections, and `mirrored: boolean` flags are preserved.
+- **Fail closed on missing construction KB:** `companionKbPaths()` throws when a construction leaf is absent rather than silently falling back to planning paths, preventing deceptive evidence satisfaction.
+- **Explicit turn sequencing for Gemini 3.5:** Replaced "Four requests total" in the system instruction with "Never call tools in parallel; invoke exactly one tool call per turn. In turn 1 call inspect_project, in turn 2 call inspect_making, in turn 3 call retrieve_context; then in turn 4 explain the active step...". This prevents Gemini 3.5 parallel tool calling and ensures strict single-read turns matching server expectations.
+- **Visual relationship diagrams for construction steps:** Introduced `StepRelationshipDiagram` SVG visualization in `MakeWorkspace` to visually convey piece layering, RST seams, fold lines, and pair relationships, moving the experience from text-heavy to visually instructive.
+- **Frozen fair search benchmark:** Evaluated 5 frozen maker tasks against 33 exact Sanity records comparing naive keyword search with Stitches exact graph + Context KB. Keyword search fails 4/5 tasks due to lack of state, DAG, and diagnostic safety awareness; Stitches passes 5/5.
+
 ## October 2, 2026 — Exact construction learning and independent KB qualification
 
 - Author separate pending constructionPlan/constructionStep records for two real, distinct source designs. A learning checkpoint records understanding, not a physical action or guided-making capability. The exact graph controls optional prerequisites, pieces and diagnostic eligibility; generated Context prose cannot override it.

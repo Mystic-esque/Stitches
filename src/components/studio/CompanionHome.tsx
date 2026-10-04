@@ -56,7 +56,8 @@ export function CompanionHome() {
   const [notes, setNotes] = useState<ProjectNote[]>([]);
   const [diagnostics, setDiagnostics] = useState<DiagnosticRecord[]>([]);
   const [scrapStep, setScrapStep] = useState<ScrapStepContext | null>(null);
-  useEffect(() => { setScrapStep(null); }, [active?.id, active?.sequence]);
+  const [makingSequence, setMakingSequence] = useState(0);
+  useEffect(() => { setScrapStep(null); setMakingSequence(0); }, [active?.id, active?.sequence]);
   const [noteText, setNoteText] = useState("");
   const [noteKind, setNoteKind] = useState<"journal" | "question">("journal");
   const [noteStage, setNoteStage] = useState<"plan" | "prepare" | "make" | "check">("plan");
@@ -247,7 +248,8 @@ export function CompanionHome() {
       {sourceBinding === "current" && sourceCard && <PieceStudy key={`piece-${sourceCard.designKey}`} card={sourceCard} />}
       {sourceBinding === "current" && sourceCard?.designKey === "sandy" && <PatternBoard key={`pattern-${active.id}`} project={active} source={sourceCard} dirty={unsavedChanges} />}
       <MakeWorkspace key={`making-${active.id}-${active.sequence}`} project={active} source={sourceBinding === "current" ? sourceCard : undefined} dirty={busy || unsavedChanges}
-        onScrapHelp={(context) => setScrapStep(context)} onContextInvalidated={() => setScrapStep(null)} />
+        onScrapHelp={(context) => setScrapStep(context)} onContextInvalidated={() => setScrapStep(null)}
+        onMakingUpdated={(seq) => setMakingSequence(seq)} />
       {sourceBinding === "current" && sourceCard && <DiagnosticStudy key={`diagnostic-${active.id}-${active.sequence}-${sourceCard.diagnosticStudy.fingerprint}`} study={sourceCard.diagnosticStudy} project={active} history={diagnostics} disabled={busy || unsavedChanges}
         makingContext={scrapStep} onClearContext={() => setScrapStep(null)}
         onSaved={(record) => { if (activeId.current === record.projectId) setDiagnostics((history) => history.some((item) => item.id === record.id) ? history : [...history, record]); }}
@@ -257,7 +259,7 @@ export function CompanionHome() {
         onSaved={(record) => { if (activeId.current === record.projectId) setDiagnostics((history) => history.some((item) => item.id === record.id) ? history : [...history, record]); }}
         currentFingerprint={sourceBinding === "current" ? sourceCard?.diagnosticStudy.fingerprint : undefined} />
       <PreparationPlan project={active} source={sourceCard} history={diagnostics} dirty={unsavedChanges} />
-      <ProjectAssistant key={`assistant-${active.id}`} project={active} source={sourceCard} historySequence={diagnostics.length} dirty={unsavedChanges} />
+      <ProjectAssistant key={`assistant-${active.id}`} project={active} source={sourceCard} historySequence={diagnostics.length} makingSequence={makingSequence} dirty={unsavedChanges} />
       <div className="project-workspace"><aside className="project-rail" aria-label="Project stages"><p className="rail-caption">THE JOURNEY</p><ol><li className="current"><b>01</b><span>Plan your idea<small>Available now</small></span></li><li><b>02</b><span>Understand the pattern<small>Qualification in progress</small></span></li><li><b>03</b><span>Cut with confidence<small>Not yet verified</small></span></li><li><b>04</b><span>Make & troubleshoot<small>Not yet verified</small></span></li></ol><a href="/demo">Explore the pattern study ↗</a></aside>
         <form className="project-form" onSubmit={save}><div className="form-intro"><p className="companion-kicker">THE WORKING BRIEF</p><h2>Make it yours, one decision at a time.</h2><p>Describe what you want to make. Stitches keeps constraints together while drafting and making tools are verified.</p></div>
           <div className="field-row"><label>Project name<input value={draft.title} maxLength={100} required onChange={(event) => update("title", event.target.value)} /></label><label>Fabric structure<select value={draft.structure} onChange={(event) => update("structure", event.target.value)}><option value="unknown">Not sure yet</option><option value="woven">Woven</option><option value="knit">Knit / stretch</option></select></label></div>

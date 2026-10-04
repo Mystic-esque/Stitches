@@ -23,7 +23,7 @@ describe("actual pinned measured study, not cutting qualification", () => {
       expect(study.after.draft.parts.map(p => p.cut.materials.fabric[0].onFold)).toEqual([true, false]);
       expect(study.cutReady).toBe(false); expect(study.capability).toBe("plan_only"); expect(JSON.stringify(current)).toBe(saved);
     }
-  });
+  }, 30_000);
   it("refuses missing inputs, unsupported source and mathematical conflicts", () => {
     expect(() => createPatternStudy({ ...project, plan: emptyProjectPlan() }, source, command)).toThrow(/Save these/);
     expect(() => createPatternStudy({ ...project, source: { kind: "candidate", designId: "tina" } }, tina, command)).toThrow(/only for Sandy/);

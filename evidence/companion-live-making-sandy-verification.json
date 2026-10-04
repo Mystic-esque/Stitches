@@ -1,0 +1,127 @@
+{
+  "kind": "actual-gemini-content-lake-context",
+  "checkedAt": "2026-10-04T03:00:35.402Z",
+  "paidBudgetUsd": 0,
+  "syntheticPrivateProject": true,
+  "sharedSanityWrites": 0,
+  "model": "gemini-3.5-flash-lite",
+  "design": "sandy",
+  "task": "step_guidance",
+  "injectedContextInterruption": false,
+  "passed": true,
+  "elapsedMs": 15550,
+  "run": {
+    "id": "8afb0524-5e51-4ceb-ad37-05cdf08ec9a4",
+    "projectId": "0a66751c-39a4-4ed5-ad0b-9d572fb574ac",
+    "basis": {
+      "projectId": "0a66751c-39a4-4ed5-ad0b-9d572fb574ac",
+      "projectSequence": 1,
+      "projectHash": "a4edc93a81e94fe9025275c0ba8bc3f3ac750fc4db71170198a7e4d6e2036be5",
+      "catalogFingerprint": "2da503f12b8f6007d4e1f6f46d4c70cf25fa33b229bf6b1aad01ec75d379abb0",
+      "diagnosticFingerprint": "0f087c6b048811f6b3dcc780f9584ad191b9a7a2a638e9545053f95cce3b1161",
+      "historySequence": 0,
+      "historyHash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "makingSequence": 1,
+      "makingHash": "286c5fcc40a26bae1e74330b86e345ffba4babd941a8f11c00f9988d20500a9d",
+      "planFingerprint": "12e12da85d49611fb489a9df037f9a9413795feb104f250e8fc082b339550a44"
+    },
+    "task": "step_guidance",
+    "consentVersion": "preparation-v1",
+    "model": "gemini-3.5-flash-lite",
+    "status": "completed",
+    "requests": 4,
+    "activeMs": 12871,
+    "checkpoints": [
+      {
+        "sequence": 1,
+        "event": "request_reserved",
+        "at": "2026-10-04T03:00:37.632Z",
+        "request": 1
+      },
+      {
+        "sequence": 2,
+        "event": "response_saved",
+        "at": "2026-10-04T03:00:39.064Z",
+        "request": 1
+      },
+      {
+        "sequence": 3,
+        "event": "tool_completed",
+        "at": "2026-10-04T03:00:40.296Z",
+        "request": 1,
+        "tool": "inspect_project"
+      },
+      {
+        "sequence": 4,
+        "event": "request_reserved",
+        "at": "2026-10-04T03:00:40.374Z",
+        "request": 2
+      },
+      {
+        "sequence": 5,
+        "event": "response_saved",
+        "at": "2026-10-04T03:00:41.586Z",
+        "request": 2
+      },
+      {
+        "sequence": 6,
+        "event": "tool_completed",
+        "at": "2026-10-04T03:00:42.830Z",
+        "request": 2,
+        "tool": "inspect_making"
+      },
+      {
+        "sequence": 7,
+        "event": "request_reserved",
+        "at": "2026-10-04T03:00:43.063Z",
+        "request": 3
+      },
+      {
+        "sequence": 8,
+        "event": "response_saved",
+        "at": "2026-10-04T03:00:44.258Z",
+        "request": 3
+      },
+      {
+        "sequence": 9,
+        "event": "tool_completed",
+        "at": "2026-10-04T03:00:46.695Z",
+        "request": 3,
+        "tool": "retrieve_context"
+      },
+      {
+        "sequence": 10,
+        "event": "request_reserved",
+        "at": "2026-10-04T03:00:46.785Z",
+        "request": 4
+      },
+      {
+        "sequence": 11,
+        "event": "response_saved",
+        "at": "2026-10-04T03:00:48.530Z",
+        "request": 4
+      },
+      {
+        "sequence": 12,
+        "event": "completed",
+        "at": "2026-10-04T03:00:50.904Z",
+        "request": 4
+      }
+    ],
+    "tools": [
+      "inspect_project",
+      "inspect_making",
+      "retrieve_context"
+    ],
+    "createdAt": "2026-10-04T03:00:37.585Z",
+    "updatedAt": "2026-10-04T03:00:50.904Z",
+    "modelTextVerified": false,
+    "projectChanged": false,
+    "capability": "plan_only",
+    "knowledgeHash": "da2f5158e2ce1abc6b78d92c1d602e34f3ae49afa2c634d2a6f251f025dfa90b",
+    "text": "**Active Step:** Understand the closure seam (Step 1, `companion-making-sandy-v1-closure-seam`), sourced from *Sandy: closure to hem* (Dataset) and *Understand the closure seam* (Dataset). Study the seam ending at the opening; this plan excludes seamless skirts. Pending review.\n\n**Orientation:** Right sides face each other.\n\n**What to verify:** Can you point to the opening that must stay accessible?"
+  },
+  "acknowledgedResponseRecoveryWithoutExtraRequest": false,
+  "projectUnchanged": true,
+  "distinction": "Actual provider and knowledge retrieval; not a benchmark, maker trial or verified pattern."
+}

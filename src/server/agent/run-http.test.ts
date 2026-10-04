@@ -5,7 +5,11 @@ import { loadOwnedAgentSnapshot, boundedAgentJson, agentErrorResponse } from "./
 import { GuestHttpError } from "../projects/guest-http";
 import { loadCompanionCatalog } from "../knowledge/companion-catalog";
 
-vi.mock("../knowledge/companion-catalog", async (original) => ({ ...await original<object>(), loadCompanionCatalog: vi.fn() }));
+vi.mock("../knowledge/companion-catalog", async (original) => ({
+  ...await original<object>(),
+  loadCompanionCatalog: vi.fn(),
+  createCompanionCatalogClient: vi.fn(() => ({ fetch: vi.fn() })),
+}));
 describe("private agent HTTP boundaries", () => {
   it("denies another guest before issuing any exact source request", async () => {
     const store = new GuestStore(":memory:");
@@ -21,5 +25,27 @@ describe("private agent HTTP boundaries", () => {
     const response = agentErrorResponse(new Error("SECRET provider trace"));
     expect(response.status).toBe(503); expect(await response.json()).toMatchObject({ error: { code: "unavailable", retryable: false, requestId: expect.any(String), message: expect.not.stringContaining("SECRET") } });
     const stale = agentErrorResponse(new GuestHttpError(409, "stale", "Review the current basis.")); expect(stale.status).toBe(409);
+  });
+  it("loads project, source, diagnostic history, making history, and handles optional making plan gracefully", async () => {
+    const store = new GuestStore(":memory:");
+    try {
+      const ownerId = "owner-1";
+      const project = store.createProject(ownerId, {
+        title: "Test Project",
+        brief: "Brief",
+        source: { kind: "candidate", designId: "sandy" },
+        idempotencyKey: "bd692072-3941-4f49-87b3-bc541049cabc"
+      }, "f".repeat(64));
+      const mockCard = { designKey: "sandy", fingerprint: "f".repeat(64), pieceStudy: [] };
+      vi.mocked(loadCompanionCatalog).mockResolvedValueOnce([mockCard as never]);
+      const snapshot = await loadOwnedAgentSnapshot(store, ownerId, project.id);
+      expect(snapshot.project.id).toBe(project.id);
+      expect(snapshot.source).toEqual(mockCard);
+      expect(snapshot.history).toEqual([]);
+      expect(snapshot.makingHistory).toEqual([]);
+      expect(snapshot.makingPlan).toBeNull();
+    } finally {
+      store.close();
+    }
   });
 });

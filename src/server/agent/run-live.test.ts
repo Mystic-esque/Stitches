@@ -12,16 +12,31 @@ import { publicAgentRun } from "./run-state";
 it.skipIf(process.env.STITCHES_LIVE_AGENT_RUN !== "true")("qualifies one actual free-tier Gemini + exact Sanity + Context preparation run", async () => {
   expect(companionFreeAuthorized()).toBe(true);
   const directory = join(process.cwd(), ".data", "rehearsals"); mkdirSync(directory, { recursive: true });
-  const store = new GuestStore(join(directory, "companion-live.sqlite")), ownerId = `rehearsal-${randomUUID()}`, started = Date.now();
   const design = process.env.STITCHES_LIVE_AGENT_DESIGN === "tina" ? "tina" : "sandy";
+  const task = (process.env.STITCHES_LIVE_AGENT_TASK as "next_preparation" | "understand_pieces" | "review_gaps" | "step_guidance" | "troubleshoot_step" | undefined) ?? (design === "tina" ? "understand_pieces" : "next_preparation");
+  const store = new GuestStore(join(directory, `companion-live-${design}-${task}-${randomUUID().slice(0, 8)}.sqlite`)), ownerId = `rehearsal-${randomUUID()}`, started = Date.now();
   const injectInterruption = process.env.STITCHES_LIVE_AGENT_INTERRUPT === "true";
   let report: Record<string, unknown> = { kind: "actual-gemini-content-lake-context", checkedAt: new Date().toISOString(), paidBudgetUsd: 0,
-    syntheticPrivateProject: true, sharedSanityWrites: 0, model: "gemini-3.5-flash-lite", design, injectedContextInterruption: injectInterruption, passed: false };
+    syntheticPrivateProject: true, sharedSanityWrites: 0, model: "gemini-3.5-flash-lite", design, task, injectedContextInterruption: injectInterruption, passed: false };
   try {
-    const source = (await loadCompanionCatalog(createCompanionCatalogClient())).find((item) => item.designKey === design)!;
+    const catalogClient = createCompanionCatalogClient();
+    const source = (await loadCompanionCatalog(catalogClient)).find((item) => item.designKey === design)!;
     const project = store.createProject(ownerId, { title: "Synthetic local qualification project", brief: "No personal data", source: { kind: "candidate", designId: design }, idempotencyKey: randomUUID() }, source.fingerprint);
+    if (task === "step_guidance" || task === "troubleshoot_step") {
+      const { loadMakingPlan } = await import("../knowledge/making-plan");
+      const makingPlan = await loadMakingPlan(catalogClient, source);
+      const options = design === "tina" ? { sleeves: true, frontBottom: true, dart: true } : { sleeves: false, frontBottom: false, dart: false };
+      store.recordMaking(ownerId, project.id, {
+        expectedProjectSequence: project.sequence,
+        expectedBasisHash: project.basisHash,
+        expectedHistorySequence: 0,
+        planFingerprint: makingPlan.fingerprint,
+        idempotencyKey: randomUUID(),
+        event: { kind: "configured", options },
+      }, makingPlan, source.fingerprint);
+    }
     const loadSnapshot = () => loadOwnedAgentSnapshot(store, ownerId, project.id);
-    const initial = await loadSnapshot(), run = store.startAgentRun(ownerId, project.id, { idempotencyKey: randomUUID(), task: design === "tina" ? "understand_pieces" : "next_preparation",
+    const initial = await loadSnapshot(), run = store.startAgentRun(ownerId, project.id, { idempotencyKey: randomUUID(), task,
       expectedBasis: companionBasis(initial), consent: { version: "preparation-v1", sharePreparationSummary: true } });
     let current = run;
     const actualReader = createStitchesCompanionReader(); let interrupted = false, recovered = false;
@@ -45,7 +60,12 @@ it.skipIf(process.env.STITCHES_LIVE_AGENT_RUN !== "true")("qualifies one actual 
     expect(current.knowledgeHash).toMatch(/^[a-f0-9]{64}$/); expect(store.getProject(ownerId, project.id)).toEqual(project);
     if (injectInterruption) expect(recovered).toBe(true);
   } finally {
-    writeFileSync(join(process.cwd(), "evidence", design === "tina" ? "companion-live-tina-recovery-verification.json" : "companion-live-run-verification.json"), JSON.stringify(report, null, 2) + "\n");
+    const evidenceName = (task === "step_guidance" || task === "troubleshoot_step")
+      ? `companion-live-making-${design}-verification.json`
+      : design === "tina"
+      ? "companion-live-tina-recovery-verification.json"
+      : "companion-live-run-verification.json";
+    writeFileSync(join(process.cwd(), "evidence", evidenceName), JSON.stringify(report, null, 2) + "\n");
     store.close();
   }
 }, 240_000);

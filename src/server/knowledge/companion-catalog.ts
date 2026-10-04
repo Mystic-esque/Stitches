@@ -49,7 +49,11 @@ export type CompanionDiagnosticStudy = { sourceId: string; testId: string; remed
   sourceTitle: string; sourceUrl: string; reviewStatus: "pending" | "reviewed"; capability: "sample_check_only"; fingerprint: string };
 
 export class CatalogError extends Error {
-  constructor(public readonly code: "missing" | "invalid" | "unavailable", message: string) { super(message); }
+  readonly code: "missing" | "invalid" | "unavailable";
+  constructor(code: "missing" | "invalid" | "unavailable", message: string) {
+    super(message);
+    this.code = code;
+  }
 }
 
 export function resolveCompanionCatalog(raw: unknown): CompanionCatalogCard[] {

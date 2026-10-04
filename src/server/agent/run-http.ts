@@ -11,11 +11,23 @@ export async function loadOwnedAgentSnapshot(store: GuestStore, ownerId: string,
   if (!project) throw new GuestHttpError(404, "not_found", "Project not found.");
   if (project.source.kind !== "candidate") throw new GuestHttpError(400, "unsupported", "This source-linked preparation assistant needs a supported example. Your private own-idea plan remains available.");
   let cards;
-  try { cards = await loadCompanionCatalog(createCompanionCatalogClient()); }
+  const client = createCompanionCatalogClient();
+  try { cards = await loadCompanionCatalog(client); }
   catch { throw new GuestHttpError(503, "source_unavailable", "Current exact Sanity sources are unavailable. Use your saved manual preparation plan."); }
   const designId = project.source.designId, source = cards.find((item) => item.designKey === designId);
   if (!source) throw new GuestHttpError(503, "source_unavailable", "The applicable exact source is missing.");
-  return { project, source, history: store.listDiagnostics(ownerId, projectId) };
+  const history = store.listDiagnostics(ownerId, projectId);
+  const makingHistory = store.listMaking(ownerId, projectId);
+  let makingPlan = null;
+  try {
+    const { loadMakingPlan } = await import("../knowledge/making-plan");
+    makingPlan = await loadMakingPlan(client, source);
+  } catch (error) {
+    if (error instanceof Error && (error.name === "AbortError" || error.message.includes("fetch") || error.message.includes("network"))) {
+      throw new GuestHttpError(503, "source_unavailable", "Current exact Sanity construction plan is unavailable. Use your saved manual preparation plan.");
+    }
+  }
+  return { project, source, history, makingHistory, makingPlan };
 }
 
 export async function boundedAgentJson(request: NextRequest): Promise<unknown> {

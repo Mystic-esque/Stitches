@@ -24,7 +24,9 @@ export async function runCompanionLoop(input: {
     if (!Array.isArray(response.calls) || response.calls.length > 1)
       throw new CompanionAgentError("unsafe_tool", "This first slice allows one read tool per model request.");
     if (!response.calls.length) {
-      if (!["inspect_project", "resolve_exact_graph", "retrieve_context"].every((name) => completed.has(name as CompanionTool)))
+      const hasBase = completed.has("inspect_project") && completed.has("retrieve_context");
+      const hasEvidence = completed.has("resolve_exact_graph") || completed.has("inspect_making");
+      if (!hasBase || !hasEvidence)
         throw new CompanionAgentError("missing_knowledge", "The agent did not inspect the project, exact records and actual KB. Its answer is not accepted.");
       const text = typeof response.text === "string" ? response.text.trim().slice(0, 1_600) : "";
       if (!text) throw new CompanionAgentError("invalid", "The agent returned no explanation.");

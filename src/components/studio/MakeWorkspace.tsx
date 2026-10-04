@@ -5,14 +5,87 @@ import type { GuestProject } from "@/domain/guest-project";
 import type { CompanionCatalogCard } from "@/server/knowledge/companion-catalog";
 import { currentMakingSession, makingPrerequisites,
   type MakingPlan, type MakingRecord, type MakingOptions, type RecordMakingInput } from "@/domain/making-plan";
+import { selectMakingStepPieces } from "@/domain/planning-piece-study";
 import "../../app/making.css";
 
 export type ScrapStepContext = { eventId: string; stepId: string; stepTitle: string; planFingerprint: string; historySequence: number };
 const noOptions: MakingOptions = { sleeves: false, frontBottom: false, dart: false };
 
-export function MakeWorkspace({ project, source, dirty, onScrapHelp, onContextInvalidated }: {
+function StepRelationshipDiagram({
+  orientation,
+  pieces,
+  edgeIds,
+}: {
+  orientation: string;
+  pieces: Array<{ title: string; pieceKey: string; cutCount: number; fold: string; mirrored: boolean; material: string }>;
+  edgeIds: string[];
+}) {
+  const isRST = /right sides (together|face each other)/i.test(orientation);
+  const primaryPiece = pieces[0]?.title ?? "First piece";
+  const secondPiece = pieces[1]?.title ?? (pieces[0] ? `${pieces[0].title} (opposite edge)` : "Joining piece");
+
+  return (
+    <div className="making-diagram-wrap">
+      <svg
+        className="making-diagram"
+        viewBox="0 0 520 180"
+        role="img"
+        aria-label={`Orientation diagram: ${orientation}`}
+      >
+        <rect x="2" y="2" width="516" height="176" rx="6" fill="#fdfbf7" stroke="#d5d7ca" strokeWidth="1" />
+        <g transform="translate(24, 20)">
+          <rect x="0" y="0" width="195" height="96" rx="4" fill="#e9eee1" stroke="#6b7d60" strokeWidth="1.5" />
+          <text x="12" y="24" fill="#344f3b" fontSize="12" fontWeight="700">{primaryPiece}</text>
+          <text x="12" y="44" fill="#515b4e" fontSize="11">{isRST ? "Face / Right side (facing inward)" : "Primary layer"}</text>
+          {pieces[0]?.fold && pieces[0].fold !== "none" && (
+            <g transform="translate(12, 58)">
+              <line x1="0" y1="0" x2="165" y2="0" stroke="#8c4c2b" strokeDasharray="3 3" strokeWidth="1.5" />
+              <text x="0" y="14" fill="#8c4c2b" fontSize="10">Fold line ({pieces[0].fold})</text>
+            </g>
+          )}
+          {pieces[0]?.mirrored && (
+            <text x="12" y="84" fill="#344f3b" fontSize="10">⧉ Pair: cut 1 + 1 mirrored</text>
+          )}
+        </g>
+        <g transform="translate(236, 50)">
+          <circle cx="16" cy="16" r="15" fill="#f0f1e7" stroke="#91a183" strokeWidth="1" />
+          <text x="16" y="21" textAnchor="middle" fill="#344f3b" fontSize="15" fontWeight="bold">↔</text>
+          <text x="16" y="42" textAnchor="middle" fill="#515b4e" fontSize="9">{isRST ? "RST seam" : "Join"}</text>
+        </g>
+        <g transform="translate(284, 20)">
+          <rect x="0" y="0" width="195" height="96" rx="4" fill="#faf8f2" stroke="#6b7d60" strokeWidth="1.5" />
+          <text x="12" y="24" fill="#344f3b" fontSize="12" fontWeight="700">{secondPiece}</text>
+          <text x="12" y="44" fill="#515b4e" fontSize="11">{isRST ? "Face / Right side (meeting top)" : "Mating layer"}</text>
+          {pieces[1]?.fold && pieces[1].fold !== "none" && (
+            <g transform="translate(12, 58)">
+              <line x1="0" y1="0" x2="165" y2="0" stroke="#8c4c2b" strokeDasharray="3 3" strokeWidth="1.5" />
+              <text x="0" y="14" fill="#8c4c2b" fontSize="10">Fold line ({pieces[1].fold})</text>
+            </g>
+          )}
+          {pieces[1]?.mirrored && (
+            <text x="12" y="84" fill="#344f3b" fontSize="10">⧉ Pair: cut 1 + 1 mirrored</text>
+          )}
+        </g>
+        <g transform="translate(24, 130)">
+          <rect x="0" y="0" width="455" height="32" rx="3" fill="#f0f1e7" stroke="#c0cbb5" strokeWidth="1" />
+          <line x1="12" y1="16" x2="48" y2="16" stroke="#8c4c2b" strokeDasharray="4 2" strokeWidth="2" />
+          <text x="56" y="20" fill="#282d27" fontSize="11">
+            {edgeIds.length > 0
+              ? `Aligning edges: ${edgeIds.join(" ↔ ")}`
+              : isRST
+                ? "Join edges aligned with right sides facing — stitch along seam allowance"
+                : "Carefully match edge markings and notches before securing"}
+          </text>
+        </g>
+      </svg>
+    </div>
+  );
+}
+
+export function MakeWorkspace({ project, source, dirty, onScrapHelp, onContextInvalidated, onMakingUpdated }: {
   project: GuestProject; source?: CompanionCatalogCard; dirty: boolean;
   onScrapHelp: (context: ScrapStepContext) => void; onContextInvalidated: () => void;
+  onMakingUpdated?: (sequence: number) => void;
 }) {
   const [plan, setPlan] = useState<MakingPlan | null>(null);
   const [history, setHistory] = useState<MakingRecord[]>([]);
@@ -38,6 +111,7 @@ export function MakeWorkspace({ project, source, dirty, onScrapHelp, onContextIn
       if (!response.ok) throw new Error(data.message || "Making notebook could not be loaded.");
       if (!mounted.current || request !== requestNumber.current) return;
       setHistory(data.history); setPlan(data.plan); setSourceCurrent(data.sourceCurrent); setMessage(data.message || "");
+      if (data.history) onMakingUpdated?.(data.history.length);
       const last = (data.history as MakingRecord[]).at(-1);
       const loadedSession = data.plan ? currentMakingSession(data.history, project, data.plan) : null;
       if (data.sourceCurrent && last?.event.kind === "help_requested" && last.event.symptom === "seam_puckering" &&
@@ -47,7 +121,7 @@ export function MakeWorkspace({ project, source, dirty, onScrapHelp, onContextIn
     } catch {
       if (mounted.current && request === requestNumber.current) { setPlan(null); setSourceCurrent(false); onContextInvalidated(); setMessage("Construction knowledge could not be refreshed. Saved history remains; keep your draft and retry."); }
     } finally { if (mounted.current && request === requestNumber.current) setLoading(false); }
-  }, [project.id, project.sequence]);
+  }, [project.id, project.sequence, onMakingUpdated]);
   useEffect(() => {
     mounted.current = true; void reload();
     const focus = () => { if (document.visibilityState === "visible") void reload(); };
@@ -79,6 +153,7 @@ export function MakeWorkspace({ project, source, dirty, onScrapHelp, onContextIn
       const saved = data.record as MakingRecord;
       setHistory((entries) => entries.some((entry) => entry.id === saved.id) ? entries : [...entries, saved]);
       pending.current = null; setConfirmed(false); setHelpOpen(false); onContextInvalidated();
+      onMakingUpdated?.(saved.sequence);
       if (event.kind === "configured" || event.kind === "reviewed") setSelected("");
       if (event.kind === "configured") setConfigEditing(false);
       setMessage("Saved privately on this revision. This records a study decision, not verified physical work.");
@@ -89,8 +164,11 @@ export function MakeWorkspace({ project, source, dirty, onScrapHelp, onContextIn
     } catch (error) { if (mounted.current) setMessage(error instanceof Error ? error.message : "Not saved. Your draft is retained."); }
     finally { if (mounted.current) setBusy(false); }
   }
-  const stepPieces = source?.pieceStudy.filter((piece) => step?.pieceKeys.includes(piece.pieceKey) &&
-    (piece.condition !== "sleeves" || session?.options.sleeves) && (piece.condition !== "front-bottom" || session?.options.frontBottom)) ?? [];
+  const stepPieces = (source && step && session)
+    ? selectMakingStepPieces(source.pieceStudy, session.options, step.pieceKeys)
+    : (source && step)
+      ? source.pieceStudy.filter((piece) => step.pieceKeys.includes(piece.pieceKey))
+      : [];
   const reviewed = !!step && !!session?.reviewed.has(step.id);
   const eligible = !!step && !!plan && !!session && makingPrerequisites(plan, session.options, step.id).every((id) => session.reviewed.has(id));
 
@@ -116,7 +194,11 @@ export function MakeWorkspace({ project, source, dirty, onScrapHelp, onContextIn
       <article className="making-step" aria-labelledby="making-step-title">
         <div className="making-step-top"><span>{reviewed ? "REVIEWED STUDY" : eligible ? "YOUR NEXT RELATIONSHIP" : "PREVIEW · NOT YET ELIGIBLE"}</span><button type="button" aria-pressed={concise} onClick={() => setConcise(!concise)}>{concise ? "More explanation" : "Concise view"}</button></div>
         <h3 id="making-step-title">{step.title}</h3><p className="making-action">{step.action}</p>
-        <div className="making-layer-study"><div className="making-layer-label">ORIENTATION / SCHEMATIC, NOT A CUTTING SHAPE</div>{/right sides (together|face each other)/i.test(step.orientation) && <div className="making-layers" aria-hidden="true"><span>Fabric piece<br /><b>right side</b></span><i>↔</i><span>Connected piece<br /><b>right side</b></span></div>}<p>{step.orientation}</p></div>
+        <div className="making-layer-study">
+          <div className="making-layer-label">ORIENTATION / SCHEMATIC, NOT A CUTTING SHAPE</div>
+          <StepRelationshipDiagram orientation={step.orientation} pieces={stepPieces} edgeIds={step.edgeIds} />
+          <p>{step.orientation}</p>
+        </div>
         {!concise && <div className="making-pieces"><h4>Bring these pieces into view</h4><ul>{stepPieces.map((piece) => <li key={piece.pieceKey}><strong>{piece.title}</strong><span>Source cut list: {piece.cutCount}{piece.mirrored ? " mirrored" : ""} · {piece.fold === "none" ? "no fold" : `${piece.fold} fold`} · {piece.material}</span></li>)}</ul><p>Counts describe the planning source, not a qualified cutting layout.</p>{step.edgeIds.length > 0 && <div><a href="#pattern-board-heading">Inspect Sandy’s measured edge study ↑</a><small>{step.edgeIds.join(" · ")}</small></div>}{plan.designKey === "tina" && <small>Tina’s exact edge mates are not yet qualified; use the original pattern markings.</small>}</div>}
         <div className="making-checkpoint"><span>BEFORE YOU MOVE ON</span><p>{step.checkpoint}</p><label><input type="checkbox" checked={confirmed} disabled={disabled || !eligible || reviewed} onChange={(event) => setConfirmed(event.target.checked)} />I reviewed this study checkpoint. This is not proof that I sewed it.</label></div>
         <div className="making-actions"><button className="making-primary" type="button" disabled={disabled || !confirmed || !eligible || reviewed} onClick={() => record({ kind: "reviewed", stepId: step.id, checkpointConfirmed: true })}>Record study checkpoint ↗</button><button type="button" disabled={disabled || session.next?.id !== step.id} onClick={() => setHelpOpen(!helpOpen)}>I’m stuck here</button></div>

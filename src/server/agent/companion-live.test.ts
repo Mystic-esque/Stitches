@@ -24,7 +24,48 @@ describe("opt-in live Stitches read tools — no Gemini request", () => {
         expect(exact.pieces).toHaveLength(source.designKey === "sandy" ? 5 : 4);
         expect(context.knowledgeHash).toMatch(/^[a-f0-9]{64}$/);
         expect(store.getProject(owner, project.id)).toEqual(project);
-        results.push({ design: source.designKey, evidence: tools.evidence(), toolSequence: ["inspect_project", "resolve_exact_graph", "retrieve_context"] });
+
+        const { loadMakingPlan } = await import("../knowledge/making-plan");
+        const makingPlan = await loadMakingPlan(client, source);
+        const options = source.designKey === "tina" ? { sleeves: true, frontBottom: true, dart: true } : { sleeves: false, frontBottom: false, dart: false };
+        store.recordMaking(owner, project.id, {
+          expectedProjectSequence: project.sequence,
+          expectedBasisHash: project.basisHash,
+          expectedHistorySequence: 0,
+          planFingerprint: makingPlan.fingerprint,
+          idempotencyKey: randomUUID(),
+          event: { kind: "configured", options },
+        }, makingPlan, source.fingerprint);
+        const makingHistory = store.listMaking(owner, project.id);
+        const makingTools = createCompanionTools({
+          snapshot: { project, source, history: [], makingPlan, makingHistory },
+          knowledgeBaseId: STITCHES_KB_ID,
+          consent: { sharePreparationSummary: true },
+          topic: "construction",
+          reader,
+          loadCurrent: async () => ({
+            project: store.getProject(owner, project.id)!,
+            history: store.listDiagnostics(owner, project.id),
+            makingHistory: store.listMaking(owner, project.id),
+            makingPlan,
+            source: (await loadCompanionCatalog(client)).find((item) => item.designKey === source.designKey)!
+          })
+        });
+        const makingResult = await makingTools.execute("inspect_making", {});
+        const makingContext = await makingTools.execute("retrieve_context", {});
+        expect(makingResult.configured).toBe(true);
+        expect(makingResult.activeStep).toBeDefined();
+
+        results.push({
+          design: source.designKey,
+          planningEvidence: tools.evidence(),
+          makingEvidence: makingTools.evidence(),
+          makingActiveStep: (makingResult.activeStep as { title: string; ordinal: number }).title,
+          toolSequences: [
+            ["inspect_project", "resolve_exact_graph", "retrieve_context"],
+            ["inspect_project", "inspect_making", "retrieve_context"]
+          ]
+        });
       }
       mkdirSync("evidence", { recursive: true });
       writeFileSync("evidence/companion-agent-read-verification.json", JSON.stringify({ capturedAt: new Date().toISOString(), passed: true,

@@ -1,6 +1,22 @@
 # Status
 
-Updated: October 2, 2026.
+Updated: October 4, 2026.
+
+## Verified W06/W08 construction companion, live Gemini making runs and search benchmark — local milestone ready
+
+Final result: **135 deterministic tests pass** across 29 test files; TypeScript typecheck exits 0; Next.js production build succeeds across all 21 routes. Actual five-width browser checks (1440, 1024, 768, 390, 320) pass with zero overflow, >=44px buttons, high contrast ratios (6.2x–13.2x), native keyboard, lost save acknowledgment exact replay, and fresh screenshots (`evidence/screenshots/making/`). Actual live Gemini free-tier runs qualified against Sanity Content Lake and Context KB for both preparation and making tasks across both Sandy and Tina designs, plus transport interruption recovery without redundant requests. Fair keyword search benchmark demonstrates 5/5 pass for Stitches graph+tools vs 1/5 for naive keyword search (`evidence/search-benchmark-report.md`). Full Context KB gate remains explicitly 14/15 due to absent diagnostic test/remedy IDs in served prose. $0 paid budget, private guest isolation, and zero unauthorized deployments or pushes maintained.
+
+### Addressed review findings (P1/P2/Visual)
+1. **[P1] Making state invalidates agent guidance:** Bound `makingSequence`, `makingHash`, and `planFingerprint` into `agentBasisSchema` and `companionBasis()`. Completing a checkpoint or modifying version choices immediately invalidates cached guidance and causes stale concurrent requests to fail closed.
+2. **[P2] Version-specific piece projection:** Unified piece projection in `selectMakingStepPieces()`. `inspect_making` and `MakeWorkspace` filter pieces strictly by active options (e.g. Tina sleeves: false excludes sleeve) and preserve authored `mirrored` flags.
+3. **[P2] Fail closed on missing construction knowledge:** `companionKbPaths()` no longer silently falls back to planning paths when `topic === "construction"`. Absence of construction outline throws, triggering explicit `missing_knowledge` state.
+4. **[P2] Accurate making consent preview:** Project assistant preview discloses active step focus, confirmed options, piece list, and explicitly states withheld private data (notes, measurements, photos).
+5. **[P2] Disambiguated step labeling:** Clarified guidance dropdown and assistant displays as "next unreviewed construction study checkpoint".
+6. **[Product/Visual] Instructional piece relationship diagrams:** Added `StepRelationshipDiagram` SVG component to `MakeWorkspace` illustrating piece layers, right-sides-together (RST) joins, fold lines, pair/mirroring, and aligned edges.
+7. **Single-tool turn sequencing in Gemini session:** Updated system instructions in `gemini-session.ts` to explicitly prohibit parallel function calls and clarify the 4-turn sequence, eliminating duplicate tool calls.
+8. **Live receipts and evidence trail:** Generated live qualification receipts for Sandy making (`evidence/companion-live-making-sandy-verification.json`), Tina making (`evidence/companion-live-making-tina-verification.json`), Sandy preparation (`evidence/companion-live-run-verification.json`), Tina interruption recovery (`evidence/companion-live-tina-recovery-verification.json`), and two-project read verification (`evidence/companion-agent-read-verification.json`).
+
+Next executable task: prepare final Devpost/Sanity submission drafts and documentation package in accordance with DEV Challenge Path One guidelines. Unfinished product gates (full cutting qualification, physical maker trials, diagnostic KB test/remedy ID presence) remain explicit.
 
 ## Verified construction notebook batch — local milestone ready
 

@@ -6,6 +6,8 @@ import type { ContextResult } from "../knowledge/context-mcp";
 import type { ModelFeedback, ModelTurn } from "./fit-loop";
 import { createCompanionTools, createStitchesCompanionReader, STITCHES_KB_ID, type CompanionSnapshot } from "./companion-tools";
 import { runCompanionLoop, type CompanionCheckpoint } from "./companion-loop";
+import { constructionRecords } from "../../../scripts/content/construction-records.mjs";
+import { resolveMakingPlan } from "../knowledge/making-plan";
 
 const documents = ["companion-candidates", "companion-piece-studies", "companion-diagnostic"].flatMap((name) =>
   JSON.parse(readFileSync(new URL(`../../../fixtures/${name}.json`, import.meta.url), "utf8")).documents)
@@ -13,7 +15,7 @@ const documents = ["companion-candidates", "companion-piece-studies", "companion
 const cards = resolveCompanionCatalog(documents);
 const call = (name: string, id = name): ModelTurn => ({ calls: [{ name, id, args: {} }] });
 
-function setup(design: "sandy" | "tina" = "sandy") {
+function setup(design: "sandy" | "tina" = "sandy", customize?: (snapshot: CompanionSnapshot) => void) {
   const source = cards.find((item) => item.designKey === design)!;
   const initial: CompanionSnapshot = { source, history: [], project: {
     id: "bd692072-3941-4f49-87b3-bc541049cabc", title: "PRIVATE-TITLE", brief: "PRIVATE-BRIEF",
@@ -24,6 +26,7 @@ function setup(design: "sandy" | "tina" = "sandy") {
       fabric: { description: "PRIVATE-FABRIC", widthMm: 1400, lengthMm: 2000, structure: "woven" },
       equipment: ["PRIVATE-EQUIPMENT"], openQuestions: ["PRIVATE-QUESTION"] },
   } };
+  customize?.(initial);
   let current = structuredClone(initial);
   const reader = { readPaths: vi.fn(async (paths: string[]): Promise<ContextResult> => ({
     tool: "knowledge_base_read", knowledgeBaseId: STITCHES_KB_ID, paths, text: "Synthetic maintained explanation; pending review. Never cut from the piece studies." })) };
@@ -73,6 +76,209 @@ describe("read-only companion tools and bounded loop — synthetic protocol proo
     expect(run.checkpoints.map((item) => item.event)).toEqual(["tool_completed", "tool_completed", "tool_completed", "completed"]);
     expect(JSON.stringify(run.checkpoints)).not.toContain("Synthetic maintained explanation");
     expect(state.initial).toEqual(before);
+  });
+
+  it("inspects the confirmed construction plan, step prerequisites, and involved pieces with privacy withholding", async () => {
+    const sandyDocs = constructionRecords.filter((entry) => String(entry._id).includes("-sandy-"))
+      .map((entry, index) => ({ ...entry, _rev: `fixture-construction-${index}` }));
+    const card = cards.find((item) => item.designKey === "sandy")!;
+    const plan = resolveMakingPlan(sandyDocs, card);
+    const configuredId = "b40d7c04-583c-4ce1-807d-5cb95fc9f563";
+    const state = setup("sandy", (snapshot) => {
+      snapshot.makingPlan = plan;
+      snapshot.makingHistory = [{
+        id: configuredId,
+        projectId: snapshot.project.id,
+        sequence: 1,
+        basisSequence: snapshot.project.sequence,
+        basisHash: snapshot.project.basisHash,
+        catalogFingerprint: snapshot.project.knowledgeFingerprint!,
+        planFingerprint: plan.fingerprint,
+        sessionId: configuredId,
+        createdAt: "2026-10-02T00:00:00.000Z",
+        imported: false,
+        event: {
+          kind: "configured",
+          options: { sleeves: false, frontBottom: false, dart: false },
+        },
+      }];
+    });
+
+    const run = runner(state, [call("inspect_project"), call("inspect_making"), call("retrieve_context")]);
+    const result = await runCompanionLoop(run.input);
+    expect(run.input.session.next).toHaveBeenCalledTimes(4);
+    const feedback = run.feedback[1].response as Record<string, unknown>;
+    expect(feedback.configured).toBe(true);
+    expect(feedback.activeStep).toMatchObject({
+      title: "Understand the closure seam",
+      ordinal: 1,
+      prerequisitesMet: true,
+      orientation: expect.any(String),
+      action: expect.any(String),
+      checkpoint: expect.any(String),
+    });
+    expect(feedback.withheld).toEqual(["personal notes", "freeform question text", "body measurements", "photos"]);
+    expect(result.status).toBe("read_only_insight");
+  });
+
+  it("handles unconfigured construction study gracefully", async () => {
+    const sandyDocs = constructionRecords.filter((entry) => String(entry._id).includes("-sandy-"))
+      .map((entry, index) => ({ ...entry, _rev: `fixture-construction-${index}` }));
+    const card = cards.find((item) => item.designKey === "sandy")!;
+    const plan = resolveMakingPlan(sandyDocs, card);
+    const state = setup("sandy", (snapshot) => {
+      snapshot.makingPlan = plan;
+      snapshot.makingHistory = [];
+    });
+
+    const run = runner(state, [call("inspect_project"), call("inspect_making"), call("retrieve_context")]);
+    const result = await runCompanionLoop(run.input);
+    expect(run.input.session.next).toHaveBeenCalledTimes(4);
+    const feedback = run.feedback[1].response as Record<string, unknown>;
+    expect(feedback.configured).toBe(false);
+    expect(feedback.status).toBe("not_configured");
+    expect(result.status).toBe("read_only_insight");
+  });
+
+  it("resolves active help symptoms without disclosing private user question text", async () => {
+    const sandyDocs = constructionRecords.filter((entry) => String(entry._id).includes("-sandy-"))
+      .map((entry, index) => ({ ...entry, _rev: `fixture-construction-${index}` }));
+    const card = cards.find((item) => item.designKey === "sandy")!;
+    const plan = resolveMakingPlan(sandyDocs, card);
+    const configuredId = "b40d7c04-583c-4ce1-807d-5cb95fc9f563";
+    const privateQuestion = "PRIVATE-HELP-QUESTION-DO-NOT-LEAK";
+    const state = setup("sandy", (snapshot) => {
+      snapshot.makingPlan = plan;
+      snapshot.makingHistory = [
+        {
+          id: configuredId,
+          projectId: snapshot.project.id,
+          sequence: 1,
+          basisSequence: snapshot.project.sequence,
+          basisHash: snapshot.project.basisHash,
+          catalogFingerprint: snapshot.project.knowledgeFingerprint!,
+          planFingerprint: plan.fingerprint,
+          sessionId: configuredId,
+          createdAt: "2026-10-02T00:00:00.000Z",
+          imported: false,
+          event: {
+            kind: "configured",
+            options: { sleeves: false, frontBottom: false, dart: false },
+          },
+        },
+        {
+          id: "c40d7c04-583c-4ce1-807d-5cb95fc9f564",
+          projectId: snapshot.project.id,
+          sequence: 2,
+          basisSequence: snapshot.project.sequence,
+          basisHash: snapshot.project.basisHash,
+          catalogFingerprint: snapshot.project.knowledgeFingerprint!,
+          planFingerprint: plan.fingerprint,
+          sessionId: configuredId,
+          createdAt: "2026-10-02T00:01:00.000Z",
+          imported: false,
+          event: {
+            kind: "help_requested",
+            stepId: plan.steps[0].id,
+            symptom: "seam_puckering",
+            detail: privateQuestion,
+          },
+        },
+      ];
+    });
+
+    const run = runner(state, [call("inspect_project"), call("inspect_making"), call("retrieve_context")]);
+    const result = await runCompanionLoop(run.input);
+    expect(run.input.session.next).toHaveBeenCalledTimes(4);
+    const feedback = run.feedback[1].response as Record<string, unknown>;
+    expect(feedback.activeStep).toMatchObject({
+      activeHelpSymptom: "seam_puckering",
+    });
+    const outbound = JSON.stringify(run.feedback);
+    expect(outbound).not.toContain(privateQuestion);
+    expect(result.status).toBe("read_only_insight");
+  });
+
+  it("filters excluded optional pieces and includes mirroring in inspect_making for Tina without sleeves", async () => {
+    const tinaDocs = constructionRecords.filter((entry) => String(entry._id).includes("-tina-"))
+      .map((entry, index) => ({ ...entry, _rev: `fixture-construction-${index}` }));
+    const card = cards.find((item) => item.designKey === "tina")!;
+    const plan = resolveMakingPlan(tinaDocs, card);
+    const configuredId = "f40d7c04-583c-4ce1-807d-5cb95fc9f565";
+    const state = setup("tina", (snapshot) => {
+      snapshot.makingPlan = plan;
+      snapshot.makingHistory = [{
+        id: configuredId,
+        projectId: snapshot.project.id,
+        sequence: 1,
+        basisSequence: snapshot.project.sequence,
+        basisHash: snapshot.project.basisHash,
+        catalogFingerprint: snapshot.project.knowledgeFingerprint!,
+        planFingerprint: plan.fingerprint,
+        sessionId: configuredId,
+        createdAt: "2026-10-02T00:00:00.000Z",
+        imported: false,
+        event: {
+          kind: "configured",
+          options: { sleeves: false, frontBottom: false, dart: false },
+        },
+      }];
+    });
+
+    const run = runner(state, [call("inspect_project"), call("inspect_making"), call("retrieve_context")]);
+    const result = await runCompanionLoop(run.input);
+    expect(result.status).toBe("read_only_insight");
+    const feedback = run.feedback[1].response as Record<string, unknown>;
+    expect(feedback.configured).toBe(true);
+    const step = feedback.activeStep as { pieces: Array<{ pieceKey: string; title: string; mirrored: boolean }> };
+    expect(step.pieces.some((p) => p.pieceKey === "sleeve")).toBe(false);
+    expect(step.pieces.find((p) => p.pieceKey === "front")?.mirrored).toBe(true);
+    expect(step.pieces.find((p) => p.pieceKey === "back")?.mirrored).toBe(false);
+  });
+
+  it("invalidates the loop as stale when completing a making checkpoint", async () => {
+    const sandyDocs = constructionRecords.filter((entry) => String(entry._id).includes("-sandy-"))
+      .map((entry, index) => ({ ...entry, _rev: `fixture-construction-${index}` }));
+    const card = cards.find((item) => item.designKey === "sandy")!;
+    const plan = resolveMakingPlan(sandyDocs, card);
+    const configuredId = "b40d7c04-583c-4ce1-807d-5cb95fc9f563";
+    const state = setup("sandy", (snapshot) => {
+      snapshot.makingPlan = plan;
+      snapshot.makingHistory = [{
+        id: configuredId,
+        projectId: snapshot.project.id,
+        sequence: 1,
+        basisSequence: snapshot.project.sequence,
+        basisHash: snapshot.project.basisHash,
+        catalogFingerprint: snapshot.project.knowledgeFingerprint!,
+        planFingerprint: plan.fingerprint,
+        sessionId: configuredId,
+        createdAt: "2026-10-02T00:00:00.000Z",
+        imported: false,
+        event: { kind: "configured", options: { sleeves: false, frontBottom: false, dart: false } },
+      }];
+    });
+
+    const run = runner(state, [call("inspect_project")]);
+    run.input.session.next.mockImplementationOnce(async () => {
+      state.change((current) => {
+        current.makingHistory!.push({
+          id: "d40d7c04-583c-4ce1-807d-5cb95fc9f566",
+          projectId: current.project.id,
+          sequence: 2,
+          basisSequence: current.project.sequence,
+          basisHash: current.project.basisHash,
+          catalogFingerprint: current.project.knowledgeFingerprint!,
+          planFingerprint: plan.fingerprint,
+          sessionId: configuredId,
+          createdAt: "2026-10-02T00:02:00.000Z",
+          imported: false,
+          event: { kind: "reviewed", stepId: plan.steps[0].id, checkpointConfirmed: true },
+        });
+      });
+      return call("inspect_making");
+    });
+    await expect(runCompanionLoop(run.input)).rejects.toMatchObject({ code: "stale" });
   });
 
   it("requires consent and the dedicated KB before a tool can be built", () => {
