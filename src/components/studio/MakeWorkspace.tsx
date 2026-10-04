@@ -11,81 +11,25 @@ import "../../app/making.css";
 export type ScrapStepContext = { eventId: string; stepId: string; stepTitle: string; planFingerprint: string; historySequence: number };
 const noOptions: MakingOptions = { sleeves: false, frontBottom: false, dart: false };
 
-function StepRelationshipDiagram({
-  orientation,
-  pieces,
-  edgeIds,
-}: {
-  orientation: string;
+function StepRelationshipDiagram({ pieces, edgeIds }: {
   pieces: Array<{ title: string; pieceKey: string; cutCount: number; fold: string; mirrored: boolean; material: string }>;
   edgeIds: string[];
 }) {
-  const isRST = /right sides (together|face each other)/i.test(orientation);
-  const primaryPiece = pieces[0]?.title ?? "First piece";
-  const secondPiece = pieces[1]?.title ?? (pieces[0] ? `${pieces[0].title} (opposite edge)` : "Joining piece");
-
-  return (
-    <div className="making-diagram-wrap">
-      <svg
-        className="making-diagram"
-        viewBox="0 0 520 180"
-        role="img"
-        aria-label={`Orientation diagram: ${orientation}`}
-      >
-        <rect x="2" y="2" width="516" height="176" rx="6" fill="#fdfbf7" stroke="#d5d7ca" strokeWidth="1" />
-        <g transform="translate(24, 20)">
-          <rect x="0" y="0" width="195" height="96" rx="4" fill="#e9eee1" stroke="#6b7d60" strokeWidth="1.5" />
-          <text x="12" y="24" fill="#344f3b" fontSize="12" fontWeight="700">{primaryPiece}</text>
-          <text x="12" y="44" fill="#515b4e" fontSize="11">{isRST ? "Face / Right side (facing inward)" : "Primary layer"}</text>
-          {pieces[0]?.fold && pieces[0].fold !== "none" && (
-            <g transform="translate(12, 58)">
-              <line x1="0" y1="0" x2="165" y2="0" stroke="#8c4c2b" strokeDasharray="3 3" strokeWidth="1.5" />
-              <text x="0" y="14" fill="#8c4c2b" fontSize="10">Fold line ({pieces[0].fold})</text>
-            </g>
-          )}
-          {pieces[0]?.mirrored && (
-            <text x="12" y="84" fill="#344f3b" fontSize="10">⧉ Pair: cut 1 + 1 mirrored</text>
-          )}
-        </g>
-        <g transform="translate(236, 50)">
-          <circle cx="16" cy="16" r="15" fill="#f0f1e7" stroke="#91a183" strokeWidth="1" />
-          <text x="16" y="21" textAnchor="middle" fill="#344f3b" fontSize="15" fontWeight="bold">↔</text>
-          <text x="16" y="42" textAnchor="middle" fill="#515b4e" fontSize="9">{isRST ? "RST seam" : "Join"}</text>
-        </g>
-        <g transform="translate(284, 20)">
-          <rect x="0" y="0" width="195" height="96" rx="4" fill="#faf8f2" stroke="#6b7d60" strokeWidth="1.5" />
-          <text x="12" y="24" fill="#344f3b" fontSize="12" fontWeight="700">{secondPiece}</text>
-          <text x="12" y="44" fill="#515b4e" fontSize="11">{isRST ? "Face / Right side (meeting top)" : "Mating layer"}</text>
-          {pieces[1]?.fold && pieces[1].fold !== "none" && (
-            <g transform="translate(12, 58)">
-              <line x1="0" y1="0" x2="165" y2="0" stroke="#8c4c2b" strokeDasharray="3 3" strokeWidth="1.5" />
-              <text x="0" y="14" fill="#8c4c2b" fontSize="10">Fold line ({pieces[1].fold})</text>
-            </g>
-          )}
-          {pieces[1]?.mirrored && (
-            <text x="12" y="84" fill="#344f3b" fontSize="10">⧉ Pair: cut 1 + 1 mirrored</text>
-          )}
-        </g>
-        <g transform="translate(24, 130)">
-          <rect x="0" y="0" width="455" height="32" rx="3" fill="#f0f1e7" stroke="#c0cbb5" strokeWidth="1" />
-          <line x1="12" y1="16" x2="48" y2="16" stroke="#8c4c2b" strokeDasharray="4 2" strokeWidth="2" />
-          <text x="56" y="20" fill="#282d27" fontSize="11">
-            {edgeIds.length > 0
-              ? `Aligning edges: ${edgeIds.join(" ↔ ")}`
-              : isRST
-                ? "Join edges aligned with right sides facing — stitch along seam allowance"
-                : "Carefully match edge markings and notches before securing"}
-          </text>
-        </g>
-      </svg>
-    </div>
-  );
+  // Step records list involved objects, but do not yet identify verified seam mates.
+  // A two-box joining arrow would invent a relationship even when two IDs exist.
+  return <div className="making-diagram-wrap making-diagram-study" role="group" aria-label="Authored pieces and edge references for this study step">
+    <p>{pieces.length ? "Source-listed pieces in this operation" : "No exact pieces are bound to this step yet. Use the original pattern instructions."}</p>
+    {pieces.length > 0 && <ul>{pieces.map((piece) => <li key={piece.pieceKey}><strong>{piece.title}</strong><span>{piece.fold === "none" ? "No fold" : `${piece.fold} fold`} · {piece.mirrored ? "mirrored pair" : `cut ${piece.cutCount}`}</span></li>)}</ul>}
+    {edgeIds.length > 0 && <small>Authored edge IDs: {edgeIds.join(" · ")}. These IDs do not by themselves establish a joining partner or stitching path.</small>}
+    <small>Exact seam-mate and placement diagram awaits source qualification. Read the original construction instructions before sewing.</small>
+  </div>;
 }
 
-export function MakeWorkspace({ project, source, dirty, onScrapHelp, onContextInvalidated, onMakingUpdated }: {
+export function MakeWorkspace({ project, source, dirty, onScrapHelp, onContextInvalidated, onMakingUpdated, onShowPattern }: {
   project: GuestProject; source?: CompanionCatalogCard; dirty: boolean;
   onScrapHelp: (context: ScrapStepContext) => void; onContextInvalidated: () => void;
   onMakingUpdated?: (sequence: number) => void;
+  onShowPattern?: () => void;
 }) {
   const [plan, setPlan] = useState<MakingPlan | null>(null);
   const [history, setHistory] = useState<MakingRecord[]>([]);
@@ -173,7 +117,7 @@ export function MakeWorkspace({ project, source, dirty, onScrapHelp, onContextIn
   const eligible = !!step && !!plan && !!session && makingPrerequisites(plan, session.options, step.id).every((id) => session.reviewed.has(id));
 
   return <section className="making-workspace" aria-labelledby="making-heading">
-    <header className="making-heading"><div><p className="companion-kicker">THE MAKING NOTEBOOK / SOURCE → STEP → CHECK</p><h2 id="making-heading">Understand the next seam.</h2><p>One relationship at a time. Keep questions and review checkpoints with the version you actually studied.</p></div><span className="making-badge">Learning plan · physical review pending</span></header>
+    <header className="making-heading"><div><p className="companion-kicker">THE MAKING NOTEBOOK / SOURCE → STEP → CHECK</p><h2 id="making-heading">Understand the next operation.</h2><p>One relationship at a time. Keep questions and review checkpoints with the version you actually studied.</p></div><span className="making-badge">Learning plan · physical review pending</span></header>
     {loading && <p role="status">Loading your construction study…</p>}
     {dirty && <p className="making-caution">Save your working brief first. New checkpoints must belong to a saved revision.</p>}
     {plan && <details className="making-source"><summary>Scope & source · {plan.title}</summary><p>{plan.envelope}</p><p>This is an authored learning summary, not complete sewing instructions. Follow your qualified pattern for allowances, material handling and physical sewing.</p><a href={plan.sourceUrl} target="_blank" rel="noreferrer">Read the original construction instructions ↗</a><small>Sanity plan {plan.id} · revision fingerprint {plan.fingerprint.slice(0, 12)} · no Context rebuild assumed</small></details>}
@@ -196,10 +140,10 @@ export function MakeWorkspace({ project, source, dirty, onScrapHelp, onContextIn
         <h3 id="making-step-title">{step.title}</h3><p className="making-action">{step.action}</p>
         <div className="making-layer-study">
           <div className="making-layer-label">ORIENTATION / SCHEMATIC, NOT A CUTTING SHAPE</div>
-          <StepRelationshipDiagram orientation={step.orientation} pieces={stepPieces} edgeIds={step.edgeIds} />
+          <StepRelationshipDiagram pieces={stepPieces} edgeIds={step.edgeIds} />
           <p>{step.orientation}</p>
         </div>
-        {!concise && <div className="making-pieces"><h4>Bring these pieces into view</h4><ul>{stepPieces.map((piece) => <li key={piece.pieceKey}><strong>{piece.title}</strong><span>Source cut list: {piece.cutCount}{piece.mirrored ? " mirrored" : ""} · {piece.fold === "none" ? "no fold" : `${piece.fold} fold`} · {piece.material}</span></li>)}</ul><p>Counts describe the planning source, not a qualified cutting layout.</p>{step.edgeIds.length > 0 && <div><a href="#pattern-board-heading">Inspect Sandy’s measured edge study ↑</a><small>{step.edgeIds.join(" · ")}</small></div>}{plan.designKey === "tina" && <small>Tina’s exact edge mates are not yet qualified; use the original pattern markings.</small>}</div>}
+        {!concise && <div className="making-pieces"><h4>Bring these pieces into view</h4><ul>{stepPieces.map((piece) => <li key={piece.pieceKey}><strong>{piece.title}</strong><span>Source cut list: {piece.cutCount}{piece.mirrored ? " mirrored" : ""} · {piece.fold === "none" ? "no fold" : `${piece.fold} fold`} · {piece.material}</span></li>)}</ul><p>Counts describe the planning source, not a qualified cutting layout.</p>{step.edgeIds.length > 0 && <div>{plan.designKey === "sandy" && onShowPattern && <button type="button" className="making-pattern-link" onClick={onShowPattern}>Inspect Sandy’s measured edge study ↗</button>}<small>{step.edgeIds.join(" · ")}</small></div>}{plan.designKey === "tina" && <small>Tina’s exact edge mates are not yet qualified; use the original pattern markings.</small>}</div>}
         <div className="making-checkpoint"><span>BEFORE YOU MOVE ON</span><p>{step.checkpoint}</p><label><input type="checkbox" checked={confirmed} disabled={disabled || !eligible || reviewed} onChange={(event) => setConfirmed(event.target.checked)} />I reviewed this study checkpoint. This is not proof that I sewed it.</label></div>
         <div className="making-actions"><button className="making-primary" type="button" disabled={disabled || !confirmed || !eligible || reviewed} onClick={() => record({ kind: "reviewed", stepId: step.id, checkpointConfirmed: true })}>Record study checkpoint ↗</button><button type="button" disabled={disabled || session.next?.id !== step.id} onClick={() => setHelpOpen(!helpOpen)}>I’m stuck here</button></div>
         {helpOpen && <form className="making-help" onSubmit={(event) => { event.preventDefault(); void record({ kind: "help_requested", stepId: step.id, symptom, detail }); }}><h4>Keep the question with this step.</h4><label>What needs attention?<select value={symptom} onChange={(event) => setSymptom(event.target.value as typeof symptom)}><option value="alignment">Piece alignment / orientation</option>{step.diagnostic && <option value="seam_puckering">A scrap seam is puckering</option>}<option value="other">Another question</option></select></label><label>What did you observe?<textarea value={detail} required maxLength={600} rows={3} onChange={(event) => setDetail(event.target.value)} /></label><p>{symptom === "seam_puckering" ? "This opens the shared source-linked sacrificial-sample check, bound to this step. It will not alter your garment." : "This records an unresolved question. No unqualified fix will be generated; consult the original source or a maker."}</p><button type="submit" disabled={disabled || !detail.trim()}>Save question{symptom === "seam_puckering" ? " & open scrap check" : ""} ↗</button></form>}

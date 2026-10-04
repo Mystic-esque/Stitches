@@ -1,6 +1,7 @@
 "use client";
 
 import "../../app/assistant.css";
+import "../../app/studio-shell.css";
 
 import Image from "next/image";
 import { useCallback, useEffect, useRef, useState, type ChangeEvent, type FormEvent } from "react";
@@ -29,6 +30,7 @@ function startFor(source: ProjectSource) {
 }
 
 type Draft = { title: string; brief: string; features: string; questions: string; equipment: string; fabric: string; width: string; length: string; structure: ProjectPlan["fabric"]["structure"]; measurements: MeasurementDraft };
+type WorkspaceView = "overview" | "pattern" | "materials" | "make" | "check";
 const lines = (value: string) => [...new Set(value.split(/\r?\n/).map((part) => part.trim()).filter(Boolean))];
 const cm = (value?: number) => value === undefined ? "" : String(value / 10);
 const mm = (value: string) => { const number = Number(value); return value.trim() && Number.isFinite(number) && number > 0 ? Math.round(number * 10) : undefined; };
@@ -50,6 +52,9 @@ export function CompanionHome() {
   const [catalog, setCatalog] = useState<CompanionCatalogCard[]>([]);
   const [catalogState, setCatalogState] = useState<"loading" | "ready" | "unavailable">("loading");
   const [active, setActive] = useState<GuestProject | null>(null);
+  const [view, setView] = useState<WorkspaceView>("overview");
+  const [agentOpen, setAgentOpen] = useState(false);
+  useEffect(() => { setAgentOpen(window.matchMedia("(min-width: 1101px)").matches); }, []);
   const activeId = useRef<string | undefined>(undefined);
   activeId.current = active?.id;
   const [revisions, setRevisions] = useState<GuestProject[]>([]);
@@ -77,9 +82,14 @@ export function CompanionHome() {
       setActive(data.project); setDraft(draftFor(data.project)); setRevisions(data.revisions); setNotes(data.notes);
       setDiagnostics(data.diagnostics ?? []);
       // Restoring this URL must not dispatch a second router restore or add a back-stack entry.
-      const projectUrl = `/?project=${encodeURIComponent(id)}`;
+      const requestedView = new URLSearchParams(window.location.search).get("view");
+      const restoredView: WorkspaceView = requestedView === "pattern" || requestedView === "materials" || requestedView === "make" || requestedView === "check" ? requestedView : "overview";
+      setView(restoredView);
+      const projectUrl = `/?project=${encodeURIComponent(id)}&view=${restoredView}`;
       if (`${window.location.pathname}${window.location.search}` !== projectUrl) {
-        window.history.pushState({}, "", projectUrl);
+        const sameProject = new URLSearchParams(window.location.search).get("project") === id;
+        if (sameProject) window.history.replaceState({}, "", projectUrl);
+        else window.history.pushState({}, "", projectUrl);
       }
       window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (cause) { setError(cause instanceof Error ? cause.message : "Project unavailable."); }
@@ -97,6 +107,24 @@ export function CompanionHome() {
       finally { if (mounted) setLoading(false); }
     })();
     return () => { mounted = false; };
+  }, [open]);
+  const changeView = (next: WorkspaceView) => {
+    if (!active) return;
+    setView(next);
+    window.history.pushState({}, "", `/?project=${encodeURIComponent(active.id)}&view=${next}`);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+  useEffect(() => {
+    const restore = () => {
+      const params = new URLSearchParams(window.location.search);
+      const id = params.get("project");
+      if (!id) { setActive(null); setDraft(null); return; }
+      const next = params.get("view");
+      setView(next === "pattern" || next === "materials" || next === "make" || next === "check" ? next : "overview");
+      if (id !== activeId.current) void open(id);
+    };
+    window.addEventListener("popstate", restore);
+    return () => window.removeEventListener("popstate", restore);
   }, [open]);
   useEffect(() => {
     let mounted = true;
@@ -129,7 +157,7 @@ export function CompanionHome() {
       const data = await json(await fetch("/api/projects", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ title: newTitle, brief: newBrief, source: newSource, idempotencyKey: crypto.randomUUID() }) }));
       setProjects((current) => [data.project, ...current]); setNewSource(null); setActive(data.project); setDraft(draftFor(data.project)); setRevisions([data.project]); setNotes([]);
       setDiagnostics([]);
-      window.history.pushState({}, "", `/?project=${data.project.id}`);
+      setView("overview"); window.history.pushState({}, "", `/?project=${data.project.id}&view=overview`);
       setNotice("Project saved privately in this browser's guest workspace.");
       window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (cause) { setError(cause instanceof Error ? cause.message : "Could not create project."); }
@@ -189,7 +217,7 @@ export function CompanionHome() {
       const data = await json(await fetch("/api/projects/import", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ backup, idempotencyKey: crypto.randomUUID() }) }));
       setProjects((current) => [data.project, ...current]); setActive(data.project); setDraft(draftFor(data.project)); setRevisions([data.project]); setNotes(data.notes);
       setDiagnostics(data.diagnostics ?? []);
-      window.history.pushState({}, "", `/?project=${data.project.id}`);
+      setView("overview"); window.history.pushState({}, "", `/?project=${data.project.id}&view=overview`);
       setNotice("Backup imported as a new private project, including its journal and unverified check history. Original revision snapshots are not included.");
     } catch (cause) { setError(cause instanceof Error ? cause.message : "Could not import backup."); }
     finally { setBusy(false); }
@@ -240,16 +268,25 @@ export function CompanionHome() {
       setProjects((current) => current.map((item) => item.id === project.id ? project : item));
       setNotice("Profile copy saved. Any edits made while copying remain unsaved; review your working brief before saving.");
     }} />}
-    {active && draft ? <main className="companion-project">
+    {active && draft ? <main className={`companion-project studio-shell ${agentOpen ? "agent-is-open" : ""}`}>
       <div className="project-topline"><button type="button" onClick={back}>← All projects</button><span>Private guest project · revision {active.sequence}</span><button type="button" disabled={busy} onClick={() => downloadBackup()}>Download latest-state backup ↓</button><button type="button" disabled={busy} onClick={() => downloadBackup(true)}>Take a making brief ↓</button></div>
       <div className="project-head"><div><p className="companion-kicker">YOUR MAKING COMPANION / 01</p><h1>{active.title}</h1><p>Carry your idea, materials and decisions in one place. Every save becomes a reviewable revision.</p></div><span className="capability-chip">Planning only · no cutting yet</span></div>
       {active.source.kind === "candidate" && <section className="project-source-strip" aria-label="Current source research">{sourceCard ? <><p className="companion-kicker">LIVE SANITY CONTENT LAKE · PLANNING SOURCE</p><strong>{sourceCard.title}</strong><p>{sourceBinding === "stale" ? "This source record changed after your saved project basis. Review and refresh it before using the new planning facts." : sourceCard.cuttingCaveat}</p><span>{sourceCard.materialStructure} · {sourceCard.requiredMeasurements.length} source-listed measurements · {sourceCard.reviewStatus} review · plan only</span><a href={sourceCard.sourceUrl} target="_blank" rel="noreferrer">Read {sourceCard.sourceTitle} ↗</a></> : <p role="status">{catalogState === "loading" ? "Checking the current Sanity source record…" : "Current Sanity source details are unavailable. Your private plan is still saved, but do not use this card to cut."}</p>}</section>}
       {sourceBinding && <div className={`source-binding ${sourceBinding}`} role="status"><span>{sourceBinding === "current" ? "This plan is bound to the current Sanity source revision. It is still planning-only." : sourceBinding === "stale" ? "Source changed since this project revision. Source-dependent advice is stale; earlier maker notes are preserved." : sourceBinding === "unbound" ? "This project has no saved Sanity source binding yet. Review the current source before attaching it." : "Sanity source check is unavailable. Source-dependent guidance is paused."}</span>{(sourceBinding === "stale" || sourceBinding === "unbound") && <button type="button" disabled={busy || unsavedChanges} onClick={refreshSource}>Review & bind current source ↗</button>}{unsavedChanges && sourceBinding !== "current" && <small>Save plan edits first.</small>}</div>}
+      <nav className="studio-view-nav" aria-label="Project workspace"><span>WORKSPACE</span>{([ ["overview", "Overview"], ["pattern", "Pattern"], ["materials", "Materials"], ["make", "Make"], ["check", "Fit & checks"] ] as const).map(([key, label]) => <button type="button" key={key} className={view === key ? "current" : ""} aria-current={view === key ? "page" : undefined} onClick={() => changeView(key)}>{label}</button>)}<button type="button" className="studio-agent-toggle" aria-expanded={agentOpen} aria-controls="studio-agent-dock" onClick={() => setAgentOpen(!agentOpen)}>{agentOpen ? "Hide companion" : "Ask companion"} ✳</button></nav>
+      <div className="studio-main-pane">
+      {view === "pattern" && <div className="studio-view-intro"><p className="companion-kicker">PATTERN STUDY</p><h2>See what each piece does.</h2><p>Authored pieces and folds are visible where available. Editorial drawings are not cutting templates.</p></div>}
+      {view === "pattern" && <>
       {sourceBinding === "current" && sourceCard && <PieceStudy key={`piece-${sourceCard.designKey}`} card={sourceCard} />}
       {sourceBinding === "current" && sourceCard?.designKey === "sandy" && <PatternBoard key={`pattern-${active.id}`} project={active} source={sourceCard} dirty={unsavedChanges} />}
+      {sourceBinding !== "current" && <p className="studio-view-empty" role="status">Pattern study waits for the current Sanity source binding. Your saved project is unchanged.</p>}
+      </>}
+      {view === "make" && <>
       <MakeWorkspace key={`making-${active.id}-${active.sequence}`} project={active} source={sourceBinding === "current" ? sourceCard : undefined} dirty={busy || unsavedChanges}
-        onScrapHelp={(context) => setScrapStep(context)} onContextInvalidated={() => setScrapStep(null)}
-        onMakingUpdated={(seq) => setMakingSequence(seq)} />
+        onScrapHelp={(context) => { setScrapStep(context); changeView("check"); }} onContextInvalidated={() => setScrapStep(null)}
+        onMakingUpdated={(seq) => setMakingSequence(seq)} onShowPattern={() => changeView("pattern")} />
+      </>}
+      {view === "check" && <>
       {sourceBinding === "current" && sourceCard && <DiagnosticStudy key={`diagnostic-${active.id}-${active.sequence}-${sourceCard.diagnosticStudy.fingerprint}`} study={sourceCard.diagnosticStudy} project={active} history={diagnostics} disabled={busy || unsavedChanges}
         makingContext={scrapStep} onClearContext={() => setScrapStep(null)}
         onSaved={(record) => { if (activeId.current === record.projectId) setDiagnostics((history) => history.some((item) => item.id === record.id) ? history : [...history, record]); }}
@@ -258,8 +295,12 @@ export function CompanionHome() {
       <DiagnosticHistory key={`history-${active.id}`} history={diagnostics} project={active} disabled={busy || unsavedChanges}
         onSaved={(record) => { if (activeId.current === record.projectId) setDiagnostics((history) => history.some((item) => item.id === record.id) ? history : [...history, record]); }}
         currentFingerprint={sourceBinding === "current" ? sourceCard?.diagnosticStudy.fingerprint : undefined} />
+      </>}
+      {view === "materials" && <div className="studio-view-intro"><p className="companion-kicker">MATERIALS & PREPARATION</p><h2>Know what still needs checking.</h2><p>Fabric suitability and quantity are planning questions until a cut layout and physical test are verified.</p></div>}
+      {view === "materials" &&
       <PreparationPlan project={active} source={sourceCard} history={diagnostics} dirty={unsavedChanges} />
-      <ProjectAssistant key={`assistant-${active.id}`} project={active} source={sourceCard} historySequence={diagnostics.length} makingSequence={makingSequence} dirty={unsavedChanges} />
+      }
+      {view === "overview" && <>
       <div className="project-workspace"><aside className="project-rail" aria-label="Project stages"><p className="rail-caption">THE JOURNEY</p><ol><li className="current"><b>01</b><span>Plan your idea<small>Available now</small></span></li><li><b>02</b><span>Understand the pattern<small>Qualification in progress</small></span></li><li><b>03</b><span>Cut with confidence<small>Not yet verified</small></span></li><li><b>04</b><span>Make & troubleshoot<small>Not yet verified</small></span></li></ol><a href="/demo">Explore the pattern study ↗</a></aside>
         <form className="project-form" onSubmit={save}><div className="form-intro"><p className="companion-kicker">THE WORKING BRIEF</p><h2>Make it yours, one decision at a time.</h2><p>Describe what you want to make. Stitches keeps constraints together while drafting and making tools are verified.</p></div>
           <div className="field-row"><label>Project name<input value={draft.title} maxLength={100} required onChange={(event) => update("title", event.target.value)} /></label><label>Fabric structure<select value={draft.structure} onChange={(event) => update("structure", event.target.value)}><option value="unknown">Not sure yet</option><option value="woven">Woven</option><option value="knit">Knit / stretch</option></select></label></div>
@@ -270,6 +311,9 @@ export function CompanionHome() {
           {error && <p className="project-alert" role="alert">{error}</p>}{notice && <p className="project-notice" role="status">{notice}</p>}<div className="save-row"><button type="submit" disabled={busy}>{busy ? "Saving…" : "Save this revision"} ↗</button><small>Saved on this local server · no account</small></div>
           <section className="maker-journal" aria-labelledby="journal-heading"><div className="form-divider">04 / MAKER JOURNAL</div><h3 id="journal-heading">Remember what happened, not just what you planned.</h3><p>Keep a private observation or question beside this exact saved revision. Earlier notes stay visible when your plan changes; they are not sewing instructions or verified advice.</p><div className="field-row"><label>Entry type<select value={noteKind} onChange={(event) => setNoteKind(event.target.value as "journal" | "question")}><option value="journal">Observation</option><option value="question">Question to resolve</option></select></label><label>Where are you?<select value={noteStage} onChange={(event) => setNoteStage(event.target.value as "plan" | "prepare" | "make" | "check")}><option value="plan">Planning</option><option value="prepare">Preparing</option><option value="make">Making</option><option value="check">Checking result</option></select></label></div><label>Your note<textarea value={noteText} maxLength={1000} rows={3} placeholder="I tested a sample seam, and the fabric puckered…" onChange={(event) => setNoteText(event.target.value)} /></label><button className="journal-add" type="button" disabled={busy || unsavedChanges || !noteText.trim()} onClick={recordNote}>Add to journal ↗</button>{unsavedChanges && <small className="journal-warning">Save your plan changes first so this note points to the right revision.</small>}<small className="journal-disclosure">Stored on this local server for this guest browser. Latest-state backup includes journal entries, but not old revision snapshots.</small><ol className="journal-list">{notes.slice().reverse().map((note) => <li key={note.id}><div><strong>{note.kind === "question" ? "Question" : "Observation"} · {note.stage}</strong><small>{note.importedFromSequence ? `Imported source revision #${note.importedFromSequence}` : note.basisHash === active.basisHash && note.basisSequence === active.sequence ? `Current revision #${note.basisSequence}` : `Earlier revision #${note.basisSequence}`}</small></div><p>{note.text}</p><time dateTime={note.createdAt}>{new Date(note.createdAt).toLocaleString()}</time></li>)}</ol>{notes.length === 0 && <p className="journal-empty">Your first entry will appear here.</p>}</section>
         </form><aside className="project-notes"><div className="note-card"><p className="companion-kicker">SOURCE</p><h3>{startFor(active.source)?.name ?? "Your own idea"}</h3><p>{active.source.kind === "candidate" ? "A distinct design candidate, not an approved printable pattern. We are testing geometry, instructions and rights before enabling cutting." : "Record your concept now. Photo analysis and drafting are not yet enabled."}</p></div><div className="note-card dark"><p className="companion-kicker">HONEST CAPABILITY</p><h3>Not a pattern file. Yet.</h3><p>Measurements and fabric notes are planning inputs. Do not cut fabric from the editorial images or illustrative demo.</p></div><div className="note-card"><p className="companion-kicker">REVISION TRAIL</p><strong>{active.plan.features.length} features · {active.plan.openQuestions.length} open questions</strong><ol className="revision-list">{revisions.slice().reverse().map((item) => <li key={item.sequence}><b>#{item.sequence}</b><span>{new Date(item.updatedAt).toLocaleString()}</span></li>)}</ol><p>Earlier snapshots are preserved on this server. Download exports the latest state only.</p></div></aside></div>
+      </>}
+      </div>
+      <aside id="studio-agent-dock" className="studio-agent-dock" hidden={!agentOpen} aria-label="Sewing companion"><button type="button" className="studio-agent-close" onClick={() => setAgentOpen(false)}>Close companion ×</button><ProjectAssistant key={`assistant-${active.id}`} project={active} source={sourceCard} historySequence={diagnostics.length} makingSequence={makingSequence} dirty={unsavedChanges} focus={view} /></aside>
     </main> : <main><section className="companion-hero"><Image src="/images/atelier-hero.png" fill priority sizes="100vw" alt="Sewing workroom with a garment on a dress form and paper pattern pieces on a table" /><div className="hero-shade" /><div className="hero-content"><p className="companion-kicker">THE SEWING COMPANION</p><h1>From “I could make that”<br />to <em>“I made it.”</em></h1><p>Stitches connects the garment you imagine to the pieces, decisions and steps needed to make it — beginning with a project that remembers your plan.</p><button type="button" onClick={() => document.getElementById("collection")?.scrollIntoView({ behavior: "smooth" })}>Explore your starting point ↗</button><small>For curious beginners, hobby makers and designers.</small></div><div className="hero-foot"><span>01 / IMAGINE</span><span>02 / UNDERSTAND</span><span>03 / MAKE</span><span>↓ EXPLORE</span></div></section>
       <section className="companion-intro" id="how-it-works"><p className="companion-kicker">WHY STITCHES EXISTS</p><div><h2>Clothing is a collection of decisions.<br /><em>Let’s make them visible.</em></h2><p>A finished garment is only the beginning. The pieces, fabric, fit and order of construction determine what you can actually make. Stitches is being built to keep those relationships connected — and help you learn as you go.</p></div></section>
       <section className="companion-collection" id="collection"><div className="collection-heading"><div><p className="companion-kicker">START A PROJECT</p><h2>Where will you begin?</h2><p>Choose a distinct garment direction or bring your own idea. These are planning starts while the pattern engines are qualified.</p></div><span>01—03 / PROJECT STARTS</span></div><div className="collection-grid">{starts.map((item, index) => <article className="collection-card" key={item.id}><div className="collection-image"><Image src={item.image} fill sizes="(max-width: 800px) 100vw, 33vw" alt={`Editorial concept of ${item.name}`} /><span>0{index + 1} / {item.kind}</span></div><div className="collection-copy"><h3>{item.name}</h3><p>{item.caption}</p><small>{item.question}</small><button type="button" onClick={() => begin({ kind: "candidate", designId: item.id })}>Start this project ↗</button></div></article>)}<article className="collection-card own"><div className="own-art"><span>✳</span><p>What do you<br />want to make?</p></div><div className="collection-copy"><h3>Your own idea</h3><p>A photo, a sketch, or something you pictured.</p><small>Record your brief now. Image analysis is a future verified capability.</small><button type="button" onClick={() => begin({ kind: "own_idea" })}>Begin with an idea ↗</button></div></article></div><p className="collection-caption">Editorial concept images only. No card represents a verified cut-ready pattern or fit preview.</p></section>

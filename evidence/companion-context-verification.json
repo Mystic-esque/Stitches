@@ -1,5 +1,5 @@
 {
-  "capturedAt": "2026-10-04T03:06:56.141Z",
+  "capturedAt": "2026-10-04T18:30:50.463Z",
   "provenance": "live-content-lake-and-context-mcp",
   "knowledgeBaseId": "kbkvu1vrPsLG",
   "exactCatalog": [
@@ -38,9 +38,9 @@
     },
     {
       "path": "seam_quality",
-      "sha256": "af2a4a6c2fa83c6c7887c41cdcc49a6d56d5deb061817bebb45ec7a7bb570f52",
-      "file": "evidence/context-companion-review/seam_quality-af2a4a6c2fa83c6c.md",
-      "characters": 2884
+      "sha256": "e158e1db87073c4d861d9aa53620f0fdfd7896dc385287781f0b42d9e6e562ef",
+      "file": "evidence/context-companion-review/seam_quality-e158e1db87073c4d.md",
+      "characters": 3275
     },
     {
       "path": "construction/sandy_circle_skirt",
@@ -62,7 +62,7 @@
     "observedUntestedShortcutAbsent": true,
     "garmentUnpickingProhibited": true,
     "diagnosticDoesNotFalselyExcludeTension": true,
-    "diagnosticStableSourceIdentities": false,
+    "diagnosticStableSourceIdentities": true,
     "planningStableSourceIdentities": true,
     "planningPieceRowsMatchExactCatalog": true,
     "planningMeasurementsPreserved": true,
@@ -72,9 +72,9 @@
     "constructionDiagnosticEligibilityMatchesExactRecords": true,
     "constructionOptionalStepsCarryPrerequisites": true
   },
-  "automatedChecksPassed": false,
-  "observedNotTestedBranch": "- **Not-tested:** Perform this scrap-stitch-release test first before considering any adjustments.",
-  "diagnosticCitationIdentityReviewRequired": true,
+  "automatedChecksPassed": true,
+  "observedNotTestedBranch": "No sample test has been performed. Proceed to perform the scrap-stitch-release test first. Do not advance to a tension-adjustment comparison without this result.\n",
+  "diagnosticCitationIdentityReviewRequired": false,
   "planningCitationIdentityReviewRequired": false,
   "materialEditorialReviewRequired": false,
   "constructionEditorialReviewRequired": false,

@@ -40,7 +40,9 @@ export async function advanceCompanionRun(input: {
     return snapshot;
   }
   try {
-    const isMakingTask = run.task === "step_guidance" || run.task === "troubleshoot_step";
+    if (run.task === "troubleshoot_step")
+      throw new CompanionAgentError("missing_knowledge", "Agent diagnosis is paused until the served Stitches diagnostic entry exposes verified test and remedy source identities. Use the manual scrap-only Check flow; no Gemini request was sent.");
+    const isMakingTask = run.task === "step_guidance";
     const snapshot = await current();
     if (isMakingTask && !snapshot.makingPlan) {
       throw new CompanionAgentError("missing_knowledge", "The construction study plan is unavailable for this candidate. Manual making remains available.");

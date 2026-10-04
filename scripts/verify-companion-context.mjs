@@ -36,8 +36,9 @@ async function snapshot(name, text) {
 }
 const diagnostic = entries.find(({ path }) => path === diagnosticPath).result.text;
 // Accept the two observed paragraph/table representations; require an explicit test-first branch.
-const notTestedLine = diagnostic.split(/\r?\n/).find((line) =>
-  /\*\*Not[ -]tested(?::)?\*\*|^\|[^|]*not-tested[^|]*\|/i.test(line)) ?? '';
+const notTestedSection = diagnostic.match(/###\s+Not[ -]tested\s*\n([\s\S]*?)(?=\n###\s|\n##\s|$)/i)?.[1]
+  ?? diagnostic.split(/\r?\n/).find((line) => /^\|[^|]*not-tested[^|]*\|/i.test(line))
+  ?? '';
 const sourceIdentities = [
   ['Thread tension may be contributing', 'companion-issue-tension-pucker-20261001'],
   ['Cause remains unresolved', 'companion-issue-unresolved-pucker-20261001'],
@@ -96,9 +97,9 @@ const checks = {
     entries[1].result.text.includes('companion-candidate-tina-20261001'),
   diagnosticPendingReviewDisclosed: /pending[ -]review|pending\*?\*? review|reviewStatus.{0,20}pending/i.test(diagnostic),
   diagnosticOriginAttributed: /\bCoats\b|coats\.com/i.test(diagnostic),
-  observedUntestedShortcutAbsent: Boolean(notTestedLine) &&
-    /perform (?:this|the).{0,60}test first|do not proceed|perform it before proceeding/i.test(notTestedLine) &&
-    !/(?<!do not )proceed to (?:the )?(?:sample[ -]tension|lower[ -]tension)/i.test(notTestedLine),
+  observedUntestedShortcutAbsent: Boolean(notTestedSection) &&
+    /perform (?:this|the).{0,60}test first|do not (?:advance|proceed)|perform it before proceeding/i.test(notTestedSection) &&
+    !/(?<!do not )proceed to (?:the )?(?:sample[ -]tension|lower[ -]tension)/i.test(notTestedSection),
   garmentUnpickingProhibited: /Do not remove stitches from the actual garment|never on the actual garment|do not unpick a finished garment|never unpick or alter the finished garment/i.test(diagnostic),
   diagnosticDoesNotFalselyExcludeTension: !/thread tension is not (?:the issue|the cause)|rules out (?:thread )?tension/i.test(body),
   diagnosticStableSourceIdentities: stableSourceIdentities,
@@ -124,7 +125,7 @@ const report = {
   outline: await snapshot('outline', outline.text),
   entries: await Promise.all(entries.map(async ({ path, result }) => ({ path, ...await snapshot(path, result.text) }))),
   checks, automatedChecksPassed: Object.values(checks).every(Boolean),
-  observedNotTestedBranch: notTestedLine || null,
+  observedNotTestedBranch: notTestedSection || null,
   diagnosticCitationIdentityReviewRequired: !stableSourceIdentities,
   planningCitationIdentityReviewRequired: !planningIdentities || !planningRowsMatch,
   materialEditorialReviewRequired: !materialIdentities || !materialUnsupportedClaimsAbsent,

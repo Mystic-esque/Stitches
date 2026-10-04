@@ -29,3 +29,8 @@ Two distinct project journeys, useful context-aware troubleshooting, project per
 
 ## Constraints
 Sanity challenge is primary; Devpost is secondary. $0 paid providers, free available quota, Stitches development dataset only, no production changes, no public deployment or submission without separate authority. Existing illustrative proof and September 29 visual reference are historical, not completion evidence.
+# Approved workspace-agent scope update — October 4, 2026
+
+The primary product is a persistent, project-aware sewing workspace. Overview, Pattern, Materials, Make and Check share one private project and a collapsible contextual companion. The short-term implementation reuses existing planning-only modules; it is not a cut-ready pattern editor. The next demonstrable agent capability is a source-backed action on an explicitly selected real piece or step, with a server-validated basis, visible tool evidence and a reviewable result. A fixed question menu plus final prose is transitional, not the target proof.
+
+Retain rather than silently drop the larger application: two genuinely distinct source-qualified garments, measured supported edits, checked layouts and print, conditional diagnosis, optional private images, teaching diagrams, physical maker review, and later 3D/fit simulation. Each remains gated by its own source, rights, geometry, privacy and/or physical evidence. `../docs/WORKSPACE-AGENT-DIRECTION.md` is the design authority for this migration; `../docs/STATUS.md` is the implementation truth.

@@ -47,3 +47,8 @@ The project exports a truthful plan/materials/step summary. A qualified cut-read
 
 ## Non-goals for this release
 Unrestricted CAD, automatic pattern drafting from image, predictive 3D drape or fit, marketplace, accounts/cloud sync, arbitrary fabric consumption promises and unsupervised physical repairs. An educational 3D assembly view may be added only after 2D relationships are correct and accessible.
+# Workspace-agent PRD addendum — October 4, 2026
+
+The maker can enter or resume a private project without re-entering context, move among five focused work surfaces, and ask the companion about the object or operation currently in view. On desktop the companion may sit beside the technical canvas; on phone it opens as a sheet without discarding the current work. Navigation and explanation do not themselves create a saved physical result.
+
+Acceptance for the current migration: a stable, non-sensitive URL restores the focused view; changing views leaves project revisions and maker history untouched; current Sanity source outages remain visible; conditional piece cut/fold/mirror data agree in Pattern, Make and agent reads; incomplete step bindings display an explicit gap, not a fabricated join; and the assistant is reachable with a truthful consent preview. Full selected-object runs, artifact cards, dynamic tool choice and conditional diagnosis are subsequent acceptance gates, not implied by a visual dock. Preserve the later photo, CAD/layout/print and 3D roadmap in `../docs/WORKSPACE-AGENT-DIRECTION.md`.

@@ -1,4 +1,11 @@
-import { defineArrayMember, defineField, defineType } from "sanity";
+// Studio accepts plain schema definitions. Keep these local identity helpers until
+// the installed Sanity major exports its optional define* helpers again.
+// They preserve literal names/types without depending on an absent runtime export.
+type SchemaRule = { required(): SchemaRule; integer(): SchemaRule; min(value: number): SchemaRule };
+type SchemaField = { name?: string; type: string; validation?: (rule: SchemaRule) => SchemaRule; [key: string]: unknown };
+const defineField = <const T extends SchemaField>(value: T): T => value;
+const defineArrayMember = <const T extends SchemaField>(value: T): T => value;
+const defineType = <const T extends SchemaField>(value: T): T => value;
 
 const required = <R extends { required: () => R }>(rule: R): R => rule.required();
 const sourceArray = () => defineField({ name: "sources", title: "Sources", type: "array", of: [defineArrayMember({ type: "reference", to: [{ type: "sourceDocument" }] })] });

@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
-import { selectPlanningPieces } from "./planning-piece-study";
+import { selectMakingStepPieces, selectPlanningPieces } from "./planning-piece-study";
 
 const fixture = JSON.parse(readFileSync(new URL("../../fixtures/companion-piece-studies.json", import.meta.url), "utf8"));
 type FixturePiece = { candidate: { _ref: string }; condition: string; pieceKey: string; fold: string; cutCount: number; mirrored: boolean };
@@ -23,5 +23,12 @@ describe("source-derived educational cut-list variants", () => {
     const expanded = selectPlanningPieces(tina, { ...base, frontBottom: true, sleeves: true });
     expect(expanded).toHaveLength(4);
     expect(expanded.filter((item) => item.mirrored).map((item) => item.pieceKey)).toEqual(["front", "sleeve"]);
+  });
+  it("projects authored Sandy variants and removes disabled Tina options from making steps", () => {
+    expect(selectMakingStepPieces(sandy, { sleeves: false, frontBottom: false },
+      ["skirt-default", "waistband-straight", "waistband-interfacing"])
+      .map((item) => item.pieceKey)).toEqual(["skirt-default", "waistband-straight", "waistband-interfacing"]);
+    expect(selectMakingStepPieces(tina, { sleeves: false, frontBottom: false },
+      ["front", "back", "front-bottom", "sleeve"]).map((item) => item.pieceKey)).toEqual(["front", "back"]);
   });
 });

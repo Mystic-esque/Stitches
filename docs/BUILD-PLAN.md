@@ -1,6 +1,6 @@
 # Build plan — Stitches Companion 2.0
 
-October 2 construction batch adds two exact pending Sanity learning graphs, the focused making notebook, current-step scrap context, immutable private progress/questions/pauses, and transactional v4 backups. It does not close source/rights/physical or complete making-agent gates. The owner rebuilt the KB into seven leaves; targeted rewrites still have attribution/eligibility defects. Follow the newest STATUS evidence before reusing historical live-provider results. RELEASE-REVIEW and MAKER-REVIEW prepare the remaining local/human checks.
+The October 4 workspace batch verifies five focus views, responsive Make and Pattern surfaces, a current production build, 137 passing tests, actual screenshots and 15/15 live Content Lake/Context editorial checks. The October 2 construction batch added two exact pending Sanity learning graphs, the making notebook and private continuity. The runtime diagnostic agent path, source/rights/physical review, fair benchmark and cut-ready qualification remain open. Follow the newest STATUS evidence before reusing historical live-provider results. RELEASE-REVIEW and MAKER-REVIEW prepare the remaining local/human checks.
 
 The executable task ledger is ../devpost/checklist.md W01–W10. The technical contracts are ../devpost/spec.md and PATTERN-ENGINE-DECISION.md; the current visual contract is DESIGN.md. This file explains dependency order; STATUS.md records actual state.
 
@@ -20,4 +20,13 @@ The current implementation includes private planning/profile/revision/history/ba
 | W10 | Maker/user trials and local release/submission package | Working W01–W09 and physical evidence |
 
 Build a complete useful loop for one project before broadening, then prove distinct second project and shared method. A blocked physical/source gate does not block planning, education, guest state or diagnostics, but it blocks cut-ready claims. Three.js is optional after the correct 2D board and Make flow; no 3D demo substitutes for fold/grain/cut/check teaching. Milestones require actual commands/results, failure notes, screenshots and one next executable task. Do not deploy or submit without separate authorization.
+# Approved October 4 workspace-agent execution order
+
+This is an additive sequence over the existing qualification plan, not a waiver of source/rights/physical gates. See `WORKSPACE-AGENT-DIRECTION.md` for the complete interaction contract and `STATUS.md` for truth.
+
+1. Repair the observed condition-aware making-piece projection and invented-join diagram, and retract the invalid hard-coded search score. Keep the diagnostic agent path paused while served test/remedy identities fail.
+2. Migrate the long project page into Overview, Pattern, Materials, Make and Check with stable non-sensitive view URLs, responsive companion dock and useful source-unavailable states. Run typecheck, deterministic tests, production build, five-width keyboard/browser checks and actual screenshots before calling this milestone verified.
+3. Add a server-resolved selection context (piece/edge/step) pinned to consent and durable run basis. Give the agent one genuine bounded choice among eligible read/check tools, produce a typed sourced artifact and prove stale/failed/unknown-outcome recovery.
+4. Repair and verify the dedicated diagnostic KB identity gate, then implement discriminating-test and prior-attempt reasoning in two distinct project contexts. Keep maker-reported results distinct from verified physical outcomes.
+5. Continue rights-cleared garment/engine qualification, complete measured artifacts, supported edit/keep, layout/print checks, maker review, fair frozen same-corpus benchmark and local release package. Photo, direct CAD and 3D remain gated later capabilities; do not replace failed sewing evidence with visual polish.
 

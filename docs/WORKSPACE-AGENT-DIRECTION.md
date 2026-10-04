@@ -1,10 +1,10 @@
 # Stitches: the agentic sewing workspace
 
-Date: October 4, 2026. Status: product and architecture proposal for review, not an implementation or completion claim.
+Date: October 4, 2026. Status: owner-approved target direction; first workspace migration in progress, not a completion claim. See `STATUS.md` for actual verification.
 
 Prepared from both supplied UI images, visual frames across the complete supplied ten-second video, the current code and Companion 2.0 contracts. The owner's later instruction explicitly retains advanced capabilities in the future roadmap.
 
-This document proposes the next application direction and the migration needed to reach it. It does not replace approved contracts automatically. Existing application code, Sanity content and completed evidence remain unchanged by this proposal.
+This document defines the approved next application direction and its staged migration. Existing code, Sanity content and completed evidence remain authoritative only for their verified scopes; the approval does not turn roadmap capabilities into current behavior.
 
 ## 1. Recommended direction
 
@@ -296,7 +296,7 @@ These are later product capabilities, not dropped ideas. The workspace can reser
 
 ## 11. Documents and implementation contracts affected
 
-This file is the review proposal. It does not silently change the approved Companion 2.0 product contract. If this direction is accepted, update the linked artifacts together:
+This direction is approved. The linked artifacts are being aligned incrementally; each records implemented versus future gates separately:
 
 | Document or area | Required alignment |
 | --- | --- |
@@ -312,7 +312,7 @@ This file is the review proposal. It does not silently change the approved Compa
 | `src/server/knowledge/*`, Sanity development and Context KB | Audit source/diagram/operation/diagnostic facts. Guarded development-only content corrections need read-back and separate served-entry verification. |
 | Screenshots, tests, evidence and maker review | Capture the actual revised app and complete journeys; label reference, fixture, live Gemini/Context/Content Lake and physical evidence separately. |
 
-### First implementation package if approved
+### First implementation package
 
 Start with current context correctness and the workspace shell, without changing Sanity's schema: shared option-aware piece projection; making/selection/KB run basis; construction-missing state; truthful consent preview; Overview/Pattern/Materials/Make/Check routes; persistent collapsible companion; stable object context; and one explain-selected-piece or current-step artifact.
 
@@ -320,4 +320,4 @@ Expand agent permissions only after this slice is stable. Keep the actual diagno
 
 For the first proof, ask the agent to explain the selected piece or current sourced step. It must inspect exactly that context, use current Sanity and served KB evidence where applicable, show its result beside the highlighted object, and mark it historical if the project/source basis changes mid-run. A live task, a deterministic test and a maker-observed outcome are three different receipts.
 
-Owner review is the only decision needed to replace the current approved information architecture with this proposal. Routine implementation choices, once approved, remain within the existing local/free/development-only authorization.
+The owner approved this direction. Routine implementation choices remain within the existing local/free/development-only authorization. The current five-view shell is only the first tranche; selected-object agent runs and qualified outputs still require their separate verification gates.

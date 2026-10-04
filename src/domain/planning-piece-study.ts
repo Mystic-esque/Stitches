@@ -12,10 +12,11 @@ export function selectMakingStepPieces<T extends { pieceKey: string; condition: 
   options: { sleeves: boolean; frontBottom: boolean },
   stepPieceKeys: readonly string[]
 ): T[] {
+  // The authored step fixes Sandy's default skirt and straight band by exact
+  // piece ID. Only Tina's two optional pieces need a separate toggle check.
   return pieces.filter((piece) =>
     stepPieceKeys.includes(piece.pieceKey) &&
-    (piece.condition === "always" ||
-      (piece.condition === "sleeves" && options.sleeves) ||
-      (piece.condition === "front-bottom" && options.frontBottom))
+    (piece.condition !== "sleeves" || options.sleeves) &&
+    (piece.condition !== "front-bottom" || options.frontBottom)
   );
 }

@@ -1,5 +1,11 @@
 # Companion 2.0 — screen and state contracts
 
+## Approved workspace contract, staged
+
+One private project remains open while the maker switches Overview, Pattern, Materials, Make and Check. The initial migration uses `/?project=<opaque-id>&view=<view>`; the URL contains no measurements or private prose and browser back/refresh restore the view. A collapsible companion remains available beside the work on desktop and as a help sheet on narrow screens. Merely changing a view does not mutate the saved project or claim a new sewing result.
+
+The next agent stage must pin an explicit selected piece/edge/step and current dependency fingerprint **at send time**, preview exactly which private fields are shared, validate selected IDs server-side, and leave an inspectable artifact/receipt. A changed dependency makes an earlier answer historical; navigating alone does not. The current task-menu explanation loop is a transitional implementation, not proof of that selected-context contract. Diagnostic action requires corrected served test/remedy identities and maker-confirmed observations. See `WORKSPACE-AGENT-DIRECTION.md` for full acceptance and later photo/CAD/layout/3D capability gates.
+
 Read PRODUCT.md, DESIGN.md and ../devpost/prd.md together. These are target user experiences, not implemented test results.
 
 ## First visit

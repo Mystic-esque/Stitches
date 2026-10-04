@@ -91,6 +91,16 @@ describe("durable private agent — synthetic deterministic proof", () => {
         .toEqual([["inspect_project"], ["inspect_making"], ["retrieve_context"]]);
     } finally { s.store.close(); }
   });
+  it("holds agent diagnosis before a Gemini request while served diagnostic identities are unresolved", async () => {
+    const s = setup(":memory:", "troubleshoot_step");
+    try {
+      const saved = await s.advance();
+      expect(saved.status).toBe("missing_knowledge");
+      expect(saved.message).toMatch(/diagnostic entry.*source identities/i);
+      expect(s.generate).not.toHaveBeenCalled();
+      expect(saved.text).toBeUndefined();
+    } finally { s.store.close(); }
+  });
   it("stops a making task with missing_knowledge if the construction plan is absent", async () => {
     const s = setup(":memory:", "step_guidance", false);
     try {

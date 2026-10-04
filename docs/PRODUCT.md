@@ -1,5 +1,11 @@
 # Stitches — project-aware sewing companion
 
+## Approved workspace direction (October 4, 2026)
+
+Stitches is a persistent **sewing workspace**, not a long report with an assistant appended. A maker opens a project, works in Overview, Pattern, Materials, Make or Check, and keeps a context-aware companion nearby. The agent's signature outcome is a reviewable object tied to the current garment, piece, step or observation, with Sanity exact records governing applicability and the scoped Context KB supplying maintained explanation. Selection, proposed change, deterministic check and maker-confirmed keep/progress are distinct states. The complete target and staged delivery contracts are in `WORKSPACE-AGENT-DIRECTION.md`; `STATUS.md` distinguishes this target from the currently implemented slice.
+
+The first workspace migration reuses verified planning/making/check components and does **not** promote their illustrative or pending-review data into cut-ready instructions. Selection-pinned agent runs, dynamic bounded tool choice, result artifacts, source-qualified diagnostics, rights-cleared geometry/layout/print, photo assistance and 3D remain separately gated in the roadmap. No recolored near-duplicates are counted as garment-family breadth.
+
 Revision: Companion 2.0, October 1, 2026. This supersedes Studio 1.0 as the product target. See DIRECTION-REVIEW.md for the comparison that led here and STATUS.md for what is actually implemented.
 
 ## Promise
@@ -61,4 +67,3 @@ The complete first application includes project creation and memory, distinct qu
 Later: arbitrary pattern CAD/import, automatic photo-to-pattern drafting, simulated drape/fit, account sync and collaboration, large marketplace and fully automated garment diagnosis. Preserve extension points without making these prerequisites to a useful first companion.
 
 No signup, paid provider use, external deployment, production Sanity mutation or submission is authorized in this work. Scope and implementation details are in ../devpost/scope.md, ../devpost/prd.md and ../devpost/spec.md.
-

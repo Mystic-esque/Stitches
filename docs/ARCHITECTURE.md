@@ -61,4 +61,9 @@ The active instructionStep supplies piece/edge/method context. An issuePattern s
 Preserve exact Content Lake and actual Context adapters, Gemini signed tool proof, immutable state ideas and 44 historical regression tests. Replace shared demo state with guest-owned transactional state while keeping a stable illustrative demo route until parity. Build first 2D educational workbench and step-specific recovery; Three.js may consume the same versioned IDs later but is not the product's core or a drape claim.
 
 No external deployment, paid model, production Sanity dataset write or deployed Function is authorized. Prepare adapters and local tests only. Do not confuse a reference screenshot with working production UI.
+# Approved workspace migration note — October 4, 2026
+
+The current implementation begins the migration by composing the existing project modules into five focused client views, with a persistent collapsible assistant dock. This does not change private SQLite ownership, fixed Content Lake queries or the scoped Context MCP reader. View location is client URL state; project revisions, making history and agent runs remain server-owned. Conditional piece projection is shared by the making UI and `inspect_making`; an instructional diagram without sufficient authored piece/edge bindings shows a gap instead of a join.
+
+Next architecture gate: resolve server-authoritative `WorkspaceContext` from an owner-scoped project, exact graph, confirmed options, active step, selected IDs and relevant private history; pin that snapshot and consent to a durable run; emit structured artifact/tool receipts; invalidate only changed dependencies. A separate diagnostic KB identity/source review gates diagnosis. No schema or whole-KB rebuild is implied by this UI migration. See `WORKSPACE-AGENT-DIRECTION.md` and current `STATUS.md`.
 

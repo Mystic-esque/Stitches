@@ -52,11 +52,16 @@ async function result(response: Response) {
   return data;
 }
 
-export function ProjectAssistant({ project, source, historySequence, makingSequence = 0, dirty }: {
+export function ProjectAssistant({ project, source, historySequence, makingSequence = 0, dirty, focus = "overview" }: {
   project: GuestProject; source?: CompanionCatalogCard; historySequence: number; makingSequence?: number; dirty: boolean;
+  focus?: "overview" | "pattern" | "materials" | "make" | "check";
 }) {
   const [runs, setRuns] = useState<AgentRun[]>([]), [preview, setPreview] = useState<Preview>(), [enabled, setEnabled] = useState(false);
   const [consent, setConsent] = useState(false), [task, setTask] = useState<AgentTask>("next_preparation");
+  useEffect(() => {
+    setTask(focus === "pattern" ? "understand_pieces" : focus === "make" ? "step_guidance" : focus === "check" ? "review_gaps" : "next_preparation");
+    setConsent(false);
+  }, [focus]);
   const [busy, setBusy] = useState(false), [error, setError] = useState("");
   const alive = useRef(true), continuing = useRef(false), startKey = useRef<string | undefined>(undefined);
   const refreshSequence = useRef(0);
@@ -123,14 +128,15 @@ export function ProjectAssistant({ project, source, historySequence, makingSeque
     run.basis.historySequence !== historySequence || !sourceCurrent || run.basis.catalogFingerprint !== source?.fingerprint ||
     (preview && (run.basis.makingSequence !== preview.basis.makingSequence || run.basis.makingHash !== preview.basis.makingHash || run.basis.planFingerprint !== preview.basis.planFingerprint));
   return <section className="project-assistant" aria-labelledby="assistant-heading">
-    <div className="assistant-intro"><p className="companion-kicker">A SECOND PAIR OF EYES</p><h2 id="assistant-heading">Understand your next move.</h2>
+    <div className="assistant-intro"><p className="companion-kicker">CONTEXT-AWARE COMPANION · {focus.toUpperCase()}</p><h2 id="assistant-heading">Understand your next move.</h2>
       <p>A read-only companion checks this saved plan, its exact Sanity pieces and the maintained Knowledge Base. You stay in charge of every making decision.</p>
       <span className="assistant-privacy">Private notebook · no automatic saves or sewing actions</span>
       <a href="#preparation-plan-heading">Continue with the manual preparation plan ↓</a>
     </div>
     <div className="assistant-work">
       <label className="assistant-task">What would help now?<select value={task} disabled={busy || !!active} onChange={(event) => { setTask(event.target.value as AgentTask); setConsent(false); startKey.current = undefined; }}>
-        <option value="next_preparation">Find my next preparation action</option><option value="understand_pieces">Help me understand these pieces</option><option value="review_gaps">Review the gaps before I make</option><option value="step_guidance">Guide next unreviewed construction step</option><option value="troubleshoot_step">Troubleshoot next unreviewed step / symptom</option></select></label>
+        <option value="next_preparation">Find my next preparation action</option><option value="understand_pieces">Help me understand these pieces</option><option value="review_gaps">Review the gaps before I make</option><option value="step_guidance">Guide next unreviewed construction step</option></select></label>
+      {focus === "check" && <p className="assistant-notice" role="status">Agent diagnosis is paused until the served diagnostic test and remedy sources pass identity review. The manual scrap-only Check flow remains available.</p>}
       <div className="assistant-consent"><strong>Before anything goes to Gemini</strong><p>{agentTaskText[task]}</p>
         {isMaking && preview?.makingSummary?.activeStep && <p style={{ margin: "6px 0", fontSize: "12px", color: "#344f3b" }}><strong>Step in focus:</strong> Next unreviewed checkpoint — Step #{preview.makingSummary.activeStep.ordinal}: {preview.makingSummary.activeStep.title}</p>}
         {isMaking && preview?.makingSummary?.allStepsReviewed && <p style={{ margin: "6px 0", fontSize: "12px", color: "#74401f" }}>All study checkpoints for this confirmed configuration are reviewed.</p>}
@@ -151,6 +157,14 @@ export function ProjectAssistant({ project, source, historySequence, makingSeque
       {latest && <article className="assistant-run" aria-label="Latest assistant run"><div className="assistant-run-title"><strong>{basisChanged(latest) ? "Historical insight · review new basis" : statusLabel[latest.status]}</strong><span>{latest.requests}/4 requests · revision {latest.basis.projectSequence}</span></div>
         <ol className="assistant-trace">{latest.tools.map((tool) => <li key={tool}>{toolLabels[tool] ?? tool}</li>)}{busy && <li aria-live="polite">Waiting for the next acknowledged checkpoint…</li>}</ol>
         {latest.text && <div className="assistant-insight">{insight(latest.text)}</div>}
+        {latest.status === "completed" && latest.task === "step_guidance" && !basisChanged(latest) && preview?.makingSummary?.activeStep && <section className="assistant-result-object" aria-label="Source-bound step card">
+          <span>RESULT OBJECT / CURRENT CONSTRUCTION STUDY</span>
+          <h3>{preview.makingSummary.activeStep.ordinal}. {preview.makingSummary.activeStep.title}</h3>
+          <p>{preview.makingSummary.activeStep.orientation ?? "Orientation is not authored for this step."}</p>
+          <dl><div><dt>Action</dt><dd>{preview.makingSummary.activeStep.action ?? "No authored action"}</dd></div><div><dt>Check</dt><dd>{preview.makingSummary.activeStep.checkpoint ?? "No authored checkpoint"}</dd></div></dl>
+          <strong>Involved source pieces</strong><ul>{preview.makingSummary.activeStep.pieces?.map((piece) => <li key={piece.pieceKey}>{piece.title} · cut {piece.cutCount}{piece.mirrored ? " mirrored" : ""} · fold: {piece.fold}</li>)}</ul>
+          <small>Authored study reference tied to this run basis. It does not certify a physical seam, full pattern geometry or cutting readiness.</small>
+        </section>}
         {latest.text && <p className="assistant-disclaimer">AI explanation, not independently verified. Planning only; no fit, cutting, making completion or cause is certified. {basisChanged(latest) ? "Do not use this earlier basis as current guidance." : "Source content remains pending review."}</p>}
         {latest.message && <p role="status">{latest.message}</p>}
         <div className="assistant-actions">{(["ready", "response_ready"].includes(latest.status) || agentRunCanResume(latest)) && <button type="button" disabled={busy || dirty || basisChanged(latest) || !enabled} onClick={() => resume(latest)}>Continue saved run</button>}

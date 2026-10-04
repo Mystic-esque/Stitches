@@ -84,12 +84,32 @@ try {
     timer = setTimeout(() => { pending.delete(id); reject(Error(method + ' timeout')); }, 60000); pending.set(id, { done, reject, timer }); socket.send(JSON.stringify({ id, method, params })); });
   const evaluate = async expression => { const r = await call('Runtime.evaluate', { expression, returnByValue: true, awaitPromise: true }); if (r.exceptionDetails) throw Error(r.exceptionDetails.text); return r.result.value; };
   const wait = async expression => { for (let i = 0; i < 240; i++) { if (await evaluate(`Boolean(${expression})`)) return; await pause(250); } throw Error('UI wait failed: ' + expression); };
-  const screenshot = async name => { const clip = await evaluate("(()=>{const r=document.querySelector('.making-workspace').getBoundingClientRect();return {x:r.x+scrollX,y:r.y+scrollY,width:r.width,height:r.height,scale:1}})()");
+  const screenshot = async name => { const clip = await evaluate("(()=>{const view=new URLSearchParams(location.search).get('view');const selector=view==='pattern'?'.piece-study':view==='materials'?'.preparation-plan':'.making-workspace';const r=document.querySelector(selector).getBoundingClientRect();return {x:r.x+scrollX,y:r.y+scrollY,width:r.width,height:r.height,scale:1}})()");
     const shot = await call('Page.captureScreenshot', { format: 'png', captureBeyondViewport: true, fromSurface: true, clip }); await writeFile(join(output, name), Buffer.from(shot.data, 'base64')); };
   await call('Runtime.enable'); await call('Page.enable');
   await call('Network.setCookie', { name: guest.cookie.split('=')[0], value: guest.cookie.slice(guest.cookie.indexOf('=') + 1), url: base, httpOnly: true, sameSite: 'Lax' });
   await call('Emulation.setDeviceMetricsOverride', { width: 1440, height: 1000, deviceScaleFactor: 1, mobile: false });
-  await call('Page.navigate', { url: `${base}/?project=${projects[0].id}` }); await wait("document.querySelector('.making-config button')&&!document.querySelector('.making-config button').disabled");
+  await call('Page.navigate', { url: `${base}/?project=${projects[0].id}&view=make` }); await wait("document.querySelector('.making-config button')&&!document.querySelector('.making-config button').disabled");
+  assert.ok(await evaluate("new URLSearchParams(location.search).get('view')==='make'"));
+  const shellShot = await call('Page.captureScreenshot', { format: 'png', fromSurface: true });
+  await writeFile(join(output, 'workspace-shell-1440.png'), Buffer.from(shellShot.data, 'base64'));
+  await screenshot('workspace-make-1440.png');
+  await evaluate("[...document.querySelectorAll('.studio-view-nav button')].find(b=>b.textContent.trim()==='Overview').click()");
+  await wait("document.querySelector('.project-workspace')&&new URLSearchParams(location.search).get('view')==='overview'");
+  await evaluate("[...document.querySelectorAll('.studio-view-nav button')].find(b=>b.textContent.trim()==='Fit & checks').click()");
+  await wait("document.querySelector('.diagnostic-study')&&new URLSearchParams(location.search).get('view')==='check'");
+  await evaluate("[...document.querySelectorAll('.studio-view-nav button')].find(b=>b.textContent.trim()==='Pattern').click()");
+  await wait("document.querySelector('.piece-study')&&new URLSearchParams(location.search).get('view')==='pattern'");
+  await screenshot('workspace-pattern-1440.png');
+  await evaluate("[...document.querySelectorAll('.studio-view-nav button')].find(b=>b.textContent.trim()==='Materials').click()");
+  await wait("document.querySelector('.preparation-plan')&&new URLSearchParams(location.search).get('view')==='materials'");
+  await screenshot('workspace-materials-1440.png');
+  await evaluate("history.back()");
+  await wait("document.querySelector('.piece-study')&&new URLSearchParams(location.search).get('view')==='pattern'");
+  await evaluate("history.forward()");
+  await wait("document.querySelector('.preparation-plan')&&new URLSearchParams(location.search).get('view')==='materials'");
+  await evaluate("[...document.querySelectorAll('.studio-view-nav button')].find(b=>b.textContent.trim()==='Make').click()");
+  await wait("document.querySelector('.making-config button')&&!document.querySelector('.making-config button').disabled");
   await evaluate("document.querySelector('.making-config button').focus()");
   await call('Input.dispatchKeyEvent', { type: 'keyDown', key: 'Enter', code: 'Enter', windowsVirtualKeyCode: 13, text: '\r', unmodifiedText: '\r' }); await call('Input.dispatchKeyEvent', { type: 'keyUp', key: 'Enter', code: 'Enter', windowsVirtualKeyCode: 13 });
   await wait("document.querySelector('.making-layout')"); assert.equal(await evaluate("document.querySelectorAll('.making-rail li').length"), 5);
@@ -104,6 +124,7 @@ try {
   await evaluate("window.fetch=window.stitchesMakingFetch;delete window.stitchesMakingFetch");
   await call('Emulation.setEmulatedMedia', { features: [{ name: 'prefers-reduced-motion', value: 'reduce' }, { name: 'prefers-color-scheme', value: 'dark' }] });
   const layouts = [];
+  await evaluate("document.querySelector('.studio-agent-close')?.click()");
   for (const width of [1440, 1024, 768, 390, 320]) {
     await call('Emulation.setDeviceMetricsOverride', { width, height: 1000, deviceScaleFactor: 1, mobile: width < 500 });
     await evaluate("document.querySelector('.making-workspace').scrollIntoView()"); await pause(250);
@@ -119,9 +140,10 @@ try {
   assert.ok(await evaluate("document.querySelector('.making-history summary').textContent.includes('2 entries')"));
   await evaluate("window.fetch=window.stitchesMakingFetch;delete window.stitchesMakingFetch;document.querySelector('.making-foot button').click()");
   await wait("document.querySelector('#making-step-title')?.textContent==='Plan the opening'");
-  await call('Page.navigate', { url: `${base}/?project=${tina.id}` }); await wait("document.querySelector('.making-layout')&&document.querySelector('#making-step-title')?.textContent==='Follow the neckline binding'");
+  await call('Page.navigate', { url: `${base}/?project=${tina.id}&view=make` }); await wait("document.querySelector('.making-layout')&&document.querySelector('#making-step-title')?.textContent==='Follow the neckline binding'");
   assert.equal(await evaluate("document.querySelectorAll('.making-rail li').length"), 5);
   await screenshot('making-tina-390.png');
+  await wait("document.querySelector('.making-rail>button:not([disabled])')");
   await evaluate("[...document.querySelectorAll('.making-rail>button')].find(b=>b.textContent.includes('version choices')).click()");
   await wait("document.querySelector('.making-config input')");
   await evaluate("document.querySelector('.making-config input').click()");
@@ -129,13 +151,18 @@ try {
   await wait("document.querySelector('.making-rail')?.textContent.includes('0 / 6')");
   await call('Emulation.setDeviceMetricsOverride', { width: 1440, height: 1000, deviceScaleFactor: 1, mobile: false }); await screenshot('making-tina-1440.png');
   await call('Page.reload'); await wait("document.querySelector('.making-rail')?.textContent.includes('0 / 6')");
-  await call('Page.navigate', { url: `${base}/?project=${imported.data.project.id}` }); await wait("document.querySelector('.making-config')&&document.querySelector('.making-history summary')?.textContent.includes('4 entries')");
+  await call('Page.navigate', { url: `${base}/?project=${imported.data.project.id}&view=make` }); await wait("document.querySelector('.making-config')&&document.querySelector('.making-history summary')?.textContent.includes('4 entries')");
   assert.equal(await evaluate("document.querySelectorAll('.making-layout').length"), 0);
   await evaluate("window.__stitchesDownloaded=[];const oldURL=URL.createObjectURL;URL.createObjectURL=b=>{window.__stitchesDownloaded.push(b);return oldURL.call(URL,b)};[...document.querySelectorAll('.project-topline button')].find(b=>b.textContent.includes('making brief')).click()");
   await wait("window.__stitchesDownloaded?.length===1");
   const brief = await evaluate("window.__stitchesDownloaded[0].text()"); assert.ok(brief.includes('PRIVATE MAKING BRIEF') && brief.includes('imported history') && brief.includes('No cut-ready'));
+  await call('Emulation.setDeviceMetricsOverride', { width: 390, height: 1000, deviceScaleFactor: 1, mobile: true });
+  await call('Page.navigate', { url: `${base}/?project=${projects[0].id}&view=pattern` });
+  await wait("document.querySelector('.piece-study')&&document.querySelector('.studio-agent-dock')");
+  assert.ok(await evaluate("document.querySelector('.studio-agent-dock').hidden"));
   assert.deepEqual(errors, []);
   report.browser = { layouts, contrast, nativeKeyboardConfiguration: true, confirmedConditionalReconfigurationPersists: true,
+    fiveFocusViewsNavigate: true, browserHistoryRestoresWorkspaceView: true, freshMobileCompanionDefaultsClosed: true,
     actualCommittedSaveLostAcknowledgementExactReplayNoDuplicate: true, injectedReadFailurePreservesHistoryAndActualRecovery: true,
     restoredHistoryRequiresFreshConfiguration: true, plainPrivateBrief: true, runtimeErrors: errors };
   report.passed = true;

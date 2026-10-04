@@ -1,0 +1,83 @@
+{
+  "capturedAt": "2026-10-04T15:21:12.986Z",
+  "provenance": "live-content-lake-and-context-mcp",
+  "knowledgeBaseId": "kbkvu1vrPsLG",
+  "exactCatalog": [
+    {
+      "designKey": "sandy",
+      "fingerprint": "2da503f12b8f6007d4e1f6f46d4c70cf25fa33b229bf6b1aad01ec75d379abb0",
+      "reviewStatus": "pending",
+      "capability": "plan_only",
+      "diagnosticFingerprint": "0f087c6b048811f6b3dcc780f9584ad191b9a7a2a638e9545053f95cce3b1161"
+    },
+    {
+      "designKey": "tina",
+      "fingerprint": "68d6026c7f508a70de2255916003d91e3607f23eb3f3afefb3a05ea82e1f215f",
+      "reviewStatus": "pending",
+      "capability": "plan_only",
+      "diagnosticFingerprint": "0f087c6b048811f6b3dcc780f9584ad191b9a7a2a638e9545053f95cce3b1161"
+    }
+  ],
+  "outline": {
+    "sha256": "5b64d68945a13dd5e97b9f66d53e40478d8aae9cf27737ecb488a97975c3273e",
+    "file": "evidence/context-companion-review/outline-5b64d68945a13dd5.md",
+    "characters": 2498
+  },
+  "entries": [
+    {
+      "path": "garment_planning/sandy_circle_skirt",
+      "sha256": "aabea16528645152786a1d27371a755e93cebde2b0ab820c0b4d3e9382f44a50",
+      "file": "evidence/context-companion-review/garment_planning-sandy_circle_skirt-aabea16528645152.md",
+      "characters": 4971
+    },
+    {
+      "path": "garment_planning/tina_faux_wrap_top",
+      "sha256": "110ea03c88600fe3d9e17fd0ddfaff00b074fc27dfb05af09d2453bff1e87187",
+      "file": "evidence/context-companion-review/garment_planning-tina_faux_wrap_top-110ea03c88600fe3.md",
+      "characters": 4263
+    },
+    {
+      "path": "seam_quality",
+      "sha256": "e158e1db87073c4d861d9aa53620f0fdfd7896dc385287781f0b42d9e6e562ef",
+      "file": "evidence/context-companion-review/seam_quality-e158e1db87073c4d.md",
+      "characters": 3275
+    },
+    {
+      "path": "construction/sandy_circle_skirt",
+      "sha256": "da2f5158e2ce1abc6b78d92c1d602e34f3ae49afa2c634d2a6f251f025dfa90b",
+      "file": "evidence/context-companion-review/construction-sandy_circle_skirt-da2f5158e2ce1abc.md",
+      "characters": 4362
+    },
+    {
+      "path": "construction/tina_faux_wrap_top",
+      "sha256": "b096960d0594e0e467465010db90269599fe4a0d7fa2c9db7f10fe92783499a5",
+      "file": "evidence/context-companion-review/construction-tina_faux_wrap_top-b096960d0594e0e4.md",
+      "characters": 5880
+    }
+  ],
+  "checks": {
+    "bothDistinctCandidatesPresent": true,
+    "diagnosticPendingReviewDisclosed": true,
+    "diagnosticOriginAttributed": true,
+    "observedUntestedShortcutAbsent": false,
+    "garmentUnpickingProhibited": true,
+    "diagnosticDoesNotFalselyExcludeTension": true,
+    "diagnosticStableSourceIdentities": true,
+    "planningStableSourceIdentities": true,
+    "planningPieceRowsMatchExactCatalog": true,
+    "planningMeasurementsPreserved": true,
+    "fabricStableSourceIdentities": true,
+    "fabricObservedUnsubstantiatedClaimsAbsent": true,
+    "constructionStableSourceIdentities": true,
+    "constructionDiagnosticEligibilityMatchesExactRecords": true,
+    "constructionOptionalStepsCarryPrerequisites": true
+  },
+  "automatedChecksPassed": false,
+  "observedNotTestedBranch": null,
+  "diagnosticCitationIdentityReviewRequired": false,
+  "planningCitationIdentityReviewRequired": false,
+  "materialEditorialReviewRequired": false,
+  "constructionEditorialReviewRequired": false,
+  "makerReviewNotEstablished": true,
+  "importCountAndBuildJobNotVerified": true
+}

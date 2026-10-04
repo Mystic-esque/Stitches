@@ -1,5 +1,19 @@
 # Implementation decisions
 
+## October 4, 2026 — verified migration boundaries
+
+- Treat the owner terminal build as current production-build evidence, labeled as owner-reported. The current full serial suite passes 137 tests with 3 opt-in skips. Actual local Chrome checks establish five-view navigation, URL Back/Forward, responsive Make/Pattern behavior and recoverable local failures; these do not establish maker approval.
+- The rebuilt Stitches Context diagnostic passes all 15 current live verifier checks, including exact test/remedy IDs and a scrap-test-first branch. Keep agent diagnosis paused until the runtime retrieves that leaf, checks exact applicability and pins the maker's observed result. A successful editorial page does not itself authorize a model-generated remedy.
+- Keep the invalid historical search comparison withdrawn. A same-corpus scored answer benchmark and physical/source rights evidence remain separate exit gates.
+
+## October 4, 2026 — Approved workspace migration and evidence correction
+
+- The owner approved `WORKSPACE-AGENT-DIRECTION.md` as the target. Keep the existing private project store, exact Sanity graph, scoped KB and durable bounded run infrastructure; incrementally reorganize the UI into five focused views and a collapsible companion. This first shell does not satisfy selection-pinned autonomy or cut-ready/maker gates.
+- Preserve variant-specific Sandy pieces in making projection while excluding only disabled Tina options. A construction diagram must expose missing authored piece/edge bindings, never invent a join.
+- Withdraw the old 5/5 versus 1/5 benchmark result. Its script assigned the Companion result instead of measuring it and used local records while claiming a live/same-corpus comparison. Replace it with a non-scored fixture search probe, then run a genuine frozen same-corpus answer evaluation before differentiation claims.
+- Do not add Sanity schema fields or rebuild the KB for a UI shell. The unresolved diagnostic test/remedy identities remain an explicit agent safety gate.
+- The frozen installed Sanity 6.15 package does not export the optional schema `define*` helpers from its root in this environment, although plain schema objects are supported. Keep tiny local identity wrappers for the existing schema until a verified package update restores those exports; do not substitute undocumented Sanity APIs.
+
 ## October 4, 2026 — Construction agent binding, single-turn tool sequencing, and search benchmark
 
 - **Bind making state to agent basis:** Added `makingSequence`, `makingHash`, and `planFingerprint` directly to `agentBasisSchema` and `companionBasis()`. Any checkpoint confirmation or reconfiguration invalidates active runs immediately, eliminating stale making guidance.
@@ -7,7 +21,7 @@
 - **Fail closed on missing construction KB:** `companionKbPaths()` throws when a construction leaf is absent rather than silently falling back to planning paths, preventing deceptive evidence satisfaction.
 - **Explicit turn sequencing for Gemini 3.5:** Replaced "Four requests total" in the system instruction with "Never call tools in parallel; invoke exactly one tool call per turn. In turn 1 call inspect_project, in turn 2 call inspect_making, in turn 3 call retrieve_context; then in turn 4 explain the active step...". This prevents Gemini 3.5 parallel tool calling and ensures strict single-read turns matching server expectations.
 - **Visual relationship diagrams for construction steps:** Introduced `StepRelationshipDiagram` SVG visualization in `MakeWorkspace` to visually convey piece layering, RST seams, fold lines, and pair relationships, moving the experience from text-heavy to visually instructive.
-- **Frozen fair search benchmark:** Evaluated 5 frozen maker tasks against 33 exact Sanity records comparing naive keyword search with Stitches exact graph + Context KB. Keyword search fails 4/5 tasks due to lack of state, DAG, and diagnostic safety awareness; Stitches passes 5/5.
+- **Historical benchmark claim retracted:** This October 4 script/report did not actually execute and grade Companion answers; its rate is invalid. See the correction above and current `STATUS.md`.
 
 ## October 2, 2026 — Exact construction learning and independent KB qualification
 

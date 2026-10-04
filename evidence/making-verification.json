@@ -1,6 +1,6 @@
 {
   "kind": "actual-production-construction-api-and-browser",
-  "checkedAt": "2026-10-04T02:51:57.574Z",
+  "checkedAt": "2026-10-04T18:40:29.295Z",
   "passed": true,
   "syntheticPrivateGuests": true,
   "source": "actual-Stitches-development-Content-Lake",
@@ -92,12 +92,19 @@
         "ratio": 6.2378654287554
       },
       {
+        "selector": ".making-pieces li span",
+        "ratio": 6.6887123803036435
+      },
+      {
         "selector": ".making-primary",
         "ratio": 9.02232720913999
       }
     ],
     "nativeKeyboardConfiguration": true,
     "confirmedConditionalReconfigurationPersists": true,
+    "fiveFocusViewsNavigate": true,
+    "browserHistoryRestoresWorkspaceView": true,
+    "freshMobileCompanionDefaultsClosed": true,
     "actualCommittedSaveLostAcknowledgementExactReplayNoDuplicate": true,
     "injectedReadFailurePreservesHistoryAndActualRecovery": true,
     "restoredHistoryRequiresFreshConfiguration": true,

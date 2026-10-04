@@ -5,6 +5,15 @@ revision: companion-2.0
 ---
 # Stitches Companion 2.0 — executable build checklist
 
+## Approved workspace-agent migration (October 4)
+
+- [x] Approve the persistent project workspace and review both concept images/video against current behavior (`../docs/WORKSPACE-AGENT-DIRECTION.md`).
+- [x] Correct the invalid hard-coded search comparison. The replacement local probe scores **zero** agent tasks; a fair live/same-corpus answer comparison remains open in W09.
+- [x] Verify the five-view project shell, stable view URL/back behavior, collapsible responsive companion and condition-aware piece/diagram fixes with typecheck, tests, build, five-width keyboard/browser review and fresh actual screenshots. Owner terminal build, 137 passing tests, live production Chrome and visually inspected captures are recorded in STATUS.
+- [ ] Pin selected piece/edge/step at send time, validate exact IDs and basis server-side, make agent consent/context task-specific, and return an inspectable sourced artifact rather than only prose.
+- [ ] Diagnostic KB source identities now pass 15/15 live checks; integrate the diagnostic leaf into the agent's stateful discriminating-test flow while preserving uncertain/failed attempts and private history.
+- [ ] Keep the later rights-cleared geometry, registered edit/keep, calibrated layout/print, maker trials, photo analysis and 3D ambitions. None is satisfied by the shell or illustrative drawings.
+
 This replaces the September 29 Studio 1.0 W01–W12 target. Existing proof is preserved, not rebranded as a finished product. At every package update docs/STATUS.md, docs/DECISIONS.md and BUILD_LOG.md with real commands/results, gaps and one next task; commit coherent local milestones. No routine approval stops. Never turn a failed proof gate into a cosmetic substitute.
 
 ## Build preferences and unit of work
@@ -49,7 +58,7 @@ Exit: two sessions cannot cross-read; actual project resumes after restart; stal
 
 ## W03 — Sanity intelligence graph
 - [x] Two separate authored construction-learning graphs (2 plans + 13 steps) created only in development and verified by actual read-back. Fixed exact readers validate refs/conditions/order/pieces/known edge IDs; all records remain pending physical/source review.
-- Current maintenance result: October 2 full rebuild regrouped the KB into seven leaves. Page-specific rewrites repaired both planning pages, construction IDs, optional order and markings eligibility. Actual served verification passes 14/15 checks; the diagnostic test/remedy IDs remain absent. Both actual preparation read-tool journeys pass with the new outline and zero inference. The full KB gate stays open; the earlier eleven-check result below is historical. See `../evidence/companion-context-verification.json`.
+- Current maintenance result: the October 4 targeted diagnostic rewrite restored exact test/remedy IDs. Fresh actual Content Lake and served Context verification passes 15/15 checks. Source/maker approval and full diagnostic agent behavior remain open. The October 2 14/15 result and earlier eleven-check result are historical. See `../evidence/companion-context-verification.json`.
 - Historical October 1 maintenance evidence: real not-tested shortcut corrected through two guarded source-field updates; both candidate fingerprints changed. Targeted rewrites then passed eleven content/source checks including nine exact piece rows. The October 2 rebuild supersedes that served state. Source/maker review, import metadata and complete two-project recovery remain open. See `../docs/KB-CONSTRUCTION-REVIEW.md` and current STATUS.
 - Verified current slice: four source/candidate records, nine conditional planning-piece records, and six shared diagnostic/source records, all pending review in `l4eeamth/development`, are read through an exact 19-ID catalog API. Guest projects pin candidate/piece **and shared-method** fingerprints; stale bindings require explicit refresh without rewriting notes. Failed reads pause both studies. Actual served Companion KB entries now pass eleven content/source checks. The 32-document import/build metadata and independent source/maker review are still unverified; served content is verified separately, not inferred from the dashboard count.
 - [ ] Extend existing schema with components, technique, equipment/fabric classes, procedures, issue patterns, diagnostic tests and remedies; preserve current pattern/step refs.
@@ -94,7 +103,7 @@ Exit: actual maker journey through pause/recovery; test wrong-step, missing sour
 Exit: supported/unsupported/occluded photos and privacy/quota tests; no photo output promoted to cut-ready evidence.
 
 ## W08 — Bounded agent and real integration
-- Current actual preparation retrieval passes for Sandy/Tina after page-specific attribution repairs; the full KB gate is 14/15 because diagnostic test/remedy IDs are missing. The outline adapter handles regrouping and refuses unreliable numeric references. Earlier live-provider receipts below remain dated evidence; this batch makes zero new model calls and does not qualify diagnostic agent tools.
+- Current actual preparation retrieval passes for Sandy/Tina. The October 4 live KB editorial gate is 15/15 after the targeted diagnostic rewrite; the agent troubleshooting path is still paused until it retrieves and validates that leaf. Earlier live-provider receipts remain dated evidence; this batch makes zero new model calls.
 - [x] Read-only preparation tools: project/source/history binding, minimized summary, fixed exact graph and scoped actual KB. Synthetic protocol/SDK tests and actual two-project Content Lake/Context read rehearsal pass.
 - [x] Durable read-only run control: owner-scoped SQLite checkpoints/start replay/request reservations, signed provider history, four-attempt/120-active-second and conservative daily bounds, cancel/continue/stale/known-quota/unknown-outcome states. Acknowledged failed reads can recover without another model request. No automatic ambiguous provider retry or model writes.
 - [x] Contextual preparation consent/history/manual-fallback UI implemented and actual five-width production rehearsal passed at 12:50:48Z. Three registered questions share minimized states/public source context, not private prose/body values/photos. Earlier basis and unverified model text remain labeled. Real private start/cancel/reload uses zero inference in this browser check; separate live receipts cover Gemini. Duplicate-key reload defect fixed with a single-history regression.
@@ -123,7 +132,7 @@ Exit: measured results with provenance and failures. No superiority claim withou
 Exit: STATUS separates working, digitally checked, maker reviewed and blocked capabilities. If physical evidence is unavailable, useful planning/making assistance may ship in local preview but cut-ready claim stays blocked.
 
 ## First next task
-Next: finish the construction batch's final production/browser rehearsal and verify the page-specific KB correction. Then extend the agent to the verified step/diagnostic tools with current private-context binding; source/physical qualification still gates actual-garment actions. The authored learning graphs and measured board do not approve notch mates, complete pattern geometry, source/output rights or cutting. Keep the curved count conflict and Tina engine qualification separate. The original first-three cards below remain full qualification gates.
+Next: bind selected piece/edge/step context to a server-validated agent run, then use the now-verified diagnostic KB leaf for a stateful, scrap-only test flow in both project contexts. The current production/browser and 15/15 KB editorial gates pass; source/physical qualification still gates actual-garment actions. The authored learning graphs and measured board do not approve notch mates, complete pattern geometry, source/output rights or cutting. Keep the curved count conflict and Tina engine qualification separate. The original first-three cards below remain full qualification gates.
 
 ### Atomic task cards — first three and final handoff
 
